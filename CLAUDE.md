@@ -2,6 +2,8 @@
 
 This file contains standing instructions for Claude Code when working in this project directory. Claude should follow these rules throughout every session.
 
+*Dernière mise à jour : 2026-02-23*
+
 ---
 
 ## Communication Style

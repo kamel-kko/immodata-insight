@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(where:*)",
+      "Bash(winget:*)",
+      "Bash(gh auth status:*)",
+      "Bash(where.exe:*)",
+      "Bash(powershell -Command \"Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\":*)",
+      "Bash(powershell -Command:*)",
+      "Bash(git init:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git -C:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git -C \"P:/CLAUDE CODE\" add -A && git -C \"P:/CLAUDE CODE\" commit -m \"Sauvegarde automatique\" && git -C \"P:/CLAUDE CODE\" push"
+          }
+        ]
+      }
+    ]
+  }
+}
