@@ -10,7 +10,9 @@
       "Bash(powershell -Command:*)",
       "Bash(git init:*)",
       "Bash(gh repo create:*)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "WebFetch(domain:www.ffbatiment.fr)",
+      "WebFetch(domain:apicarto.ign.fr)"
     ]
   },
   "hooks": {
