@@ -180,7 +180,7 @@ with st.sidebar:
 
     # ── Langfuse ────────────────────────────────────────
     st.divider()
-    st.caption("📊 [Langfuse](http://localhost:3001)")
+    st.caption("📊 [Langfuse](http://localhost:3003)")
 
     # ── Section Rollback ────────────────────────────────
     if not SAAS_MODE:
