@@ -14,7 +14,11 @@
       "WebFetch(domain:www.ffbatiment.fr)",
       "WebFetch(domain:apicarto.ign.fr)",
       "Bash(docker --version)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(docker info:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker ps:*)",
+      "Bash(netstat -ano)"
     ]
   },
   "hooks": {
