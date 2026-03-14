@@ -20,7 +20,7 @@ from langgraph.graph import StateGraph, END, START
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.sqlite import SqliteSaver
-from langfuse.callback import CallbackHandler
+from langfuse.langchain import CallbackHandler
 
 from tool_runner import charger_outils
 
