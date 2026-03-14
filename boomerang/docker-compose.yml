@@ -1,0 +1,126 @@
+version: "3.9"
+
+services:
+
+  boomerang_app:
+    build: .
+    container_name: boomerang_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./boomerang_tools:/app/boomerang_tools
+      - ./temp_tools:/app/temp_tools
+      - ./tests:/app/tests
+      - ./backups:/app/backups
+      - ~/.claude:/root/.claude:ro          # Auth Claude Code depuis l'hôte (Pro/Max)
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker : pilotage des containers outils
+      - .:/app/project:ro                          # Accès au docker-compose.yml de l'hôte
+    env_file: .env
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+      - LANGFUSE_HOST=http://langfuse:3000
+      - PYTHONPATH=/app
+      - COMPOSE_FILE=/app/project/docker-compose.yml  # chemin stable pour subprocess docker compose
+    group_add:
+      - "${DOCKER_GROUP_ID:-999}"  # GID du groupe docker sur l'hôte (évite sudo)
+    depends_on:
+      searxng:
+        condition: service_healthy
+      langfuse:
+        condition: service_started
+      tool_recherche_searxng:
+        condition: service_healthy
+      tool_notice_securite:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - boomerang_net   # accès Internet et services
+      - tools_net       # accès aux containers outils
+
+  # ── Outils containerisés ──────────────────────────────
+  tool_recherche_searxng:
+    build: ./boomerang_tools/tool_recherche_searxng
+    container_name: tool_recherche_searxng
+    ports:
+      - "8001:8001"
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+    depends_on:
+      searxng:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - tools_net       # réseau interne outils
+      - boomerang_net   # accès Internet requis (via SearXNG)
+    # ↑ REQUIERT_INTERNET: oui — doit accéder à searxng qui accède au web
+
+  tool_notice_securite:
+    build: ./boomerang_tools/tool_notice_securite
+    container_name: tool_notice_securite
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
+    networks:
+      - tools_net       # réseau interne isolé — pas d'accès Internet
+    # ↑ REQUIERT_INTERNET: non — calcul local uniquement
+
+  # ── SearXNG ────────────────────────────────────────────
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng_settings:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - boomerang_net
+
+  langfuse-db:
+    image: postgres:15-alpine
+    container_name: langfuse_db
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    volumes:
+      - ./data/langfuse_pg:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - boomerang_net
+
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: langfuse
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      - NEXTAUTH_SECRET=boomerang-secret-change-me
+      - NEXTAUTH_URL=http://localhost:3000
+      - SALT=boomerang-salt-change-me
+      - TELEMETRY_ENABLED=false
+    depends_on:
+      - langfuse-db
+    restart: unless-stopped
+    networks:
+      - boomerang_net
+
+networks:
+  boomerang_net:
+    driver: bridge          # réseau principal — accès Internet
+
+  tools_net:
+    driver: bridge
+    internal: true          # ← clé Docker : coupe l'accès Internet
+    # Les outils sur ce réseau ne peuvent joindre que d'autres containers
+    # Pas d'accès à Internet sauf si le container est AUSSI sur boomerang_net
