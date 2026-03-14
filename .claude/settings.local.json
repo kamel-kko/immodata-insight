@@ -24,7 +24,17 @@
       "Bash(grep -q \":$p \")",
       "Bash(echo \"$p: USED\")",
       "Bash(echo \"$p: FREE\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(curl -s http://localhost:8001/health)",
+      "Bash(curl -s http://localhost:8002/health)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3003)",
+      "Bash(curl -s -o /dev/null -w \"streamlit: %{http_code}\\\\n\" http://localhost:8501)",
+      "Bash(curl -s -o /dev/null -w \"searxng: %{http_code}\\\\n\" http://localhost:8080)",
+      "Bash(curl -s -o /dev/null -w \"langfuse: %{http_code}\\\\n\" http://localhost:3003)",
+      "Bash(docker exec boomerang_app python -c \":*)",
+      "Bash(docker exec:*)"
     ]
   },
   "hooks": {
