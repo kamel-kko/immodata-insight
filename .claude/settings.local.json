@@ -18,7 +18,13 @@
       "Bash(docker info:*)",
       "Bash(docker rm:*)",
       "Bash(docker ps:*)",
-      "Bash(netstat -ano)"
+      "Bash(netstat -ano)",
+      "Bash(for p:*)",
+      "Bash(do netstat:*)",
+      "Bash(grep -q \":$p \")",
+      "Bash(echo \"$p: USED\")",
+      "Bash(echo \"$p: FREE\")",
+      "Bash(done)"
     ]
   },
   "hooks": {
