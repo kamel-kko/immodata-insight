@@ -12,7 +12,9 @@
       "Bash(gh repo create:*)",
       "Bash(git -C:*)",
       "WebFetch(domain:www.ffbatiment.fr)",
-      "WebFetch(domain:apicarto.ign.fr)"
+      "WebFetch(domain:apicarto.ign.fr)",
+      "Bash(docker --version)",
+      "Bash(docker compose:*)"
     ]
   },
   "hooks": {
