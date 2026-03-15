@@ -85,7 +85,7 @@ class LocalTool(BaseTool):
 
     def _run(self, **kwargs) -> str:
         try:
-            result = self._func(**kwargs)
+            result = self.local_func(**kwargs)
             if isinstance(result, dict):
                 return result.get("output", str(result))
             return str(result)
