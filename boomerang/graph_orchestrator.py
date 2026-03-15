@@ -33,6 +33,28 @@ os.makedirs("/app/data", exist_ok=True)
 
 logger = logging.getLogger(__name__)
 
+# Modeles connus pour supporter nativement le tool calling Ollama.
+# Les autres basculeront en mode "prompt-based" (instructions textuelles).
+TOOL_CAPABLE_MODELS = [
+    "llama3", "llama3.1", "llama3.2", "llama3.3",
+    "qwen", "qwen2", "qwen2.5", "qwen3",
+    "mistral", "mixtral", "mistral-small", "mistral-large",
+    "gemma", "gemma2", "gemma3",
+    "command-r", "command-r-plus",
+    "firefunction",
+    "hermes", "nous-hermes",
+    "deepseek-v2", "deepseek-v3",
+]
+
+
+def _modele_supporte_tools(model_name: str) -> bool:
+    """Verifie si le modele Ollama supporte le tool calling natif."""
+    model_lower = model_name.lower().split(":")[0]
+    for capable in TOOL_CAPABLE_MODELS:
+        if capable in model_lower:
+            return True
+    return False
+
 
 # ── Sélection LLM ──────────────────────────────────────
 
