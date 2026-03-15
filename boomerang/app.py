@@ -736,6 +736,7 @@ else:
         st.session_state.attached_file_ctx = None
 
         # Invoquer le graphe avec le modele selectionne
+        current_model = st.session_state.ollama_model
         with st.chat_message("assistant"):
             with st.status("Agent en reflexion...") as status:
                 try:
@@ -743,20 +744,28 @@ else:
                         llm_text,
                         thread_id,
                         status_widget=status,
-                        model_name=st.session_state.ollama_model,
+                        model_name=current_model,
                     )
+                    # Succes : memoriser ce modele comme dernier fonctionnel
+                    st.session_state.last_working_model = current_model
                 except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(f"Erreur invoke_graph: {e}")
+
+                    last_ok = st.session_state.get("last_working_model", "")
+                    suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
+
                     result = {
                         "response": (
-                            "Desole, une erreur s'est produite lors du traitement "
-                            "de votre demande. Veuillez reformuler votre question "
-                            "ou reessayer dans quelques instants."
+                            f"Le modele **{current_model}** a rencontre une difficulte "
+                            f"avec votre demande.{suggestion}\n\n"
+                            "Vous pouvez :\n"
+                            "- Reformuler votre question\n"
+                            "- Changer de modele dans la sidebar (qwen3:14b, llama3.2:3b, gemma3:12b)\n"
+                            "- Reessayer dans quelques instants"
                         ),
                         "besoin_forge": None,
                     }
-                    logger_msg = f"Erreur invoke_graph: {str(e)}"
-                    import logging
-                    logging.getLogger(__name__).error(logger_msg)
 
             if result.get("besoin_forge") and not SAAS_MODE:
                 st.session_state.besoin_forge = result["besoin_forge"]
