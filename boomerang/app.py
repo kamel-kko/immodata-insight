@@ -835,7 +835,7 @@ else:
     else:
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
+                _render_message_content(msg["content"])
 
     # ══════════════════════════════════════════════════════
     #  TRAITEMENT DU MESSAGE PENDING
