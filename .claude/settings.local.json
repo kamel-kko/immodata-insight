@@ -83,7 +83,10 @@
       "Bash(findstr \":8002\")",
       "Bash(findstr -A5 \"tool_notice_securite\")",
       "Bash(timeout /t 10 /nobreak)",
-      "Bash(curl -s --max-time 3 http://localhost:$port/health)"
+      "Bash(curl -s --max-time 3 http://localhost:$port/health)",
+      "Bash(curl -s --max-time 3 http://localhost:9000/servers-dashboard.html)",
+      "Bash(curl -s --max-time 3 -o /dev/null -w \"%{http_code}\" http://localhost:9000/servers-dashboard.html)",
+      "Bash(start \"\" \"P:\\\\CLAUDE CODE\\\\boomerang\\\\.claude\\\\servers-dashboard.html\")"
     ]
   },
   "hooks": {

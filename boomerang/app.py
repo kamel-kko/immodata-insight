@@ -520,20 +520,11 @@ with st.sidebar:
 
 id_projet = st.session_state.id_projet
 
-
-# ══════════════════════════════════════════════════════════
-#  ZONE PRINCIPALE
-# ══════════════════════════════════════════════════════════
-
-if not id_projet:
-    st.info("Selectionnez ou creez un projet dans le panneau Projet.")
-    st.stop()
-
-thread_id = f"projet_{id_projet}"
+thread_id = f"projet_{id_projet}" if id_projet else None
 
 # ── État FORGE ──────────────────────────────────────────
 
-if not SAAS_MODE and st.session_state.forge_mode is not None:
+if id_projet and not SAAS_MODE and st.session_state.forge_mode is not None:
 
     st.warning("🔨 Outil forgé — révision requise avant intégration")
 
