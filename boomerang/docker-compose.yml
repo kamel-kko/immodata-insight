@@ -63,6 +63,41 @@ services:
       - tools_net       # réseau interne isolé — pas d'accès Internet
     # ↑ REQUIERT_INTERNET: non — calcul local uniquement
 
+  tool_api_urbanisme:
+    build: ./boomerang_tools/tool_api_urbanisme
+    container_name: tool_api_urbanisme
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+    networks:
+      - tools_net       # réseau interne outils
+      - boomerang_net   # accès Internet requis (APIs BAN + GPU)
+    # REQUIERT_INTERNET: oui — appelle les APIs publiques BAN et Géoportail de l'Urbanisme
+
+  tool_mcp_legal:
+    build: ./boomerang_tools/tool_mcp_legal
+    container_name: tool_mcp_legal
+    ports:
+      - "8004:8004"
+    environment:
+      - MCP_LEGAL_SERVER_URL=${MCP_LEGAL_SERVER_URL:-http://localhost:8000}
+    restart: unless-stopped
+    networks:
+      - tools_net       # réseau interne outils
+      - boomerang_net   # accès Internet requis (serveur MCP)
+    # REQUIERT_INTERNET: oui — connexion au serveur MCP juridique
+
+  tool_georisques:
+    build: ./boomerang_tools/tool_georisques
+    container_name: tool_georisques
+    ports:
+      - "8005:8005"
+    restart: unless-stopped
+    networks:
+      - tools_net       # réseau interne outils
+      - boomerang_net   # accès Internet requis (APIs BAN + Géorisques)
+    # REQUIERT_INTERNET: oui — appelle les APIs publiques BAN et Géorisques
+
   # ── SearXNG ────────────────────────────────────────────
   searxng:
     image: searxng/searxng:latest
