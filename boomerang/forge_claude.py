@@ -264,12 +264,25 @@ def forger_outil(
     requiert_internet = response.get("requiert_internet", False)
     pip_package = response.get("pip_package")
 
+    # Validation statique du code genere AVANT ecriture sur disque
+    _status("🔒 Validation de sécurité du code généré...")
+    problemes = _valider_code_forge(server_py)
+    if problemes:
+        msg = "Code rejeté — problèmes de sécurité détectés :\n" + "\n".join(f"  - {p}" for p in problemes)
+        logger.warning(f"[FORGE] {msg}")
+        if trace:
+            trace.update(output={"erreur": msg, "problemes": problemes}, level="WARNING")
+        return {"statut": "erreur", "message": msg}
+
     if pip_package and pip_package != "null":
         _status(f"📦 Installation de {pip_package}...")
-        subprocess.run(
-            ["pip", "install", pip_package],
-            capture_output=True, text=True, timeout=60,
-        )
+        try:
+            subprocess.run(
+                ["pip", "install", pip_package],
+                capture_output=True, text=True, timeout=60,
+            )
+        except Exception as e:
+            logger.warning(f"[FORGE] pip install {pip_package} echoue : {e}")
 
     # Écrire les fichiers dans temp_tools/
     temp_dir = os.getenv("TEMP_TOOLS_DIR", "/app/temp_tools")
