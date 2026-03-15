@@ -913,7 +913,7 @@ else:
                 st.rerun()
             else:
                 response = result.get("response", "")
-                st.markdown(response)
+                _render_message_content(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 sauvegarder_message(id_projet, "assistant", response)
 
