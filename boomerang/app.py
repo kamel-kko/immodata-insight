@@ -34,6 +34,7 @@ SAAS_MODE = os.getenv("SAAS_MODE", "false").lower() == "true"
 # ── Persistance des settings ─────────────────────────
 from pathlib import Path as _Path
 import json as _json
+import portalocker as _portalocker
 
 SETTINGS_FILE = _Path("/app/data/settings.json")
 
@@ -51,7 +52,9 @@ def load_settings() -> dict:
     if SETTINGS_FILE.exists():
         try:
             with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                _portalocker.lock(f, _portalocker.LOCK_SH)
                 stored = _json.load(f)
+                _portalocker.unlock(f)
                 defaults.update(stored)
         except (ValueError, IOError):
             pass
@@ -63,7 +66,9 @@ def save_settings(key: str, value) -> None:
     settings = load_settings()
     settings[key] = value
     with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+        _portalocker.lock(f, _portalocker.LOCK_EX)
         _json.dump(settings, f, ensure_ascii=False, indent=2)
+        _portalocker.unlock(f)
 
 # ── Imports internes ────────────────────────────────────
 
