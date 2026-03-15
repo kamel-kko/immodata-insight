@@ -154,6 +154,9 @@ services:
     networks:
       - boomerang_net
 
+volumes:
+  boomerang_tools_vol:      # Volume nomme pour les outils Python locaux (Forge)
+
 networks:
   boomerang_net:
     driver: bridge          # réseau principal — accès Internet
