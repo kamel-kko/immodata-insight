@@ -119,3 +119,80 @@ data = pickle.loads(b"malicious")
 '''
     problemes = _valider_code_forge(code)
     assert any("pickle" in p for p in problemes)
+
+
+def test_import_socket_detecte():
+    code = '''
+import socket
+s = socket.socket()
+'''
+    problemes = _valider_code_forge(code)
+    assert any("socket" in p for p in problemes)
+
+
+def test_setattr_detecte():
+    code = '''
+setattr(obj, "attr", "value")
+'''
+    problemes = _valider_code_forge(code)
+    assert any("setattr" in p for p in problemes)
+
+
+def test_globals_detecte():
+    code = '''
+g = globals()
+'''
+    problemes = _valider_code_forge(code)
+    assert any("globals" in p for p in problemes)
+
+
+def test_os_chmod_detecte():
+    code = '''
+import os
+os.chmod("/etc/passwd", 0o777)
+'''
+    problemes = _valider_code_forge(code)
+    assert any("chmod" in p for p in problemes)
+
+
+def test_localhost_string_detecte():
+    code = '''
+import requests
+resp = requests.get("http://127.0.0.1:8080/admin")
+'''
+    problemes = _valider_code_forge(code)
+    assert any("127.0.0.1" in p for p in problemes)
+
+
+def test_metadata_ip_detecte():
+    code = '''
+import requests
+resp = requests.get("http://169.254.169.254/latest/meta-data/")
+'''
+    problemes = _valider_code_forge(code)
+    assert any("169.254" in p for p in problemes)
+
+
+def test_input_detecte():
+    code = '''
+secret = input("Entrez votre mot de passe: ")
+'''
+    problemes = _valider_code_forge(code)
+    assert any("input" in p for p in problemes)
+
+
+def test_from_socket_detecte():
+    code = '''
+from socket import create_connection
+'''
+    problemes = _valider_code_forge(code)
+    assert any("socket" in p for p in problemes)
+
+
+def test_safe_requests_externe_passe():
+    code = '''
+import requests
+resp = requests.get("https://api.georisques.gouv.fr/v1/resultats")
+'''
+    problemes = _valider_code_forge(code)
+    assert problemes == []
