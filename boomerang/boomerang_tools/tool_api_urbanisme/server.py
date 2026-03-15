@@ -79,7 +79,7 @@ def generer_url_carte_wms(lat: float, lon: float, zoom: int = 17) -> str:
     """Construit l'URL WMS Geoportail pour une carte cadastrale centree sur lat/lon."""
     bbox = f"{lon - 0.002},{lat - 0.002},{lon + 0.002},{lat + 0.002}"
     return (
-        "https://wxs.ign.fr/geoportail/geoscroll/wms?"
+        "https://data.geopf.fr/wms-v/ows?"
         "SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
         "&LAYERS=CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
         f"&CRS=CRS:84&BBOX={bbox}"

@@ -87,7 +87,9 @@
       "Bash(curl -s --max-time 3 http://localhost:9000/servers-dashboard.html)",
       "Bash(curl -s --max-time 3 -o /dev/null -w \"%{http_code}\" http://localhost:9000/servers-dashboard.html)",
       "Bash(start \"\" \"P:\\\\CLAUDE CODE\\\\boomerang\\\\.claude\\\\servers-dashboard.html\")",
-      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''OK''\\)\")"
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''OK''\\)\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''pdf_export.py'', doraise=True\\); print\\(''Syntaxe OK''\\)\")",
+      "Bash(python -m pytest tests/test_pdf_export.py -v)"
     ]
   },
   "hooks": {
