@@ -442,10 +442,34 @@ with col_right:
         unsafe_allow_html=True,
     )
 
-    if st.session_state.map_url:
+    if st.session_state.plu_loaded and st.session_state.project_lat:
+        lat = st.session_state.project_lat
+        lon = st.session_state.project_lon
+        zone = st.session_state.project_zone or "?"
+        st.markdown(
+            '<div class="drop-zone" style="height:70px;display:flex;'
+            'flex-direction:column;align-items:center;justify-content:center;'
+            f'font-size:11px;color:var(--t2)">Geoportail IGN · Zone {zone}'
+            f'<div style="font-size:10px;color:var(--t3);margin-top:4px">'
+            f'Lat {lat:.4f} · Lon {lon:.4f}</div></div>',
+            unsafe_allow_html=True,
+        )
+        if st.session_state.plu_fiche:
+            try:
+                from boomerang_tools.plu_synthese import exporter_fiche_pdf
+                pdf_bytes = exporter_fiche_pdf(st.session_state.plu_fiche)
+                st.download_button(
+                    "Telecharger fiche PDF",
+                    data=pdf_bytes,
+                    file_name=f"fiche_plu_{st.session_state.project_commune}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                    key="dl_pdf",
+                )
+            except Exception:
+                pass
+    elif st.session_state.map_url:
         st.image(st.session_state.map_url, use_container_width=True)
-    elif st.session_state.schema_path:
-        st.image(st.session_state.schema_path, use_container_width=True)
     elif st.session_state.mermaid_code:
         st.components.v1.html(
             "<div class='mermaid'>" + st.session_state.mermaid_code + "</div>"
