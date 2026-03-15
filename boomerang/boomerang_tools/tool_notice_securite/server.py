@@ -26,9 +26,18 @@ def health():
 @app.post("/run")
 def run(body: RunInput) -> dict:
     p = body.input
-    type_erp = p.get("type_erp", "N")
-    capacite = int(p.get("capacite", 100))
-    description = p.get("description", "")
+    type_erp = str(p.get("type_erp", "N")).upper().strip()
+    if not type_erp or len(type_erp) > 5:
+        return {"output": "Erreur : type_erp invalide (attendu : M, L, N, O, R, W, etc.)"}
+
+    try:
+        capacite = int(p.get("capacite", 100))
+    except (ValueError, TypeError):
+        return {"output": "Erreur : capacite doit etre un nombre entier."}
+    if capacite < 1 or capacite > 100000:
+        return {"output": f"Erreur : capacite hors limites (1-100000). Recu : {capacite}"}
+
+    description = str(p.get("description", ""))[:2000]
 
     if capacite > 1500:   cat_label = "1ère catégorie (>1500 pers.)"
     elif capacite > 700:  cat_label = "2ème catégorie (701-1500 pers.)"
