@@ -169,6 +169,10 @@ def rechercher_plu_gpu(code_insee: str, lat: float = None, lon: float = None) ->
         "gpu_doc_id": gpu_doc_id,
         "archive_url": archive_url,
         "fichiers_pdf": [f for f in fichiers if f.endswith(".pdf")],
+        "zone_parcelle": zone_parcelle,
+        "nomfic": nomfic,
+        "idurba": idurba,
+        "partition": partition,
     }
 
 
