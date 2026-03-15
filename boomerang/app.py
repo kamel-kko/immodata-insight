@@ -292,7 +292,11 @@ with col_left:
 
     if st.button("Analyser", key="btn_analyse", use_container_width=True):
         st.session_state.project_address = addr_input
-        st.info("Module PLU non encore charge.")
+        if addr_input.strip():
+            st.session_state.plu_loading = True
+            st.rerun()
+        else:
+            st.warning("Saisissez une adresse.")
 
     if st.session_state.project_commune:
         st.markdown(f"""
