@@ -38,17 +38,27 @@ import json as _json
 SETTINGS_FILE = _Path("/app/data/settings.json")
 
 
+_SETTINGS_DEFAULTS = {
+    "streaming_enabled": True,
+    "hybrid_mode": False,
+    "model_fast": "llama3.2:1b",
+    "model_slow": "qwen2.5:14b",
+}
+
+
 def load_settings() -> dict:
+    defaults = dict(_SETTINGS_DEFAULTS)
     if SETTINGS_FILE.exists():
         try:
             with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-                return _json.load(f)
+                stored = _json.load(f)
+                defaults.update(stored)
         except (ValueError, IOError):
-            return {}
-    return {}
+            pass
+    return defaults
 
 
-def save_settings(key: str, value: str) -> None:
+def save_settings(key: str, value) -> None:
     SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
     settings = load_settings()
     settings[key] = value
