@@ -714,46 +714,43 @@ async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
     full_text = ""
     besoin_forge = None
 
-    try:
-        async for event in _asyncio.wait_for(
-            _collect_stream_events(graph, user_input, config, on_token, on_tool_start, on_tool_end),
-            timeout=GRAPH_TIMEOUT,
+    async def _run_stream():
+        nonlocal full_text, besoin_forge
+        async for event in graph.astream_events(
+            {"messages": [HumanMessage(content=user_input)]},
+            config=config,
+            version="v2",
         ):
-            pass
+            kind = event.get("event", "")
+
+            if kind == "on_chat_model_stream":
+                chunk = event.get("data", {}).get("chunk")
+                if chunk and hasattr(chunk, "content") and chunk.content:
+                    full_text += chunk.content
+                    if on_token:
+                        on_token(chunk.content)
+
+            elif kind == "on_tool_start":
+                tool_name = event.get("name", "")
+                if on_tool_start:
+                    on_tool_start(tool_name)
+
+            elif kind == "on_tool_end":
+                tool_name = event.get("name", "")
+                if on_tool_end:
+                    on_tool_end(tool_name)
+
+        if full_text:
+            besoin_forge = _detecter_besoin_forge(full_text)
+
+    try:
+        await _asyncio.wait_for(_run_stream(), timeout=GRAPH_TIMEOUT)
     except _asyncio.TimeoutError:
         logger.error(f"[stream_graph] Timeout apres {GRAPH_TIMEOUT}s")
         if on_token:
             on_token(f"\n\n⚠️ Timeout ({GRAPH_TIMEOUT}s). Reformulez ou changez de modele.")
-        return {"response": full_text, "besoin_forge": None}
 
-    # On utilise un helper interne pour collecter le texte
-    # (la boucle est dans _collect_stream_events pour le timeout)
-    return {"response": full_text, "besoin_forge": besoin_forge}
-
-
-async def _collect_stream_events(graph, user_input, config, on_token, on_tool_start, on_tool_end):
-    """Helper async generator pour stream_graph avec timeout."""
-    async for event in graph.astream_events(
-        {"messages": [HumanMessage(content=user_input)]},
-        config=config,
-        version="v2",
-    ):
-        kind = event.get("event", "")
-
-        if kind == "on_chat_model_stream":
-            chunk = event.get("data", {}).get("chunk")
-            if chunk and hasattr(chunk, "content") and chunk.content:
-                if on_token:
-                    on_token(chunk.content)
-
-        elif kind == "on_tool_start":
-            tool_name = event.get("name", "")
-            if on_tool_start:
-                on_tool_start(tool_name)
-
-        elif kind == "on_tool_end":
-            tool_name = event.get("name", "")
-            if on_tool_end:
-                on_tool_end(tool_name)
-
-        yield event
+    return {
+        "response": full_text,
+        "besoin_forge": besoin_forge,
+    }
