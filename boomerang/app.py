@@ -237,10 +237,15 @@ def render_topbar():
     zone    = st.session_state.project_zone
     model   = st.session_state.model_choice
 
+    plu_loaded = st.session_state.plu_loaded
     badge_proj = (
-        f'<span class="chip">{commune} · Zone {zone}</span>'
-        if commune
-        else '<span class="chip warn">Aucun projet charge</span>'
+        f'<span class="chip ok">PLU charge · {commune} {zone}</span>'
+        if plu_loaded and commune
+        else (
+            f'<span class="chip">{commune} · Zone {zone}</span>'
+            if commune
+            else '<span class="chip warn">Aucun projet charge</span>'
+        )
     )
     badge_model = (
         f'<span class="chip">{model}</span>'
