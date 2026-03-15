@@ -518,26 +518,30 @@ with st.sidebar:
                     if st.button(f"↩️ Restaurer {nom_outil}", key=f"btn_rollback_{nom_outil}"):
                         version = next(v for v in versions if v["timestamp"] == selected)
                         service_name = f"tool_{nom_outil}"
-                        # Arrêter le container
-                        subprocess.run(
-                            ["docker", "compose", "stop", service_name],
-                            cwd="/app/project",
-                            capture_output=True, timeout=30,
-                        )
-                        # Remplacer par le backup
-                        dest = os.path.join(
-                            os.getenv("TOOLS_DIR", "/app/boomerang_tools"),
-                            service_name,
-                        )
-                        if os.path.exists(dest):
-                            shutil.rmtree(dest)
-                        shutil.copytree(version["path"], dest)
-                        # Relancer
-                        subprocess.run(
-                            ["docker", "compose", "up", "-d", "--build", service_name],
-                            cwd="/app/project",
-                            capture_output=True, timeout=120,
-                        )
+                        try:
+                            # Arrêter le container
+                            subprocess.run(
+                                ["docker", "compose", "stop", service_name],
+                                cwd="/app/project",
+                                capture_output=True, timeout=30,
+                            )
+                            # Remplacer par le backup
+                            dest = os.path.join(
+                                os.getenv("TOOLS_DIR", "/app/boomerang_tools"),
+                                service_name,
+                            )
+                            if os.path.exists(dest):
+                                shutil.rmtree(dest)
+                            shutil.copytree(version["path"], dest)
+                            # Relancer
+                            subprocess.run(
+                                ["docker", "compose", "up", "-d", "--build", service_name],
+                                cwd="/app/project",
+                                capture_output=True, timeout=120,
+                            )
+                        except Exception as e:
+                            logger.error(f"[rollback] Erreur restauration {nom_outil}: {e}")
+                            st.error(f"Erreur lors de la restauration : {e}")
                         # Attendre health
                         url = TOOL_REGISTRY.get(nom_outil, "")
                         if url and _attendre_health(url):
