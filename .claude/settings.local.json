@@ -135,7 +135,10 @@
       "Bash(mkdir -p ~/.streamlit)",
       "Bash(~/.streamlit/credentials.toml:*)",
       "Bash(taskkill //F //IM streamlit.exe)",
-      "Bash(pkill -f streamlit)"
+      "Bash(pkill -f streamlit)",
+      "Bash(mkdir -p backup_20260315)",
+      "Bash(cp app.py graph_orchestrator.py requirements.txt backup_20260315/)",
+      "Bash(cp -r boomerang_tools backup_20260315/)"
     ]
   },
   "hooks": {
