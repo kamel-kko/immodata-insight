@@ -1,21 +1,8 @@
 # REQUIERT_INTERNET: oui — appelle les APIs publiques BAN et Georisques (BRGM)
-import os
 import re
-import logging
 import requests
 from fastapi import FastAPI
 from pydantic import BaseModel
-
-logger = logging.getLogger(__name__)
-
-# Importer le cache si disponible (en container, PYTHONPATH=/app)
-try:
-    from db_manager import get_cache, set_cache
-    CACHE_AVAILABLE = True
-except ImportError:
-    CACHE_AVAILABLE = False
-
-CACHE_TTL_JOURS = int(os.getenv("CACHE_TTL_JOURS", "7"))
 
 app = FastAPI()
 TOOL_NAME = "recherche_risques_parcelle"
