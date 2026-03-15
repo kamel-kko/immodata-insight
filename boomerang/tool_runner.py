@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 try:
     from db_manager import get_cache, set_cache
     _CACHE_AVAILABLE = True
-except ImportError:
+except Exception:
     _CACHE_AVAILABLE = False
 
 _CACHE_ENABLED = os.getenv("CACHE_ENABLED", "1") != "0"

@@ -43,7 +43,9 @@
       "Bash(curl -s -X POST http://localhost:8005/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"12 rue de Rivoli Paris\"\"\"\"}}')",
       "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"Réglementation incendie ERP type M\"\"\"\"}}')",
       "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json; charset=utf-8\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"ERP type M\"\"\"\"}}')",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python -m pytest tests/test_tool_runner.py tests/test_tool_api_urbanisme.py -v --tb=short)",
+      "Bash(pip install:*)"
     ]
   },
   "hooks": {
