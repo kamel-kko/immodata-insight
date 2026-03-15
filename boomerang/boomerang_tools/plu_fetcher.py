@@ -303,9 +303,14 @@ def telecharger_plu(infos_plu: dict, code_insee: str) -> dict:
         logger.error("Fichier ZIP invalide")
         return result
     finally:
-        # Nettoyer le ZIP
+        # Nettoyer le ZIP (avec retry pour Windows qui garde le fichier verrouille)
         if os.path.exists(zip_path):
-            os.remove(zip_path)
+            for _ in range(3):
+                try:
+                    os.remove(zip_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.5)
 
     result["fichiers"] = fichiers_info
 
