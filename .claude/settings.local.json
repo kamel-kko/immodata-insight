@@ -67,7 +67,8 @@
       "Bash(findstr '8501 8001 8002 8003 8004 8005')",
       "Bash(tasklist /FI 'PID eq 37952' /FO TABLE)",
       "Bash(tasklist)",
-      "Bash(wmic process:*)"
+      "Bash(wmic process:*)",
+      "Bash(python -c \"import yaml; print\\(''PyYAML OK:'', yaml.__version__\\)\")"
     ]
   },
   "hooks": {
