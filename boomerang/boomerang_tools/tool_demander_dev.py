@@ -11,6 +11,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+import portalocker
+
 DEV_REQUESTS_FILE = Path("/app/data/dev_requests.json")
 
 
@@ -18,7 +20,10 @@ def _charger_demandes() -> list[dict]:
     if DEV_REQUESTS_FILE.exists():
         try:
             with open(DEV_REQUESTS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                portalocker.lock(f, portalocker.LOCK_SH)
+                data = json.load(f)
+                portalocker.unlock(f)
+                return data
         except (json.JSONDecodeError, IOError):
             return []
     return []
@@ -27,7 +32,9 @@ def _charger_demandes() -> list[dict]:
 def _sauvegarder_demandes(demandes: list[dict]) -> None:
     DEV_REQUESTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(DEV_REQUESTS_FILE, "w", encoding="utf-8") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)
         json.dump(demandes, f, ensure_ascii=False, indent=2)
+        portalocker.unlock(f)
 
 
 def tool_demander_dev(outil_manquant: str, description_fonctionnelle: str) -> dict:
