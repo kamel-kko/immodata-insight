@@ -977,34 +977,45 @@ else:
 
         current_model = st.session_state.ollama_model
         with st.chat_message("assistant"):
-            with st.status("Agent en reflexion...") as status:
-                try:
-                    result = invoke_graph(
-                        llm_text,
-                        thread_id,
-                        status_widget=status,
-                        model_name=current_model,
+            placeholder = st.empty()
+            status_container = st.container()
+
+            # Verifier si le streaming est active dans les settings
+            settings = load_settings()
+            use_streaming = settings.get("streaming_enabled", True)
+
+            try:
+                if use_streaming:
+                    result = _run_streaming(
+                        llm_text, thread_id, current_model,
+                        placeholder, status_container,
                     )
-                    st.session_state.last_working_model = current_model
-                    save_settings("last_model", current_model)
-                except Exception as e:
-                    import logging
-                    logging.getLogger(__name__).error(f"Erreur invoke_graph: {e}")
+                else:
+                    with st.status("Agent en reflexion...") as status:
+                        result = invoke_graph(
+                            llm_text, thread_id,
+                            status_widget=status, model_name=current_model,
+                        )
+                st.session_state.last_working_model = current_model
+                save_settings("last_model", current_model)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Erreur invoke/stream: {e}")
 
-                    last_ok = st.session_state.get("last_working_model", "")
-                    suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
+                last_ok = st.session_state.get("last_working_model", "")
+                suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
 
-                    result = {
-                        "response": (
-                            f"Le modele **{current_model}** a rencontre une difficulte "
-                            f"avec votre demande.{suggestion}\n\n"
-                            "Vous pouvez :\n"
-                            "- Reformuler votre question\n"
-                            "- Changer de modele\n"
-                            "- Reessayer dans quelques instants"
-                        ),
-                        "besoin_forge": None,
-                    }
+                result = {
+                    "response": (
+                        f"Le modele **{current_model}** a rencontre une difficulte "
+                        f"avec votre demande.{suggestion}\n\n"
+                        "Vous pouvez :\n"
+                        "- Reformuler votre question\n"
+                        "- Changer de modele\n"
+                        "- Reessayer dans quelques instants"
+                    ),
+                    "besoin_forge": None,
+                }
 
             if result.get("besoin_forge") and not SAAS_MODE:
                 st.session_state.besoin_forge = result["besoin_forge"]
