@@ -15,9 +15,12 @@ from datetime import datetime
 import nest_asyncio
 nest_asyncio.apply()
 
+import logging
 import requests
 import streamlit as st
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
