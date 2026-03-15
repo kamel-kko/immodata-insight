@@ -184,7 +184,8 @@ def _etape_risques(tool_registry: dict):
                 data["resultat_risques"] = resultat
 
         st.markdown("### Risques identifies")
-        st.markdown(data["resultat_risques"])
+        with st.expander("Voir les resultats", expanded=True):
+            st.text(data["resultat_risques"])
     else:
         st.warning(
             "L'outil Georisques n'est pas disponible. "
