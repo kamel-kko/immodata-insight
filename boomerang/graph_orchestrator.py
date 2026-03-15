@@ -61,26 +61,65 @@ def _modele_supporte_tools(model_name: str) -> bool:
 
 # ── Sélection LLM ──────────────────────────────────────
 
-def get_llm(model_name: str = ""):
-    """Retourne le LLM configuré selon LLM_PROVIDER.
+# --- ANCIEN get_llm (sauvegarde) ---
+# def get_llm(model_name=""): retournait ChatOllama(model=model_name or env)
+# --- FIN SAUVEGARDE ---
+
+SETTINGS_FILE = Path("/app/data/settings.json")
+
+
+def _load_settings() -> dict:
+    if SETTINGS_FILE.exists():
+        try:
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (ValueError, IOError):
+            return {}
+    return {}
+
+
+def get_llm(model_name: str = "", speed: str = ""):
+    """Retourne le LLM configure selon LLM_PROVIDER.
 
     Args:
-        model_name: Nom du modèle à utiliser (prioritaire sur .env).
-                    Si vide, utilise OLLAMA_MODEL / TOGETHER_MODEL du .env.
+        model_name: Nom du modele a utiliser (prioritaire sur tout le reste).
+        speed: "fast" ou "slow". Si hybrid_mode est actif dans settings.json,
+               utilise model_fast ou model_slow. Ignore si model_name est fourni.
     """
     provider = os.getenv("LLM_PROVIDER", "ollama")
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+
+    # Si model_name est explicitement fourni, l'utiliser directement
+    effective_model = model_name
+
+    # Sinon, verifier le mode hybride
+    if not effective_model and speed:
+        settings = _load_settings()
+        if settings.get("hybrid_mode", False):
+            effective_model = settings.get(f"model_{speed}", "")
+            if effective_model:
+                logger.info(f"[HYBRID] speed={speed} -> modele={effective_model}")
+
+    # Fallback sur la variable d'env
+    if not effective_model:
+        effective_model = os.getenv("OLLAMA_MODEL", "llama3.2")
+
+    temperature = 0.0 if speed == "fast" else 0.3
+
     if provider == "ollama":
         from langchain_ollama import ChatOllama
         return ChatOllama(
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434"),
-            model=model_name or os.getenv("OLLAMA_MODEL", "llama3.2"),
+            base_url=base_url,
+            model=effective_model,
+            temperature=temperature,
         )
     elif provider == "together":
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             base_url="https://api.together.xyz/v1",
             api_key=os.getenv("TOGETHER_API_KEY", ""),
-            model=model_name or os.getenv("TOGETHER_MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo"),
+            model=effective_model,
+            temperature=temperature,
         )
     else:
         raise ValueError(f"LLM_PROVIDER inconnu : {provider}")
