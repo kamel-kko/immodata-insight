@@ -253,6 +253,76 @@ def _render_message_content(content: str):
     st.markdown(content)
 
 
+# ── Indicateurs de progression par outil ──────────────
+
+TOOL_STATUS_MESSAGES = {
+    "recherche_urbanisme":        "Interrogation du Geoportail de l'Urbanisme...",
+    "recherche_risques_parcelle":  "Analyse des risques naturels (Georisques)...",
+    "recherche_web":              "Recherche documentaire en cours...",
+    "recherche_legale":           "Consultation des textes juridiques...",
+    "notice_securite":            "Generation de la notice de securite...",
+    "tool_demander_dev":          "Enregistrement demande developpeur...",
+    "tool_generer_schema":        "Generation du schema...",
+}
+
+
+def _get_status_label(tool_name: str) -> str:
+    return TOOL_STATUS_MESSAGES.get(tool_name, f"Execution de {tool_name}...")
+
+
+# ── Streaming de la reponse avec indicateurs visuels ──
+
+def _run_streaming(llm_text, thread_id, model_name, placeholder, status_container):
+    """Execute le graphe en mode streaming avec affichage progressif."""
+    full_text = ""
+    current_status = None
+
+    def on_token(chunk):
+        nonlocal full_text
+        full_text += chunk
+        placeholder.markdown(full_text + " |")
+
+    def on_tool_start(tool_name):
+        nonlocal current_status
+        label = _get_status_label(tool_name)
+        current_status = status_container.status(label, expanded=False)
+        current_status.write(f"Outil : `{tool_name}`")
+
+    def on_tool_end(tool_name):
+        nonlocal current_status
+        if current_status:
+            current_status.update(label=f"{_get_status_label(tool_name).rstrip('...')} OK", state="complete")
+            current_status = None
+
+    try:
+        result = asyncio.run(stream_graph(
+            llm_text,
+            thread_id,
+            model_name=model_name,
+            on_token=on_token,
+            on_tool_start=on_tool_start,
+            on_tool_end=on_tool_end,
+        ))
+    except Exception as e:
+        # Fallback sur invoke_graph synchrone si le streaming echoue
+        import logging
+        logging.getLogger(__name__).warning(f"Streaming echoue, fallback synchrone: {e}")
+        result = invoke_graph(llm_text, thread_id, model_name=model_name)
+        full_text = result.get("response", "")
+
+    # Affichage final sans curseur
+    if full_text:
+        placeholder.markdown(full_text)
+    else:
+        full_text = result.get("response", "")
+        placeholder.markdown(full_text)
+
+    return {
+        "response": full_text,
+        "besoin_forge": result.get("besoin_forge"),
+    }
+
+
 # ── Langfuse handler (une seule fois) ──────────────────
 
 if "langfuse_handler" not in st.session_state:
