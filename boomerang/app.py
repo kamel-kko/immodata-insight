@@ -47,6 +47,8 @@ _SETTINGS_DEFAULTS = {
     "hybrid_mode": False,
     "model_fast": "llama3.2:1b",
     "model_slow": "qwen2.5:14b",
+    "cache_enabled": True,
+    "cache_ttl_jours": 7,
 }
 
 
