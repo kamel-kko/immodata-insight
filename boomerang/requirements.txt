@@ -16,3 +16,4 @@ mcp>=1.0.0
 sqlalchemy>=2.0.0
 PyPDF2>=3.0.0
 matplotlib>=3.8.0
+nest-asyncio>=1.6.0

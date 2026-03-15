@@ -42,7 +42,8 @@
       "Bash(curl -s -X POST http://localhost:8003/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"43.6047,1.4442\"\"\"\"}}')",
       "Bash(curl -s -X POST http://localhost:8005/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"12 rue de Rivoli Paris\"\"\"\"}}')",
       "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"Réglementation incendie ERP type M\"\"\"\"}}')",
-      "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json; charset=utf-8\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"ERP type M\"\"\"\"}}')"
+      "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json; charset=utf-8\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"ERP type M\"\"\"\"}}')",
+      "mcp__Claude_Preview__preview_start"
     ]
   },
   "hooks": {
