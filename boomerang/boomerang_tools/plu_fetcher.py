@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 BAN_URL = "https://api-adresse.data.gouv.fr/search/"
 GPU_APICARTO_DOC = "https://apicarto.ign.fr/api/gpu/document"
+GPU_APICARTO_ZONE = "https://apicarto.ign.fr/api/gpu/zone-urba"
 GPU_DETAILS = "https://www.geoportail-urbanisme.gouv.fr/api/document/{doc_id}/details"
 CACHE_DIR = os.environ.get("PLU_CACHE_DIR", "/app/data/plu_cache")
 CACHE_TTL_JOURS = 30

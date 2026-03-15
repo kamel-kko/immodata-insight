@@ -108,7 +108,8 @@
       "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/download/40327_reglement_20250715.pdf\")",
       "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/file?fileName=40327_reglement_20250715.pdf\")",
       "Bash(curl -sI \"https://data.geopf.fr/annexes/gpu/documents/DU_40327/40327_reglement_20250715.pdf\")",
-      "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/download/40327_PLU_20250715.zip\")"
+      "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/download/40327_PLU_20250715.zip\")",
+      "Bash(curl -s \"https://apicarto.ign.fr/api/gpu/zone-urba\" --data-urlencode 'geom={\"\"\"\"type\"\"\"\":\"\"\"\"Point\"\"\"\",\"\"\"\"coordinates\"\"\"\":[-0.376962,43.314473]}')"
     ]
   },
   "hooks": {
