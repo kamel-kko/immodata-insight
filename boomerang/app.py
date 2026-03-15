@@ -299,12 +299,23 @@ with col_left:
             st.warning("Saisissez une adresse.")
 
     if st.session_state.project_commune:
+        zone_display = st.session_state.project_zone or "—"
+        plu_badge = ""
+        if st.session_state.plu_type_doc:
+            plu_badge = (
+                f'<div style="display:inline-block;background:var(--acc-b);'
+                f'color:var(--acc);border:0.5px solid var(--acc-d);'
+                f'border-radius:4px;padding:2px 8px;font-size:10px;'
+                f'margin:4px 0">Zone {zone_display} · {st.session_state.plu_type_doc}'
+                f' {st.session_state.plu_date_appro[:4] if st.session_state.plu_date_appro else ""}</div>'
+            )
         st.markdown(f"""
+        {plu_badge}
         <div class="hdiv"></div>
         <div class="meta">
             <div class="meta-i">Commune<b>{st.session_state.project_commune}</b></div>
             <div class="meta-i">INSEE<b>{st.session_state.project_insee}</b></div>
-            <div class="meta-i">Zone PLU<b>{st.session_state.project_zone or "—"}</b></div>
+            <div class="meta-i">Dept.<b>Landes ({st.session_state.project_dept})</b></div>
             <div class="meta-i">Georisques<b style="color:var(--warn)">—</b></div>
         </div>""", unsafe_allow_html=True)
 
