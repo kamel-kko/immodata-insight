@@ -40,7 +40,12 @@ from pathlib import Path as _Path
 import json as _json
 import portalocker as _portalocker
 
-SETTINGS_FILE = _Path("/app/data/settings.json")
+if os.path.exists("/app/data"):
+    _DATA_DIR = "/app/data"
+else:
+    _DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(_DATA_DIR, exist_ok=True)
+SETTINGS_FILE = _Path(os.path.join(_DATA_DIR, "settings.json"))
 
 
 _SETTINGS_DEFAULTS = {
