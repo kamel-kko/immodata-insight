@@ -93,6 +93,27 @@ if not SAAS_MODE:
 
 init_db()
 
+# ── Authentification ────────────────────────────────────
+# Gate d'acces basique via mot de passe. Configure via la variable d'environnement
+# BOOMERANG_PASSWORD. Si non defini, l'application est ouverte (dev local).
+
+_AUTH_PASSWORD = os.getenv("BOOMERANG_PASSWORD", "")
+
+if _AUTH_PASSWORD:
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+
+    if not st.session_state["authenticated"]:
+        st.markdown("## BOOMERANG — Connexion")
+        _pwd = st.text_input("Mot de passe", type="password", key="auth_pwd")
+        if st.button("Se connecter"):
+            if _pwd == _AUTH_PASSWORD:
+                st.session_state["authenticated"] = True
+                st.rerun()
+            else:
+                st.error("Mot de passe incorrect.")
+        st.stop()
+
 # ── Session state defaults ──────────────────────────────
 
 defaults = {
