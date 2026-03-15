@@ -555,26 +555,40 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
 # ── État NORMAL ─────────────────────────────────────────
 
 else:
-    # Afficher historique
-    historique = charger_historique(id_projet)
-    for msg in historique:
+    # Charger l'historique depuis la DB au premier affichage du projet
+    if not st.session_state.messages:
+        historique = charger_historique(id_projet)
+        if historique:
+            st.session_state.messages = historique
+
+    # Afficher tous les messages de la session
+    for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Chat input
-    user_input = st.chat_input("Votre question réglementaire...")
+    # Chat input — actif uniquement si un projet est sélectionné
+    if st.session_state.get("id_projet"):
+        user_input = st.chat_input("Votre question réglementaire...")
+    else:
+        user_input = None
 
     if user_input:
-        # Afficher message utilisateur
+        # Ajouter et afficher le message utilisateur
+        st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.markdown(user_input)
 
         sauvegarder_message(id_projet, "user", user_input)
 
-        # Invoquer le graphe
+        # Invoquer le graphe avec le modèle sélectionné
         with st.chat_message("assistant"):
             with st.status("🤔 Agent en réflexion...") as status:
-                result = invoke_graph(user_input, thread_id, status_widget=status)
+                result = invoke_graph(
+                    user_input,
+                    thread_id,
+                    status_widget=status,
+                    model_name=st.session_state.ollama_model,
+                )
 
             if result.get("besoin_forge") and not SAAS_MODE:
                 st.session_state.besoin_forge = result["besoin_forge"]
@@ -583,4 +597,5 @@ else:
             else:
                 response = result.get("response", "")
                 st.markdown(response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
                 sauvegarder_message(id_projet, "assistant", response)
