@@ -457,6 +457,20 @@ with st.sidebar:
         st.success(f"Historique vidé ({count} messages supprimés)")
         st.rerun()
 
+    # ── Bouton export PDF ──────────────────────────────
+    if id_projet and st.session_state.messages:
+        from pdf_export import generer_pdf_rapport
+        from db_manager import charger_historique_complet
+        messages_complets = charger_historique_complet(id_projet)
+        if messages_complets:
+            pdf_bytes = generer_pdf_rapport(id_projet, messages_complets)
+            st.download_button(
+                label="Exporter PDF",
+                data=pdf_bytes,
+                file_name=f"BOOMERANG_{id_projet}_{datetime.now().strftime('%Y%m%d')}.pdf",
+                mime="application/pdf",
+            )
+
     st.divider()
 
     # ── Outils forgés du projet ─────────────────────────
