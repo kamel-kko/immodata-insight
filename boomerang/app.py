@@ -85,8 +85,8 @@ defaults = {
     "besoin_forge": None,
     "forge_result": None,
     "messages": [],           # historique chat affiché dans la session courante
-    "ollama_model": os.getenv("OLLAMA_MODEL", "llama3.2"),
-    "last_working_model": os.getenv("OLLAMA_MODEL", "llama3.2"),  # dernier modele ayant repondu OK
+    "ollama_model": load_settings().get("last_model", os.getenv("OLLAMA_MODEL", "llama3.2")),
+    "last_working_model": load_settings().get("last_model", os.getenv("OLLAMA_MODEL", "llama3.2")),
     "attached_file_ctx": None,  # contexte du fichier joint (dict ou None)
     "web_search_enabled": False,  # toggle recherche web
     "show_file_uploader": False,  # afficher/masquer le file uploader
