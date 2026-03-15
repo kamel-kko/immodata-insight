@@ -322,26 +322,50 @@ def indexer_chunks(chunks: list, code_insee: str, force: bool = False) -> Chroma
         logger.warning("Aucun document a indexer")
         return None
 
+    # Tronquer les textes trop longs pour nomic-embed-text (max ~8000 chars)
+    MAX_CHARS = 6000
+    for doc in documents:
+        if len(doc.page_content) > MAX_CHARS:
+            doc.page_content = doc.page_content[:MAX_CHARS]
+
     logger.info(f"Indexation de {len(documents)} chunks dans {collection_name}...")
 
-    # Indexer par batches (ChromaDB a une limite de ~5000 par batch)
-    BATCH_SIZE = 500
+    # Batches de 100 pour eviter de depasser la limite de contexte du modele
+    BATCH_SIZE = 100
     vectorstore = None
 
     for start in range(0, len(documents), BATCH_SIZE):
         batch_docs = documents[start:start + BATCH_SIZE]
         batch_ids = ids[start:start + BATCH_SIZE]
 
-        if vectorstore is None:
-            vectorstore = Chroma.from_documents(
-                documents=batch_docs,
-                embedding=embed,
-                collection_name=collection_name,
-                persist_directory=CHROMA_DIR,
-                ids=batch_ids,
-            )
-        else:
-            vectorstore.add_documents(batch_docs, ids=batch_ids)
+        try:
+            if vectorstore is None:
+                vectorstore = Chroma.from_documents(
+                    documents=batch_docs,
+                    embedding=embed,
+                    collection_name=collection_name,
+                    persist_directory=CHROMA_DIR,
+                    ids=batch_ids,
+                )
+            else:
+                vectorstore.add_documents(batch_docs, ids=batch_ids)
+        except Exception as e:
+            logger.warning(f"  Batch {start//BATCH_SIZE + 1} echoue: {e}")
+            # Fallback : indexer un par un
+            for j, (doc, did) in enumerate(zip(batch_docs, batch_ids)):
+                try:
+                    if vectorstore is None:
+                        vectorstore = Chroma.from_documents(
+                            documents=[doc],
+                            embedding=embed,
+                            collection_name=collection_name,
+                            persist_directory=CHROMA_DIR,
+                            ids=[did],
+                        )
+                    else:
+                        vectorstore.add_documents([doc], ids=[did])
+                except Exception:
+                    logger.warning(f"    Chunk {start+j} ignore (trop long)")
 
         logger.info(f"  Batch {start//BATCH_SIZE + 1}: {len(batch_docs)} docs indexes")
 
