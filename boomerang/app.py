@@ -254,7 +254,22 @@ with st.sidebar:
         current = st.session_state.ollama_model
         idx = modeles.index(current) if current in modeles else 0
         choix_modele = st.selectbox("Modèle Ollama", options=modeles, index=idx)
-        st.session_state.ollama_model = choix_modele
+
+        # Si le modele change, reinitialiser le thread LangGraph
+        # pour eviter que les residus du modele precedent polluent le nouveau
+        if choix_modele != st.session_state.ollama_model:
+            st.session_state.ollama_model = choix_modele
+            # Forcer un nouveau thread_id pour repartir proprement
+            if st.session_state.id_projet:
+                rebuild_graph()
+            st.toast(f"Modele change : {choix_modele}")
+        else:
+            st.session_state.ollama_model = choix_modele
+
+        # Afficher le dernier modele ayant fonctionne
+        last_ok = st.session_state.get("last_working_model", "")
+        if last_ok and last_ok != choix_modele:
+            st.caption(f"Dernier modele OK : {last_ok}")
 
     # ── Bouton vider historique ─────────────────────────
     if id_projet and st.button("🗑️ Vider historique"):
