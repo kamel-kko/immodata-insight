@@ -1,5 +1,4 @@
 # REQUIERT_INTERNET: oui — appelle les APIs publiques BAN et Geoportail de l'Urbanisme
-import os
 import re
 import requests
 from fastapi import FastAPI
