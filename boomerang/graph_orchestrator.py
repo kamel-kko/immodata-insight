@@ -480,12 +480,23 @@ def build_graph():
 
     workflow = StateGraph(dict)
 
+    workflow.add_node("refine_intent_node", refine_intent_node)
     workflow.add_node("agent_node", agent_node)
     workflow.add_node("action_node", action_node)
     workflow.add_node("forge_node", forge_node)
     workflow.add_node("hitl_node", hitl_node)
 
-    workflow.add_edge(START, "agent_node")
+    # START -> refine_intent_node -> (agent_node | forge_node | END)
+    workflow.add_edge(START, "refine_intent_node")
+    workflow.add_conditional_edges(
+        "refine_intent_node",
+        router_apres_refine,
+        {
+            "agent_node": "agent_node",
+            "forge_node": "forge_node",
+            END: END,
+        },
+    )
     workflow.add_conditional_edges(
         "agent_node",
         router_apres_agent,
