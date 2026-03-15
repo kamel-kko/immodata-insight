@@ -315,7 +315,7 @@ def forger_outil(
     tests_ok = pytest_result.returncode == 0
     pytest_output = pytest_result.stdout + pytest_result.stderr
 
-    # Si échec, retenter une fois
+    # Si echec, retenter une fois
     if not tests_ok:
         _status("⚠️ Tests échoués — nouvelle tentative...")
         retry_prompt = (
@@ -325,22 +325,30 @@ def forger_outil(
         )
         try:
             retry_response = _appeler_claude_forge(retry_prompt)
-            server_py = retry_response.get("server_py", server_py)
-            test_code = retry_response.get("test", test_code)
+            new_server_py = retry_response.get("server_py", server_py)
+            new_test_code = retry_response.get("test", test_code)
 
-            with open(os.path.join(tool_dir, "server.py"), "w", encoding="utf-8") as f:
-                f.write(server_py)
-            with open(test_file, "w", encoding="utf-8") as f:
-                f.write(test_code)
+            # Re-valider le code corrige
+            retry_problemes = _valider_code_forge(new_server_py)
+            if retry_problemes:
+                logger.warning(f"[FORGE] Code retry rejete : {retry_problemes}")
+            else:
+                server_py = new_server_py
+                test_code = new_test_code
 
-            pytest_result = subprocess.run(
-                ["pytest", test_file, "-v", "--tb=short"],
-                capture_output=True, text=True, timeout=120,
-            )
-            tests_ok = pytest_result.returncode == 0
-            pytest_output = pytest_result.stdout + pytest_result.stderr
-        except Exception:
-            pass
+                with open(os.path.join(tool_dir, "server.py"), "w", encoding="utf-8") as f:
+                    f.write(server_py)
+                with open(test_file, "w", encoding="utf-8") as f:
+                    f.write(test_code)
+
+                pytest_result = subprocess.run(
+                    ["pytest", test_file, "-v", "--tb=short"],
+                    capture_output=True, text=True, timeout=120,
+                )
+                tests_ok = pytest_result.returncode == 0
+                pytest_output = pytest_result.stdout + pytest_result.stderr
+        except Exception as e:
+            logger.warning(f"[FORGE] Retry echoue : {e}")
 
     if tests_ok:
         _status("✅ Tests OK — en attente de validation")
