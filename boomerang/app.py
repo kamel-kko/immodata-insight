@@ -445,6 +445,11 @@ def _attendre_health(url, timeout_total=30, intervalle=2):
 with st.sidebar:
     st.title("BOOMERANG")
 
+    # ── Logout ─────────────────────────────────────────
+    if _AUTH_ENABLED:
+        st.caption(f"Connecte : **{st.session_state.get('name', '')}**")
+        authenticator.logout("Deconnexion", "sidebar")
+
     # ── Sélecteur de projet ─────────────────────────────
     projets = lister_projets()
     options = projets + ["+ Nouveau projet"]
