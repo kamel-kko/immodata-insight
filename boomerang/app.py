@@ -9,7 +9,11 @@ import base64
 import shutil
 import subprocess
 import time
+import asyncio
 from datetime import datetime
+
+import nest_asyncio
+nest_asyncio.apply()
 
 import requests
 import streamlit as st
