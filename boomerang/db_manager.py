@@ -192,4 +192,98 @@ def lister_outils_projet(id_projet: str) -> List[Dict]:
         ]
 
 
+# ── Cache API ──────────────────────────────────────────
+
+
+def _make_cache_key(tool_name: str, identifiant: str) -> str:
+    """Genere une cle de cache deterministe a partir du nom d'outil et d'un identifiant.
+
+    L'identifiant est typiquement le code INSEE pour les outils geographiques.
+    On hash pour eviter les caracteres speciaux et garder une longueur fixe.
+    """
+    raw = f"{tool_name}:{identifiant}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:64]
+
+
+def get_cache(tool_name: str, identifiant: str) -> Optional[str]:
+    """Retourne le resultat en cache s'il existe et n'est pas expire.
+
+    Args:
+        tool_name: Nom de l'outil (ex: 'recherche_urbanisme').
+        identifiant: Cle metier (ex: code INSEE '75056').
+
+    Returns:
+        Le contenu cache (string) ou None si absent/expire.
+    """
+    key = _make_cache_key(tool_name, identifiant)
+    now = datetime.utcnow()
+    with SessionLocal() as db:
+        row = (
+            db.query(CacheAPI)
+            .filter(CacheAPI.cache_key == key, CacheAPI.expires_at > now)
+            .first()
+        )
+        if row:
+            return row.output
+    return None
+
+
+def set_cache(tool_name: str, identifiant: str, output: str, ttl_jours: int = 7) -> None:
+    """Stocke un resultat en cache avec une duree de vie (TTL).
+
+    Args:
+        tool_name: Nom de l'outil.
+        identifiant: Cle metier.
+        output: Resultat a cacher (string).
+        ttl_jours: Duree de vie en jours (defaut 7).
+    """
+    key = _make_cache_key(tool_name, identifiant)
+    expires = datetime.utcnow() + timedelta(days=ttl_jours)
+    with SessionLocal() as db:
+        existing = db.query(CacheAPI).filter(CacheAPI.cache_key == key).first()
+        if existing:
+            existing.output = output
+            existing.created_at = datetime.utcnow()
+            existing.expires_at = expires
+        else:
+            db.add(CacheAPI(
+                cache_key=key,
+                tool_name=tool_name,
+                output=output,
+                expires_at=expires,
+            ))
+        db.commit()
+
+
+def purge_cache(tool_name: str = "") -> int:
+    """Supprime les entrees de cache expirees (ou toutes pour un outil donne).
+
+    Args:
+        tool_name: Si fourni, ne purge que cet outil. Sinon, purge tout le cache expire.
+
+    Returns:
+        Nombre d'entrees supprimees.
+    """
+    now = datetime.utcnow()
+    with SessionLocal() as db:
+        query = db.query(CacheAPI)
+        if tool_name:
+            query = query.filter(CacheAPI.tool_name == tool_name)
+        else:
+            query = query.filter(CacheAPI.expires_at <= now)
+        count = query.delete()
+        db.commit()
+        return count
+
+
+def stats_cache() -> dict:
+    """Retourne des statistiques sur le cache (pour l'UI settings)."""
+    now = datetime.utcnow()
+    with SessionLocal() as db:
+        total = db.query(CacheAPI).count()
+        actifs = db.query(CacheAPI).filter(CacheAPI.expires_at > now).count()
+        expires = total - actifs
+        return {"total": total, "actifs": actifs, "expires": expires}
+
+
 init_db()
