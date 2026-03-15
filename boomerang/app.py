@@ -1000,6 +1000,7 @@ else:
                 )
                 if choix_modele != st.session_state.ollama_model:
                     st.session_state.ollama_model = choix_modele
+                    save_settings("last_model", choix_modele)
                     if st.session_state.id_projet:
                         rebuild_graph()
                     st.toast(f"Modele : {choix_modele}")
