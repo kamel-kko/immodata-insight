@@ -1,16 +1,16 @@
 """
-tool_runner.py — Client HTTP centralisé pour appeler les outils containerisés
+tool_runner.py — Client HTTP centralise pour appeler les outils containerises
 
-boomerang_app ne connaît pas les outils directement. Il passe par tool_runner.py qui :
+boomerang_app ne connait pas les outils directement. Il passe par tool_runner.py qui :
 - Maintient un registre {nom_outil: url_container}
 - Expose des LangChain BaseTool qui font des appels HTTP
-- Recharge le registre dynamiquement après validation HITL
+- Recharge le registre dynamiquement apres validation HITL
 """
 
 import requests
 import os
 from langchain.tools import BaseTool
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 TOOL_REGISTRY = {
     "recherche_web":              "http://tool_recherche_searxng:8001",
@@ -21,10 +21,34 @@ TOOL_REGISTRY = {
 }
 
 
+class QueryInput(BaseModel):
+    """Schema d'entree pour les outils de recherche."""
+    query: str = Field(
+        description="Requete de recherche ou adresse complete. "
+        "Pour les outils geographiques, fournir l'adresse complete "
+        "(ex: '9 Rue des Pyrenees, 40230 Saint-Vincent-de-Tyrosse') "
+        "ou des coordonnees GPS 'lat,lon' (ex: '43.6047,1.4442')."
+    )
+
+
+class NoticeInput(BaseModel):
+    """Schema d'entree pour l'outil notice de securite."""
+    type_erp: str = Field(description="Type d'ERP (ex: M, L, N, O, R, W)")
+    capacite: int = Field(description="Capacite d'accueil en nombre de personnes")
+    description: str = Field(default="", description="Description du projet")
+
+
+# Mapping des schemas d'entree par nom d'outil
+_INPUT_SCHEMAS = {
+    "notice_securite": NoticeInput,
+}
+
+
 class ContainerTool(BaseTool):
     name: str
     description: str
     tool_url: str
+    args_schema: type = QueryInput
 
     def _run(self, **kwargs) -> str:
         try:
@@ -50,10 +74,12 @@ def charger_outils() -> list[BaseTool]:
             resp = requests.get(f"{url}/health", timeout=5)
             if resp.json().get("status") == "ok":
                 meta = resp.json()
+                schema = _INPUT_SCHEMAS.get(nom, QueryInput)
                 outils.append(ContainerTool(
                     name=nom,
                     description=meta.get("description", f"Outil {nom}"),
                     tool_url=url,
+                    args_schema=schema,
                 ))
         except Exception:
             pass  # Container outil indisponible — skip silencieux
