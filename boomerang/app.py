@@ -1363,6 +1363,213 @@ else:
         st.markdown('</div></div>', unsafe_allow_html=True)
         st.write("")
 
+        # -- Bloc Analyse PLU RAG --
+        if id_projet:
+            st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+            st.markdown('<div class="bento-head">Analyse PLU</div>', unsafe_allow_html=True)
+            st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+            # Initialiser les etats PLU RAG
+            if "plu_rag_status" not in st.session_state:
+                st.session_state.plu_rag_status = None  # None | "loading" | "ready" | "error"
+            if "plu_rag_chatbot" not in st.session_state:
+                st.session_state.plu_rag_chatbot = None
+            if "plu_rag_fiche" not in st.session_state:
+                st.session_state.plu_rag_fiche = None
+            if "plu_rag_history" not in st.session_state:
+                st.session_state.plu_rag_history = []
+
+            adresse_plu = st.text_input(
+                "Adresse a analyser",
+                placeholder="12 rue de la Paix, 64000 Pau",
+                key="plu_rag_adresse_input",
+                label_visibility="collapsed",
+            )
+
+            if st.button("Analyser PLU", key="btn_plu_rag", use_container_width=True,
+                         disabled=not adresse_plu):
+                st.session_state.plu_rag_status = "loading"
+                st.session_state.plu_rag_chatbot = None
+                st.session_state.plu_rag_fiche = None
+                st.session_state.plu_rag_history = []
+                st.rerun()
+
+            # Pipeline PLU RAG
+            if st.session_state.plu_rag_status == "loading" and adresse_plu:
+                import os as _os
+                _os.environ.setdefault("PLU_CACHE_DIR", os.path.join(
+                    os.path.dirname(__file__), "data", "plu_cache"))
+                _os.environ.setdefault("PLU_CHROMA_DIR", os.path.join(
+                    os.path.dirname(__file__), "data", "plu_chroma"))
+
+                with st.status("Analyse PLU en cours...", expanded=True) as plu_status:
+                    try:
+                        from boomerang_tools.plu_fetcher import (
+                            geocoder_adresse, rechercher_plu_gpu, telecharger_plu,
+                        )
+                        from boomerang_tools.plu_rag_pipeline import (
+                            pipeline_indexation_plu, creer_retriever,
+                        )
+                        from boomerang_tools.plu_synthese import (
+                            generer_fiche_synthese, formater_fiche_texte,
+                        )
+                        from boomerang_tools.plu_chatbot import PLUChatbot
+
+                        # Etape 1 : Geocodage
+                        st.write("Geocodage de l'adresse...")
+                        geo = geocoder_adresse(adresse_plu)
+                        code_insee = geo["code_insee"]
+
+                        # Mettre a jour les infos projet
+                        st.session_state.plu_adresse_normalisee = geo["adresse_normalisee"]
+                        st.session_state.plu_commune = geo["commune"]
+                        st.session_state.plu_code_insee = code_insee
+                        st.session_state.plu_latitude = geo["latitude"]
+                        st.session_state.plu_longitude = geo["longitude"]
+
+                        # Etape 2 : Recherche PLU
+                        st.write("Recherche du PLU sur le GPU...")
+                        plu = rechercher_plu_gpu(
+                            code_insee, lat=geo["latitude"], lon=geo["longitude"]
+                        )
+                        st.session_state.plu_zone = plu.get("zone_parcelle", "")
+                        st.session_state.plu_type_document = plu.get("type_document", "")
+
+                        # Carte WMS
+                        from boomerang_tools.tool_api_urbanisme.server import generer_url_carte_wms
+                        st.session_state.plu_map_url = generer_url_carte_wms(
+                            geo["latitude"], geo["longitude"]
+                        )
+
+                        if plu.get("statut") != "trouve":
+                            st.session_state.plu_rag_status = "error"
+                            st.error(plu.get("message", "PLU non trouve"))
+                        else:
+                            # Etape 3 : Telechargement
+                            st.write("Telechargement des documents PLU...")
+                            dl = telecharger_plu(plu, code_insee)
+                            cache_dir = dl["chemin_cache"]
+
+                            if not dl["fichiers"]:
+                                st.warning("Aucun PDF telecharge")
+                                st.session_state.plu_rag_status = "error"
+                            else:
+                                # Etape 4 : Indexation RAG
+                                st.write(f"Indexation de {len(dl['fichiers'])} PDFs...")
+                                stats = pipeline_indexation_plu(cache_dir, code_insee)
+
+                                if stats["statut"] != "ok":
+                                    st.warning(stats.get("message", "Indexation echouee"))
+                                    st.session_state.plu_rag_status = "error"
+                                else:
+                                    st.write(f"{stats['nb_chunks']} articles indexes")
+
+                                    # Etape 5 : Creer retriever + chatbot
+                                    retriever = creer_retriever(code_insee, k=6)
+                                    if retriever:
+                                        bot = PLUChatbot(
+                                            retriever,
+                                            commune=geo["commune"],
+                                            zone=plu.get("zone_parcelle", ""),
+                                            type_document=plu.get("type_document", ""),
+                                        )
+                                        st.session_state.plu_rag_chatbot = bot
+
+                                        # Generer la fiche de synthese
+                                        fiche = generer_fiche_synthese(geo, plu)
+                                        st.session_state.plu_rag_fiche = fiche
+
+                                        st.session_state.plu_rag_status = "ready"
+                                        plu_status.update(
+                                            label="PLU analyse avec succes",
+                                            state="complete",
+                                        )
+                                    else:
+                                        st.session_state.plu_rag_status = "error"
+                                        st.error("Impossible de creer le retriever")
+
+                    except ValueError as ve:
+                        st.session_state.plu_rag_status = "error"
+                        st.error(str(ve))
+                    except Exception as ex:
+                        st.session_state.plu_rag_status = "error"
+                        st.error(f"Erreur: {ex}")
+
+            # Affichage fiche + chatbot si pret
+            if st.session_state.plu_rag_status == "ready":
+                fiche = st.session_state.plu_rag_fiche
+                if fiche:
+                    plu_sec = fiche.get("plu", {})
+                    zone_txt = plu_sec.get("zone", "")
+                    type_txt = plu_sec.get("type_document", "")
+                    if zone_txt or type_txt:
+                        st.markdown(f"""
+                        <div style="display:inline-block;font-size:10px;padding:2px 8px;
+                                    border-radius:4px;background:#1a2633;color:#4A90D9;
+                                    border:0.5px solid #2a3d52;margin:4px 0">
+                            Zone {zone_txt} - {type_txt}
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                # Mini-chatbot PLU
+                st.markdown('<div class="meta-divider"></div>', unsafe_allow_html=True)
+                st.markdown("""<div style="font-size:10px;color:#6b7280;margin-bottom:4px">
+                    Posez une question sur le reglement PLU :
+                </div>""", unsafe_allow_html=True)
+
+                # Historique du chat PLU
+                for msg in st.session_state.plu_rag_history:
+                    role_label = "Vous" if msg["role"] == "user" else "PLU"
+                    color = "#9ca3af" if msg["role"] == "user" else "#4A90D9"
+                    st.markdown(f"""<div style="font-size:10px;color:{color};margin:2px 0">
+                        <b>{role_label}:</b> {msg['content'][:300]}
+                    </div>""", unsafe_allow_html=True)
+
+                question_plu = st.text_input(
+                    "Question PLU",
+                    placeholder="Hauteur max? Reculs? Stationnement?",
+                    key="plu_rag_question",
+                    label_visibility="collapsed",
+                )
+                if st.button("Demander", key="btn_plu_ask", use_container_width=True,
+                             disabled=not question_plu):
+                    bot = st.session_state.plu_rag_chatbot
+                    if bot:
+                        with st.spinner("Recherche dans le PLU..."):
+                            reponse = bot.poser_question(question_plu)
+                        st.session_state.plu_rag_history.append(
+                            {"role": "user", "content": question_plu}
+                        )
+                        st.session_state.plu_rag_history.append(
+                            {"role": "assistant", "content": reponse}
+                        )
+                        # Afficher les sources
+                        sources = bot.get_sources()
+                        if sources:
+                            src_txt = ", ".join(
+                                s["article"] for s in sources if s["article"]
+                            )
+                            st.markdown(f"""<div style="font-size:9px;color:#4b5563;margin-top:2px">
+                                Sources: {src_txt}
+                            </div>""", unsafe_allow_html=True)
+                        st.rerun()
+
+                # Export fiche PDF
+                if st.session_state.plu_rag_fiche:
+                    from boomerang_tools.plu_synthese import exporter_fiche_pdf
+                    fiche_pdf = exporter_fiche_pdf(st.session_state.plu_rag_fiche)
+                    st.download_button(
+                        "Fiche PLU (PDF)",
+                        data=fiche_pdf,
+                        file_name=f"Fiche_PLU_{st.session_state.get('plu_code_insee','')}.pdf",
+                        mime="application/pdf",
+                        key="btn_plu_pdf",
+                        use_container_width=True,
+                    )
+
+            st.markdown('</div></div>', unsafe_allow_html=True)
+            st.write("")
+
         # -- Bloc Documents --
         st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
         st.markdown('<div class="bento-head">Documents</div>', unsafe_allow_html=True)
