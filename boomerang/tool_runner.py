@@ -13,8 +13,11 @@ from langchain.tools import BaseTool
 from pydantic import BaseModel
 
 TOOL_REGISTRY = {
-    "recherche_web":    "http://tool_recherche_searxng:8001",
-    "notice_securite":  "http://tool_notice_securite:8002",
+    "recherche_web":              "http://tool_recherche_searxng:8001",
+    "notice_securite":            "http://tool_notice_securite:8002",
+    "recherche_urbanisme":        "http://tool_api_urbanisme:8003",
+    "recherche_legale":           "http://tool_mcp_legal:8004",
+    "recherche_risques_parcelle": "http://tool_georisques:8005",
 }
 
 
