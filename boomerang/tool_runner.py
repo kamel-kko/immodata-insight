@@ -69,7 +69,22 @@ class ContainerTool(BaseTool):
     tool_url: str
     args_schema: type = QueryInput
 
+    def _make_cache_id(self, kwargs: dict) -> str:
+        query = kwargs.get("query", "")
+        return query.strip().lower() if query else ""
+
     def _run(self, **kwargs) -> str:
+        cache_id = self._make_cache_id(kwargs)
+
+        if _CACHE_AVAILABLE and _CACHE_ENABLED and cache_id:
+            try:
+                cached = get_cache(self.name, cache_id)
+                if cached:
+                    logger.info(f"[CACHE HIT] {self.name} pour '{cache_id}'")
+                    return cached
+            except Exception as e:
+                logger.warning(f"[CACHE] Erreur lecture pour {self.name}: {e}")
+
         try:
             resp = requests.post(
                 f"{self.tool_url}/run",
@@ -77,9 +92,18 @@ class ContainerTool(BaseTool):
                 timeout=30,
             )
             resp.raise_for_status()
-            return resp.json()["output"]
+            output = resp.json()["output"]
         except Exception as e:
             return f"Erreur outil {self.name} : {str(e)}"
+
+        if _CACHE_AVAILABLE and _CACHE_ENABLED and cache_id:
+            try:
+                set_cache(self.name, cache_id, output, _CACHE_TTL_JOURS)
+                logger.info(f"[CACHE SET] {self.name} pour '{cache_id}' (TTL {_CACHE_TTL_JOURS}j)")
+            except Exception as e:
+                logger.warning(f"[CACHE] Erreur ecriture pour {self.name}: {e}")
+
+        return output
 
     async def _arun(self, **kwargs) -> str:
         return self._run(**kwargs)
