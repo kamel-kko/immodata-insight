@@ -68,7 +68,10 @@
       "Bash(tasklist /FI 'PID eq 37952' /FO TABLE)",
       "Bash(tasklist)",
       "Bash(wmic process:*)",
-      "Bash(python -c \"import yaml; print\\(''PyYAML OK:'', yaml.__version__\\)\")"
+      "Bash(python -c \"import yaml; print\\(''PyYAML OK:'', yaml.__version__\\)\")",
+      "Bash(python -m pytest tests/test_forge_validation.py -v)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -m pytest tests/test_forge_validation.py tests/test_tool_runner.py -v)"
     ]
   },
   "hooks": {
