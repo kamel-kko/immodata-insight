@@ -48,12 +48,27 @@ DEFAULTS = {
     "project_insee":   "",
     "project_commune": "",
     "project_zone":    "",
+    "project_dept":    "",
+    "project_lat":     None,
+    "project_lon":     None,
     "model_choice":    load_settings().get("last_model", ""),
     "map_url":         None,
     "mermaid_code":    None,
     "schema_path":     None,
     "chroma_chunks":   0,
     "tool_statuses":   {},
+    # PLU module
+    "plu_loaded":      False,
+    "plu_infos":       None,
+    "plu_retriever":   None,
+    "plu_chatbot":     None,
+    "plu_fiche":       None,
+    "plu_messages":    [],
+    "plu_type_doc":    "",
+    "plu_date_appro":  "",
+    "plu_nb_chunks":   0,
+    "plu_zones":       [],
+    "plu_loading":     False,
 }
 for k, v in DEFAULTS.items():
     if k not in st.session_state:
