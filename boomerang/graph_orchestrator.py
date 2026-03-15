@@ -356,6 +356,122 @@ def router_apres_agent(state: dict) -> str:
     return END
 
 
+# ── Noeud de raffinement d'intention ──────────────────
+
+# Patterns pour detecter une adresse ou des coordonnees dans la requete
+_ADDR_PATTERNS = [
+    r'\d{5}',                          # code postal
+    r'\d+\s*(rue|avenue|boulevard|chemin|place|impasse|allee|route)',
+    r'(rue|avenue|boulevard|chemin|place|impasse|allee|route)\s+\w+',
+    r'-?\d+\.\d+\s*,\s*-?\d+\.\d+',   # coordonnees GPS
+    r'\b[A-Z][a-z]+-[A-Z][a-z]+\b',    # nom compose type Saint-Vincent
+]
+
+_PROJECT_KEYWORDS = [
+    "construction", "renovation", "extension", "permis",
+    "erp", "pmr", "plu", "accessibilite", "securite incendie",
+    "notice", "urbanisme", "batiment", "logement", "immeuble",
+    "maison", "local commercial", "commerce", "restaurant",
+    "bureau", "entrepot", "hangar", "garage",
+]
+
+
+def _contient_adresse(texte: str) -> bool:
+    texte_lower = texte.lower()
+    for pattern in _ADDR_PATTERNS:
+        if re.search(pattern, texte_lower):
+            return True
+    return False
+
+
+def _est_requete_vague(texte: str) -> bool:
+    mots = texte.strip().split()
+    return len(mots) < 10 and not _contient_adresse(texte)
+
+
+def _deviner_type_projet(texte: str) -> str:
+    texte_lower = texte.lower()
+    if any(k in texte_lower for k in ["erp", "commerce", "restaurant", "hotel", "local commercial"]):
+        return "ERP (Etablissement Recevant du Public)"
+    if any(k in texte_lower for k in ["maison", "logement", "habitation", "villa"]):
+        return "Habitation"
+    if any(k in texte_lower for k in ["renovation", "rehab", "transformation"]):
+        return "Renovation"
+    if any(k in texte_lower for k in ["extension", "agrandissement", "surelevation"]):
+        return "Extension"
+    return "Construction neuve (type a preciser)"
+
+
+def _reformuler_requete_experte(texte: str) -> str:
+    type_projet = _deviner_type_projet(texte)
+    verifications = ["PLU (zonage, regles de hauteur, emprise, recul)"]
+    verifications.append("Georisques (inondation, sismicite, radon, mouvements de terrain)")
+
+    if "erp" in texte.lower() or any(k in texte.lower() for k in ["commerce", "restaurant", "hotel"]):
+        verifications.append("ERP (categorie, type, notice de securite incendie)")
+        verifications.append("PMR (accessibilite handicapes)")
+
+    checks = "\n".join(f"  - {v}" for v in verifications)
+    return (
+        f"ANALYSE EXPERTE DEMANDEE — Type de projet detecte : {type_projet}\n"
+        f"Requete initiale : {texte}\n\n"
+        f"Verifications a effectuer :\n{checks}\n\n"
+        f"Utilise les outils disponibles pour chaque verification listee ci-dessus, "
+        f"puis synthetise les resultats en suivant le plan en 5 sections."
+    )
+
+
+def refine_intent_node(state: dict) -> dict:
+    messages = state.get("messages", [])
+    if not messages:
+        return state
+
+    last = messages[-1]
+    user_text = last.content if hasattr(last, "content") else str(last)
+
+    # Requete trop courte et sans adresse -> demander plus d'infos
+    if _est_requete_vague(user_text):
+        clarification = (
+            "Pour vous repondre precisement, j'ai besoin de l'adresse exacte "
+            "ou de la commune du projet. Pouvez-vous la preciser ?"
+        )
+        return {
+            "messages": [AIMessage(content=clarification)],
+            "besoin_forge": None,
+            "_skip_agent": True,
+        }
+
+    # Requete avec adresse mais vague -> reformuler en instruction experte
+    if _contient_adresse(user_text) and len(user_text.strip().split()) < 20:
+        enriched = _reformuler_requete_experte(user_text)
+        # Remplacer le dernier message par la version enrichie
+        return {
+            "messages": [HumanMessage(content=enriched)],
+            "besoin_forge": None,
+            "_skip_agent": False,
+        }
+
+    # Requete suffisamment detaillee -> passer au noeud agent tel quel
+    return {
+        "messages": [],
+        "besoin_forge": None,
+        "_skip_agent": False,
+    }
+
+
+def router_apres_refine(state: dict) -> str:
+    if state.get("_skip_agent"):
+        return END
+    # Si le message contient FORGE (casse insensible), court-circuiter vers forge_node
+    messages = state.get("messages", [])
+    if messages:
+        last = messages[-1]
+        content = last.content if hasattr(last, "content") else str(last)
+        if "forge" in content.lower():
+            return "forge_node"
+    return "agent_node"
+
+
 # ── Construction du graphe ──────────────────────────────
 
 def build_graph():
