@@ -907,6 +907,12 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
                 st.session_state.forge_mode = "review"
                 st.rerun()
 
+# ── État GUIDE ──────────────────────────────────────────
+
+elif st.session_state.guide_mode == "depot_pc":
+    from guide_depot_pc import render_guide
+    render_guide(id_projet, TOOL_REGISTRY)
+
 # ── État NORMAL ─────────────────────────────────────────
 
 else:
