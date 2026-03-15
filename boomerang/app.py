@@ -526,7 +526,7 @@ id_projet = st.session_state.id_projet
 # ══════════════════════════════════════════════════════════
 
 if not id_projet:
-    st.info("Sélectionnez ou créez un projet dans la sidebar.")
+    st.info("Selectionnez ou creez un projet dans le panneau Projet.")
     st.stop()
 
 thread_id = f"projet_{id_projet}"
