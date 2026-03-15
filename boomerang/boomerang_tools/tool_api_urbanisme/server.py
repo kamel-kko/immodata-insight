@@ -74,6 +74,18 @@ def _interroger_gpu(lat: float, lon: float) -> list[dict]:
     return data.get("features", [])
 
 
+def generer_url_carte_wms(lat: float, lon: float, zoom: int = 17) -> str:
+    """Construit l'URL WMS Geoportail pour une carte cadastrale centree sur lat/lon."""
+    bbox = f"{lon - 0.002},{lat - 0.002},{lon + 0.002},{lat + 0.002}"
+    return (
+        "https://wxs.ign.fr/geoportail/geoscroll/wms?"
+        "SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
+        "&LAYERS=CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
+        f"&CRS=CRS:84&BBOX={bbox}"
+        "&WIDTH=600&HEIGHT=400&FORMAT=image/png"
+    )
+
+
 @app.post("/run")
 def run(body: RunInput) -> dict:
     query = body.input.get("query", "")
