@@ -69,7 +69,7 @@ def _modele_supporte_tools(model_name: str) -> bool:
 # def get_llm(model_name=""): retournait ChatOllama(model=model_name or env)
 # --- FIN SAUVEGARDE ---
 
-SETTINGS_FILE = Path("/app/data/settings.json")
+SETTINGS_FILE = Path(os.path.join(_DATA_DIR, "settings.json"))
 
 
 def _load_settings() -> dict:
