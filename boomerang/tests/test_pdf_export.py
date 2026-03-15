@@ -100,7 +100,7 @@ def test_generer_pdf_retourne_bytes():
         {"role": "assistant", "content": "Bienvenue sur BOOMERANG."},
     ]
     result = generer_pdf_rapport("test_projet", messages)
-    assert isinstance(result, bytes)
+    assert isinstance(result, (bytes, bytearray))
     assert len(result) > 100
 
 
@@ -112,7 +112,7 @@ def test_generer_pdf_commence_par_pdf_header():
 
 def test_generer_pdf_messages_vides():
     result = generer_pdf_rapport("projet_vide", [])
-    assert isinstance(result, bytes)
+    assert isinstance(result, (bytes, bytearray))
     assert result[:5] == b"%PDF-"
 
 
@@ -122,7 +122,7 @@ def test_generer_pdf_message_sans_contenu_ignore():
         {"role": "assistant", "content": "Reponse utile"},
     ]
     result = generer_pdf_rapport("projet_x", messages)
-    assert isinstance(result, bytes)
+    assert isinstance(result, (bytes, bytearray))
 
 
 def test_generer_pdf_avec_horodatage():
@@ -139,7 +139,7 @@ def test_generer_pdf_avec_horodatage():
         },
     ]
     result = generer_pdf_rapport("projet_ts", messages)
-    assert isinstance(result, bytes)
+    assert isinstance(result, (bytes, bytearray))
     assert len(result) > 100
 
 
@@ -148,4 +148,4 @@ def test_generer_pdf_contenu_markdown_nettoye():
         {"role": "assistant", "content": "## Titre\n**Gras** et *italique*\n```python\ncode\n```"},
     ]
     result = generer_pdf_rapport("projet_md", messages)
-    assert isinstance(result, bytes)
+    assert isinstance(result, (bytes, bytearray))

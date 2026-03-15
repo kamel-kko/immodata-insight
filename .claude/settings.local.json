@@ -71,7 +71,8 @@
       "Bash(python -c \"import yaml; print\\(''PyYAML OK:'', yaml.__version__\\)\")",
       "Bash(python -m pytest tests/test_forge_validation.py -v)",
       "Bash(python -m pytest tests/ -v)",
-      "Bash(python -m pytest tests/test_forge_validation.py tests/test_tool_runner.py -v)"
+      "Bash(python -m pytest tests/test_forge_validation.py tests/test_tool_runner.py -v)",
+      "Bash(python -m pytest tests/test_pdf_export.py tests/test_guide_depot_pc.py tests/test_forge_validation.py tests/test_tool_runner.py tests/test_cache_api.py -v)"
     ]
   },
   "hooks": {
