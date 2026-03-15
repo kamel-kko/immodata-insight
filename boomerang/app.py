@@ -1254,38 +1254,55 @@ else:
     with col_center:
         st.markdown('<div class="bento-panel" style="display:flex;flex-direction:column">', unsafe_allow_html=True)
 
-        # Quick Actions (chips decoratifs + vrais boutons)
-        QUICK_ACTIONS = {
-            "Verifier PLU":      "Analyse le PLU de la parcelle et verifie la conformite du projet",
-            "Synthese risques":  "Genere une synthese des risques naturels et technologiques",
-            "Generer schema":    "Cree un schema de principe du projet",
-            "Depot PC":          "Liste les pieces necessaires au depot du permis de construire",
-        }
-        if not SAAS_MODE:
-            QUICK_ACTIONS["FORGE"] = "FORGE — analyse technique approfondie"
+        if id_projet:
+            # Quick Actions (chips decoratifs + vrais boutons)
+            QUICK_ACTIONS = {
+                "Verifier PLU":      "Analyse le PLU de la parcelle et verifie la conformite du projet",
+                "Synthese risques":  "Genere une synthese des risques naturels et technologiques",
+                "Generer schema":    "Cree un schema de principe du projet",
+                "Depot PC":          "Liste les pieces necessaires au depot du permis de construire",
+            }
+            if not SAAS_MODE:
+                QUICK_ACTIONS["FORGE"] = "FORGE — analyse technique approfondie"
 
-        qa_html = '<div class="qa-strip">'
-        for label in QUICK_ACTIONS:
-            qa_html += f'<div class="qa-chip">{label}</div>'
-        qa_html += '</div>'
-        st.markdown(qa_html, unsafe_allow_html=True)
+            qa_html = '<div class="qa-strip">'
+            for label in QUICK_ACTIONS:
+                qa_html += f'<div class="qa-chip">{label}</div>'
+            qa_html += '</div>'
+            st.markdown(qa_html, unsafe_allow_html=True)
 
-        # Vrais boutons (invisibles visuellement, declenchent l'action)
-        qa_cols = st.columns(len(QUICK_ACTIONS))
-        clicked_action = None
-        for i, (label, prompt) in enumerate(QUICK_ACTIONS.items()):
-            with qa_cols[i]:
-                if st.button(label, key=f"qa_{i}", help=prompt, use_container_width=True):
-                    clicked_action = prompt
-        if clicked_action:
-            st.session_state.messages.append({"role": "user", "content": clicked_action})
-            st.session_state.pending_input = clicked_action
-            st.rerun()
+            # Vrais boutons (invisibles visuellement, declenchent l'action)
+            qa_cols = st.columns(len(QUICK_ACTIONS))
+            clicked_action = None
+            for i, (label, prompt) in enumerate(QUICK_ACTIONS.items()):
+                with qa_cols[i]:
+                    if st.button(label, key=f"qa_{i}", help=prompt, use_container_width=True):
+                        clicked_action = prompt
+            if clicked_action:
+                st.session_state.messages.append({"role": "user", "content": clicked_action})
+                st.session_state.pending_input = clicked_action
+                st.rerun()
 
         # Historique chat (conteneur scrollable)
         chat_container = st.container(height=500)
         with chat_container:
-            if not has_messages:
+            if not id_projet:
+                st.markdown("""
+                <div style="display:flex;flex-direction:column;align-items:center;
+                            justify-content:center;min-height:380px;text-align:center;padding:2rem">
+                    <div style="font-size:2.2rem;font-weight:300;color:#e8e6e0;margin-bottom:0.5rem">
+                        BOOM<span style="color:#4A90D9">ERANG</span>
+                    </div>
+                    <div style="font-size:1rem;color:#9ca3af;margin-bottom:1.5rem">
+                        Assistant reglementaire pour architectes
+                    </div>
+                    <div style="font-size:0.82rem;color:#4b5563;max-width:340px;line-height:1.6">
+                        Selectionnez ou creez un projet dans le panneau
+                        <span style="color:#4A90D9">Projet</span> a gauche pour commencer.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            elif not has_messages:
                 st.markdown("""
                 <div style="display:flex;flex-direction:column;align-items:center;
                             justify-content:center;min-height:300px;text-align:center;padding:2rem">
