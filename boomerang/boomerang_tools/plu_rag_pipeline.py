@@ -373,6 +373,28 @@ def indexer_chunks(chunks: list, code_insee: str, force: bool = False) -> Chroma
     return vectorstore
 
 
+def indexer_plu_chromadb(chunks: list, code_insee: str,
+                         force_reindex: bool = False) -> str:
+    """Wrapper conforme au spec : indexe et retourne un statut texte."""
+    collection_name = _collection_id(code_insee)
+    client = chromadb.PersistentClient(path=CHROMA_DIR)
+
+    if not force_reindex:
+        try:
+            existing = client.list_collections()
+            existing_names = [c.name if hasattr(c, 'name') else c for c in existing]
+            if collection_name in existing_names:
+                coll = client.get_collection(collection_name)
+                if coll.count() == len(chunks):
+                    return "deja_indexe"
+        except Exception:
+            pass
+
+    # Convertir les chunks dicts en format attendu par indexer_chunks
+    indexer_chunks(chunks, code_insee, force=force_reindex)
+    return "re-indexe" if force_reindex else "indexe"
+
+
 def creer_retriever(code_insee: str, k: int = 6, fetch_k: int = 20) -> Optional[object]:
     """Cree un retriever MMR pour une commune deja indexee.
 
