@@ -4,63 +4,49 @@
     {
       "name": "boomerang_app",
       "runtimeExecutable": "streamlit",
-      "runtimeArgs": ["run", "app.py", "--server.address=0.0.0.0", "--server.headless=true"],
+      "runtimeArgs": ["run", "app.py", "--server.headless=true"],
       "port": 8501,
       "autoPort": true
     },
     {
       "name": "tool_recherche_searxng",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["server:app", "--host", "0.0.0.0"],
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--app-dir", "boomerang_tools/tool_recherche_searxng"],
       "port": 8001,
       "autoPort": true
     },
     {
       "name": "tool_notice_securite",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["server:app", "--host", "0.0.0.0"],
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--app-dir", "boomerang_tools/tool_notice_securite"],
       "port": 8002,
       "autoPort": true
     },
     {
       "name": "tool_api_urbanisme",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["server:app", "--host", "0.0.0.0"],
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--app-dir", "boomerang_tools/tool_api_urbanisme"],
       "port": 8003,
       "autoPort": true
     },
     {
       "name": "tool_mcp_legal",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["server:app", "--host", "0.0.0.0"],
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--app-dir", "boomerang_tools/tool_mcp_legal"],
       "port": 8004,
       "autoPort": true
     },
     {
       "name": "tool_georisques",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["server:app", "--host", "0.0.0.0"],
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--app-dir", "boomerang_tools/tool_georisques"],
       "port": 8005,
       "autoPort": true
     },
     {
-      "name": "langfuse",
+      "name": "docker_all",
       "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "up", "langfuse", "langfuse-db"],
-      "port": 3003,
-      "autoPort": true
-    },
-    {
-      "name": "searxng",
-      "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "up", "searxng"],
-      "port": 8080,
-      "autoPort": true
-    },
-    {
-      "name": "all_docker",
-      "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "up", "-d"],
+      "runtimeArgs": ["compose", "up"],
       "port": 8501,
       "autoPort": true
     }

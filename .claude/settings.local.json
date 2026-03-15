@@ -45,7 +45,23 @@
       "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json; charset=utf-8\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"ERP type M\"\"\"\"}}')",
       "mcp__Claude_Preview__preview_start",
       "Bash(python -m pytest tests/test_tool_runner.py tests/test_tool_api_urbanisme.py -v --tb=short)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(findstr \"8501\")",
+      "Bash(taskkill /PID 15852 /F)",
+      "Bash(taskkill /PID 39508 /F)",
+      "Bash(taskkill //PID 15852 //F)",
+      "Bash(taskkill //PID 39508 //F)",
+      "Bash(streamlit run:*)",
+      "Bash(uvicorn server:app --host 0.0.0.0 --port 8002)",
+      "Bash(uvicorn server:app --host 0.0.0.0 --port 8003)",
+      "Bash(uvicorn server:app --host 0.0.0.0 --port 8005)",
+      "Bash(uvicorn server:app --host 0.0.0.0 --port 8004)",
+      "Bash(uvicorn server:app --host 0.0.0.0 --port 8001)",
+      "Bash(findstr \"LISTENING\")",
+      "Bash(findstr \"8001 8002 8003 8004 8005 8501\")",
+      "Bash(findstr \"8002\")",
+      "Bash(python -c \"import server; print\\(''OK''\\)\")",
+      "Bash(curl -s http://localhost:8501/_stcore/health)"
     ]
   },
   "hooks": {
