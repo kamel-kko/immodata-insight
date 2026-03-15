@@ -26,15 +26,28 @@ from langfuse import Langfuse
 # Imports et appels interdits dans le code forge (securite)
 _FORBIDDEN_IMPORTS = {
     "subprocess", "shutil", "ctypes", "importlib",
-    "eval", "exec", "compile", "__import__",
     "pickle", "shelve", "tempfile",
+    "socket", "multiprocessing", "threading",
+    "signal", "pty", "code", "codeop",
+    "webbrowser", "antigravity",
 }
 
 _FORBIDDEN_CALLS = {
-    "os.system", "os.popen", "os.exec",
-    "os.remove", "os.rmdir", "os.unlink",
-    "open",  # sauf si c'est dans un pattern safe
+    "os.system", "os.popen", "os.exec", "os.execvp", "os.execve",
+    "os.remove", "os.rmdir", "os.unlink", "os.rename",
+    "os.chdir", "os.chmod", "os.chown", "os.mkdir", "os.makedirs",
+    "os.kill", "os.fork", "os.spawn", "os.spawnl",
+    "open",
+    "globals", "locals", "vars",
+    "setattr", "delattr",
+    "eval", "exec", "compile", "__import__",
+    "input",
 }
+
+_FORBIDDEN_STRING_PATTERNS = [
+    "127.0.0.1", "0.0.0.0", "localhost",
+    "metadata.google", "169.254.169.254",
+]
 
 
 def _valider_code_forge(code: str) -> list[str]:
