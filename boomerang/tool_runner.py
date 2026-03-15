@@ -116,8 +116,8 @@ def charger_outils() -> list[BaseTool]:
                     tool_url=url,
                     args_schema=schema,
                 ))
-        except Exception:
-            pass  # Container outil indisponible — skip silencieux
+        except Exception as e:
+            logger.warning(f"[charger_outils] Outil '{nom}' indisponible ({url}): {e}")
 
     # Outils locaux (pas de container)
     try:
