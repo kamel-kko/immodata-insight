@@ -424,6 +424,15 @@ Retourne le code amélioré en JSON."""
     code_ameliore = response.get("code", code_actuel)
     test_code = response.get("test", "")
 
+    # Validation statique avant ecriture
+    problemes = _valider_code_forge(code_ameliore)
+    if problemes:
+        return {
+            "code": code_actuel,
+            "tests_ok": False,
+            "pytest_output": "Code rejeté — problèmes de sécurité :\n" + "\n".join(f"  - {p}" for p in problemes),
+        }
+
     # Écrire dans temp_tools
     temp_dir = os.getenv("TEMP_TOOLS_DIR", "/app/temp_tools")
     tool_dir = os.path.join(temp_dir, nom_fichier)
