@@ -640,35 +640,72 @@ else:
     [data-testid="stFileUploader"] > label { display: none !important; }
     [data-testid="stFileUploader"] > div { margin-top: -1rem; }
 
-    /* Style boutons actions sous le chat */
-    .action-bar {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 0;
+    /* Masquer le label du text_input dans le conteneur de saisie */
+    .input-box [data-testid="stTextInput"] > label { display: none !important; }
+    .input-box [data-testid="stTextInput"] > div { margin-top: 0; }
+
+    /* Conteneur de saisie unifie (texte + actions) */
+    .input-box [data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 1.5rem !important;
+        border-color: rgba(255,255,255,0.2) !important;
+        background: rgba(255,255,255,0.03) !important;
+        padding: 0 !important;
     }
-    .action-btn {
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 1.5rem;
-        color: rgba(255,255,255,0.7);
-        padding: 0.4rem 1rem;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.15s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
+    .input-box [data-testid="stVerticalBlockBorderWrapper"] > div {
+        padding: 0.8rem 1rem 0.4rem 1rem !important;
     }
-    .action-btn:hover {
-        background: rgba(255,255,255,0.08);
-        border-color: rgba(255,255,255,0.3);
-        color: rgba(255,255,255,0.95);
+
+    /* Text input inside : pas de bordure propre */
+    .input-box [data-testid="stTextInput"] input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0.3rem 0 !important;
+        font-size: 1rem;
+        color: rgba(255,255,255,0.9);
+        box-shadow: none !important;
     }
-    .action-btn.active {
-        background: rgba(209,163,112,0.15);
-        border-color: rgba(209,163,112,0.5);
-        color: #d1a370;
+    .input-box [data-testid="stTextInput"] input:focus {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .input-box [data-testid="stTextInput"] input::placeholder {
+        color: rgba(255,255,255,0.4);
+    }
+
+    /* Boutons d'action dans la barre */
+    .input-box button[kind="secondary"] {
+        border-radius: 1.2rem !important;
+        font-size: 0.82rem !important;
+        padding: 0.25rem 0.8rem !important;
+        border-color: rgba(255,255,255,0.15) !important;
+        background: transparent !important;
+    }
+    .input-box button[kind="secondary"]:hover {
+        background: rgba(255,255,255,0.06) !important;
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    .input-box button[kind="primary"] {
+        border-radius: 1.2rem !important;
+        font-size: 0.82rem !important;
+        padding: 0.25rem 0.8rem !important;
+    }
+
+    /* Selectbox compact dans la barre */
+    .input-box [data-testid="stSelectbox"] {
+        min-width: 0 !important;
+    }
+    .input-box [data-testid="stSelectbox"] > label { display: none !important; }
+    .input-box [data-testid="stSelectbox"] [data-baseweb="select"] {
+        background: transparent !important;
+        border-color: rgba(255,255,255,0.15) !important;
+        border-radius: 1.2rem !important;
+        font-size: 0.82rem !important;
+    }
+
+    /* Separateur discret entre texte et actions */
+    .input-box hr {
+        margin: 0.2rem 0 0.4rem 0;
+        border-color: rgba(255,255,255,0.08);
     }
 
     /* Message de bienvenue centre */
@@ -677,7 +714,7 @@ else:
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 40vh;
+        min-height: 35vh;
         text-align: center;
         padding: 2rem;
     }
@@ -691,7 +728,7 @@ else:
     .welcome-subtitle {
         font-size: 1rem;
         color: rgba(255,255,255,0.5);
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     /* Chips fichier joint */
@@ -707,17 +744,14 @@ else:
         font-size: 0.85rem;
         color: rgba(255,255,255,0.8);
     }
-
-    /* Suggestions rapides */
-    .suggestions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: center;
-        margin-top: 1rem;
-    }
     </style>
     """, unsafe_allow_html=True)
+
+    # Initialiser le compteur de cle pour le text_input
+    if "input_key" not in st.session_state:
+        st.session_state.input_key = 0
+    if "pending_input" not in st.session_state:
+        st.session_state.pending_input = None
 
     # Charger l'historique depuis la DB au premier affichage du projet
     if not st.session_state.messages:
@@ -725,34 +759,16 @@ else:
         if historique:
             st.session_state.messages = historique
 
+    has_messages = bool(st.session_state.messages) or st.session_state.pending_input is not None
+
     # ── Ecran de bienvenue (pas d'historique) ──────────
-    if not st.session_state.messages:
-        st.markdown(f"""
+    if not has_messages:
+        st.markdown("""
         <div class="welcome-container">
             <div class="welcome-title">Bonjour, bienvenue sur BOOMERANG</div>
-            <div class="welcome-subtitle">Assistant reglementaire pour architectes — PLU, ERP, PMR</div>
+            <div class="welcome-subtitle">Assistant reglementaire pour architectes</div>
         </div>
         """, unsafe_allow_html=True)
-
-        # Suggestions rapides
-        suggestion_cols = st.columns(4)
-        suggestions = [
-            ("Urbanisme", "Zonage PLU pour une adresse"),
-            ("Risques", "Risques naturels d'une parcelle"),
-            ("ERP", "Notice de securite incendie"),
-            ("Recherche", "Reglementation PMR"),
-        ]
-        for i, (label, hint) in enumerate(suggestions):
-            with suggestion_cols[i]:
-                if st.button(f"{label}", key=f"sugg_{i}", use_container_width=True, help=hint):
-                    prompts = [
-                        "Quel est le zonage PLU pour mon adresse ?",
-                        "Quels sont les risques naturels pour ma parcelle ?",
-                        "Genere une notice de securite ERP type M, 300 personnes",
-                        "Quelles sont les normes PMR pour un ERP neuf ?",
-                    ]
-                    st.session_state._suggestion_prompt = prompts[i]
-                    st.rerun()
 
     # ── Afficher les messages existants ─────────────────
     else:
@@ -761,138 +777,45 @@ else:
                 st.markdown(msg["content"])
 
     # ══════════════════════════════════════════════════════
-    #  BARRE DE SAISIE STYLE CLAUDE
+    #  TRAITEMENT DU MESSAGE PENDING
     # ══════════════════════════════════════════════════════
 
-    if st.session_state.get("id_projet"):
+    if st.session_state.get("id_projet") and st.session_state.pending_input:
+        user_input_text = st.session_state.pending_input
+        st.session_state.pending_input = None
 
-        # ── Chip fichier joint (au-dessus de la saisie) ──
-        if st.session_state.attached_file_ctx and st.session_state.attached_file_ctx["type"] != "error":
-            ctx = st.session_state.attached_file_ctx
-            chip_col1, chip_col2 = st.columns([10, 1])
-            with chip_col1:
-                icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "TXT" if ctx["filename"].lower().endswith(".txt") else "IMG"
-                st.markdown(f'<div class="file-chip">{icon} {ctx["filename"]}</div>', unsafe_allow_html=True)
-            with chip_col2:
-                if st.button("x", key="remove_file", help="Retirer le fichier"):
-                    st.session_state.attached_file_ctx = None
-                    st.session_state.show_file_uploader = False
-                    st.rerun()
-
-        # ── Chat input principal ─────────────────────────
-        # Recuperer une eventuelle suggestion
-        suggestion_prompt = st.session_state.pop("_suggestion_prompt", None)
-        user_input = st.chat_input("Comment puis-je vous aider ?")
-        if suggestion_prompt and not user_input:
-            user_input = suggestion_prompt
-
-        # ── Barre d'actions sous le chat input ───────────
-        act_cols = st.columns([1, 2, 6, 2])
-
-        with act_cols[0]:
-            if st.button("+", key="btn_attach", help="Joindre un fichier (PDF, image, texte)"):
-                st.session_state.show_file_uploader = not st.session_state.show_file_uploader
-                st.rerun()
-
-        with act_cols[1]:
-            web_label = "Recherche web" if not st.session_state.web_search_enabled else "Recherche web (ON)"
-            web_type = "primary" if st.session_state.web_search_enabled else "secondary"
-            if st.button(web_label, key="btn_web", type=web_type):
-                st.session_state.web_search_enabled = not st.session_state.web_search_enabled
-                st.rerun()
-
-        with act_cols[3]:
-            # Selecteur de modele compact dans la barre
-            modeles = get_ollama_models()
-            current = st.session_state.ollama_model
-            idx = modeles.index(current) if current in modeles else 0
-            # Afficher des noms courts (sans le tag :latest)
-            display_names = [m.replace(":latest", "") for m in modeles]
-            choix_modele = st.selectbox(
-                "Modele",
-                options=modeles,
-                index=idx,
-                format_func=lambda x: x.replace(":latest", ""),
-                label_visibility="collapsed",
-                key="model_select_bar",
-            )
-            if choix_modele != st.session_state.ollama_model:
-                st.session_state.ollama_model = choix_modele
-                if st.session_state.id_projet:
-                    rebuild_graph()
-                st.toast(f"Modele : {choix_modele}")
-
-        # ── Zone file uploader (visible seulement apres clic +) ──
-        if st.session_state.show_file_uploader:
-            uploaded_file = st.file_uploader(
-                "Joindre un fichier",
-                type=["pdf", "txt", "jpg", "jpeg", "png", "webp"],
-                key="file_uploader",
-                label_visibility="collapsed",
-                help="Formats : PDF, TXT, JPG, PNG, WebP (max 10 Mo)",
-            )
-            if uploaded_file is not None:
-                ctx = _preparer_contexte_fichier(uploaded_file)
-                if ctx["type"] == "error":
-                    st.error(ctx["content"])
-                elif ctx["type"] == "image" and not _modele_supporte_vision(st.session_state.ollama_model):
-                    st.warning(
-                        f"Le modele {st.session_state.ollama_model} ne supporte pas les images. "
-                        "Choisissez un modele vision (llava, qwen2-vl...) ou joignez un PDF/TXT."
-                    )
-                else:
-                    st.session_state.attached_file_ctx = ctx
-                    st.session_state.show_file_uploader = False
-                    st.rerun()
-
-    else:
-        user_input = None
-
-    # ══════════════════════════════════════════════════════
-    #  TRAITEMENT DU MESSAGE
-    # ══════════════════════════════════════════════════════
-
-    if user_input:
         file_ctx = st.session_state.attached_file_ctx
-
-        # Construire le message complet avec le contexte du fichier
-        display_text = user_input
-        llm_text = user_input
+        display_text = user_input_text
+        llm_text = user_input_text
 
         if file_ctx and file_ctx["type"] == "text":
             llm_text = (
-                f"{user_input}\n\n"
+                f"{user_input_text}\n\n"
                 f"--- CONTENU DU FICHIER JOINT : {file_ctx['filename']} ---\n"
                 f"{file_ctx['content'][:15000]}"
             )
-            display_text = f"{user_input}\n\n*Fichier joint : {file_ctx['filename']}*"
-
+            display_text = f"{user_input_text}\n\n*Fichier joint : {file_ctx['filename']}*"
         elif file_ctx and file_ctx["type"] == "image":
             llm_text = (
-                f"{user_input}\n\n"
+                f"{user_input_text}\n\n"
                 f"[Image jointe : {file_ctx['filename']}]"
             )
-            display_text = f"{user_input}\n\n*Image jointe : {file_ctx['filename']}*"
+            display_text = f"{user_input_text}\n\n*Image jointe : {file_ctx['filename']}*"
 
-        # Si recherche web activee, prefixer la requete
         if st.session_state.web_search_enabled:
             llm_text = (
                 f"[RECHERCHE WEB DEMANDEE] L'utilisateur souhaite que tu utilises "
                 f"l'outil recherche_web pour enrichir ta reponse.\n\n{llm_text}"
             )
 
-        # Ajouter et afficher le message utilisateur
         st.session_state.messages.append({"role": "user", "content": display_text})
         with st.chat_message("user"):
             st.markdown(display_text)
-
         sauvegarder_message(id_projet, "user", display_text)
 
-        # Reinitialiser le fichier joint apres envoi
         st.session_state.attached_file_ctx = None
         st.session_state.show_file_uploader = False
 
-        # Invoquer le graphe avec le modele selectionne
         current_model = st.session_state.ollama_model
         with st.chat_message("assistant"):
             with st.status("Agent en reflexion...") as status:
@@ -917,7 +840,7 @@ else:
                             f"avec votre demande.{suggestion}\n\n"
                             "Vous pouvez :\n"
                             "- Reformuler votre question\n"
-                            "- Changer de modele (qwen3:14b, llama3.2:3b, gemma3:12b)\n"
+                            "- Changer de modele\n"
                             "- Reessayer dans quelques instants"
                         ),
                         "besoin_forge": None,
@@ -932,3 +855,118 @@ else:
                 st.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 sauvegarder_message(id_projet, "assistant", response)
+
+    # ══════════════════════════════════════════════════════
+    #  CONTENEUR DE SAISIE STYLE CLAUDE
+    # ══════════════════════════════════════════════════════
+
+    if st.session_state.get("id_projet"):
+
+        # ── Chip fichier joint (au-dessus du conteneur) ──
+        if st.session_state.attached_file_ctx and st.session_state.attached_file_ctx["type"] != "error":
+            ctx = st.session_state.attached_file_ctx
+            chip_col1, chip_col2 = st.columns([10, 1])
+            with chip_col1:
+                icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "TXT" if ctx["filename"].lower().endswith(".txt") else "IMG"
+                st.markdown(f'<div class="file-chip">{icon} {ctx["filename"]}</div>', unsafe_allow_html=True)
+            with chip_col2:
+                if st.button("x", key="remove_file", help="Retirer le fichier"):
+                    st.session_state.attached_file_ctx = None
+                    st.session_state.show_file_uploader = False
+                    st.rerun()
+
+        # ── Conteneur unifie : texte + actions ───────────
+        st.markdown('<div class="input-box">', unsafe_allow_html=True)
+        with st.container(border=True):
+            user_input = st.text_input(
+                "Message",
+                placeholder="Comment puis-je vous aider ?",
+                label_visibility="collapsed",
+                key=f"user_msg_{st.session_state.input_key}",
+            )
+
+            st.markdown("<hr>", unsafe_allow_html=True)
+
+            act_cols = st.columns([1, 3, 4, 3])
+
+            with act_cols[0]:
+                if st.button("+", key="btn_attach", help="Joindre un fichier"):
+                    st.session_state.show_file_uploader = not st.session_state.show_file_uploader
+                    st.rerun()
+
+            with act_cols[1]:
+                web_label = "Recherche web" if not st.session_state.web_search_enabled else "Recherche web ON"
+                web_type = "primary" if st.session_state.web_search_enabled else "secondary"
+                if st.button(web_label, key="btn_web", type=web_type):
+                    st.session_state.web_search_enabled = not st.session_state.web_search_enabled
+                    st.rerun()
+
+            with act_cols[3]:
+                modeles = get_ollama_models()
+                current = st.session_state.ollama_model
+                idx = modeles.index(current) if current in modeles else 0
+                choix_modele = st.selectbox(
+                    "Modele",
+                    options=modeles,
+                    index=idx,
+                    format_func=lambda x: x.replace(":latest", ""),
+                    label_visibility="collapsed",
+                    key="model_select_bar",
+                )
+                if choix_modele != st.session_state.ollama_model:
+                    st.session_state.ollama_model = choix_modele
+                    if st.session_state.id_projet:
+                        rebuild_graph()
+                    st.toast(f"Modele : {choix_modele}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # ── Zone file uploader (visible apres clic +) ────
+        if st.session_state.show_file_uploader:
+            uploaded_file = st.file_uploader(
+                "Joindre un fichier",
+                type=["pdf", "txt", "jpg", "jpeg", "png", "webp"],
+                key="file_uploader",
+                label_visibility="collapsed",
+                help="Formats : PDF, TXT, JPG, PNG, WebP (max 10 Mo)",
+            )
+            if uploaded_file is not None:
+                ctx = _preparer_contexte_fichier(uploaded_file)
+                if ctx["type"] == "error":
+                    st.error(ctx["content"])
+                elif ctx["type"] == "image" and not _modele_supporte_vision(st.session_state.ollama_model):
+                    st.warning(
+                        f"Le modele {st.session_state.ollama_model} ne supporte pas les images. "
+                        "Choisissez un modele vision (llava, qwen2-vl...) ou joignez un PDF/TXT."
+                    )
+                else:
+                    st.session_state.attached_file_ctx = ctx
+                    st.session_state.show_file_uploader = False
+                    st.rerun()
+
+        # ── Detecter nouvelle soumission ─────────────────
+        if user_input:
+            st.session_state.pending_input = user_input
+            st.session_state.input_key += 1
+            st.rerun()
+
+    # ── Suggestions rapides (ecran de bienvenue, sous le conteneur) ──
+    if not has_messages and st.session_state.get("id_projet"):
+        suggestion_cols = st.columns(4)
+        suggestions = [
+            ("Urbanisme", "Zonage PLU pour une adresse"),
+            ("Risques", "Risques naturels d'une parcelle"),
+            ("ERP", "Notice de securite incendie"),
+            ("Recherche", "Reglementation PMR"),
+        ]
+        prompts = [
+            "Quel est le zonage PLU pour mon adresse ?",
+            "Quels sont les risques naturels pour ma parcelle ?",
+            "Genere une notice de securite ERP type M, 300 personnes",
+            "Quelles sont les normes PMR pour un ERP neuf ?",
+        ]
+        for i, (label, hint) in enumerate(suggestions):
+            with suggestion_cols[i]:
+                if st.button(label, key=f"sugg_{i}", use_container_width=True, help=hint):
+                    st.session_state.pending_input = prompts[i]
+                    st.rerun()
