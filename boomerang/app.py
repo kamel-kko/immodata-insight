@@ -68,7 +68,7 @@ from db_manager import (
     get_prochain_port,
     enregistrer_port,
 )
-from graph_orchestrator import invoke_graph, rebuild_graph, get_langfuse_handler
+from graph_orchestrator import invoke_graph, stream_graph, rebuild_graph, get_langfuse_handler
 from tool_runner import TOOL_REGISTRY, charger_outils
 
 if not SAAS_MODE:
