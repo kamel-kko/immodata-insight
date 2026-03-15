@@ -461,6 +461,7 @@ def _reformuler_requete_experte(texte: str) -> str:
 
 
 def refine_intent_node(state: dict) -> dict:
+    logger.info("[refine_intent_node] mode=fast (pas d'appel LLM, traitement local)")
     messages = state.get("messages", [])
     if not messages:
         return state
