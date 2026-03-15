@@ -558,8 +558,8 @@ def _parallel_action_node(state: dict) -> dict:
 
     if len(tool_calls) > 1:
         logger.info(f"Execution parallele de {len(tool_calls)} outils: {[c.get('name') for c in tool_calls]}")
-        with ThreadPoolExecutor(max_workers=min(len(tool_calls), 4)) as executor:
-            tool_messages = list(executor.map(run_one_tool, tool_calls))
+        futures = [_TOOL_EXECUTOR.submit(run_one_tool, call) for call in tool_calls]
+        tool_messages = [f.result(timeout=60) for f in futures]
     else:
         tool_messages = [run_one_tool(tool_calls[0])]
 
