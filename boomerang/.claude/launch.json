@@ -1,0 +1,59 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "boomerang_app",
+      "runtimeExecutable": "streamlit",
+      "runtimeArgs": ["run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"],
+      "port": 8501
+    },
+    {
+      "name": "tool_recherche_searxng",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--port", "8001"],
+      "port": 8001
+    },
+    {
+      "name": "tool_notice_securite",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--port", "8002"],
+      "port": 8002
+    },
+    {
+      "name": "tool_api_urbanisme",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--port", "8003"],
+      "port": 8003
+    },
+    {
+      "name": "tool_mcp_legal",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--port", "8004"],
+      "port": 8004
+    },
+    {
+      "name": "tool_georisques",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["server:app", "--host", "0.0.0.0", "--port", "8005"],
+      "port": 8005
+    },
+    {
+      "name": "langfuse",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "langfuse", "langfuse-db"],
+      "port": 3003
+    },
+    {
+      "name": "searxng",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "searxng"],
+      "port": 8080
+    },
+    {
+      "name": "all_docker",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "-d"],
+      "port": 8501
+    }
+  ]
+}
