@@ -36,20 +36,26 @@ logger = logging.getLogger(__name__)
 
 # ── Sélection LLM ──────────────────────────────────────
 
-def get_llm():
+def get_llm(model_name: str = ""):
+    """Retourne le LLM configuré selon LLM_PROVIDER.
+
+    Args:
+        model_name: Nom du modèle à utiliser (prioritaire sur .env).
+                    Si vide, utilise OLLAMA_MODEL / TOGETHER_MODEL du .env.
+    """
     provider = os.getenv("LLM_PROVIDER", "ollama")
     if provider == "ollama":
         from langchain_ollama import ChatOllama
         return ChatOllama(
             base_url=os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434"),
-            model=os.getenv("OLLAMA_MODEL", "llama3.2"),
+            model=model_name or os.getenv("OLLAMA_MODEL", "llama3.2"),
         )
     elif provider == "together":
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             base_url="https://api.together.xyz/v1",
             api_key=os.getenv("TOGETHER_API_KEY", ""),
-            model=os.getenv("TOGETHER_MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo"),
+            model=model_name or os.getenv("TOGETHER_MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo"),
         )
     else:
         raise ValueError(f"LLM_PROVIDER inconnu : {provider}")
