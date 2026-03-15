@@ -8,6 +8,7 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import tool_runner
 from tool_runner import ContainerTool, LocalTool, QueryInput, NoticeInput, DevRequestInput, TOOL_REGISTRY
 
 
@@ -17,7 +18,8 @@ def test_tool_registry_has_expected_tools():
 
 
 def test_container_tool_run_success():
-    with patch("tool_runner.requests.post") as mock_post:
+    with patch("tool_runner.requests.post") as mock_post, \
+         patch.object(tool_runner, "_CACHE_AVAILABLE", False):
         mock_resp = MagicMock()
         mock_resp.json.return_value = {"output": "Zone UA"}
         mock_resp.raise_for_status = MagicMock()
@@ -33,7 +35,8 @@ def test_container_tool_run_success():
 
 
 def test_container_tool_run_http_error():
-    with patch("tool_runner.requests.post", side_effect=Exception("Connection refused")):
+    with patch("tool_runner.requests.post", side_effect=Exception("Connection refused")), \
+         patch.object(tool_runner, "_CACHE_AVAILABLE", False):
         tool = ContainerTool(
             name="test_tool",
             description="Outil de test",
@@ -41,6 +44,60 @@ def test_container_tool_run_http_error():
         )
         result = tool._run(query="test")
         assert "Erreur" in result
+
+
+def test_container_tool_cache_hit():
+    with patch("tool_runner.get_cache", return_value="Resultat cache") as mock_get, \
+         patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
+         patch.object(tool_runner, "_CACHE_ENABLED", True):
+        tool = ContainerTool(
+            name="recherche_urbanisme",
+            description="Test cache",
+            tool_url="http://fake:8003",
+        )
+        result = tool._run(query="12 rue de Rivoli Paris")
+        assert result == "Resultat cache"
+        mock_get.assert_called_once_with("recherche_urbanisme", "12 rue de rivoli paris")
+
+
+def test_container_tool_cache_miss_then_store():
+    with patch("tool_runner.get_cache", return_value=None) as mock_get, \
+         patch("tool_runner.set_cache") as mock_set, \
+         patch("tool_runner.requests.post") as mock_post, \
+         patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
+         patch.object(tool_runner, "_CACHE_ENABLED", True):
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {"output": "Zone UA fraiche"}
+        mock_resp.raise_for_status = MagicMock()
+        mock_post.return_value = mock_resp
+
+        tool = ContainerTool(
+            name="recherche_urbanisme",
+            description="Test cache miss",
+            tool_url="http://fake:8003",
+        )
+        result = tool._run(query="Paris centre")
+        assert result == "Zone UA fraiche"
+        mock_get.assert_called_once()
+        mock_set.assert_called_once()
+
+
+def test_container_tool_cache_disabled():
+    with patch("tool_runner.requests.post") as mock_post, \
+         patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
+         patch.object(tool_runner, "_CACHE_ENABLED", False):
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {"output": "Direct API"}
+        mock_resp.raise_for_status = MagicMock()
+        mock_post.return_value = mock_resp
+
+        tool = ContainerTool(
+            name="recherche_urbanisme",
+            description="Test cache off",
+            tool_url="http://fake:8003",
+        )
+        result = tool._run(query="Paris")
+        assert result == "Direct API"
 
 
 def test_local_tool_run_success():
