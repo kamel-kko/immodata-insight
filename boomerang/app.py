@@ -642,11 +642,15 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
                     pass  # service existe déjà
 
                 # Lancer le container
-                subprocess.run(
-                    ["docker", "compose", "up", "-d", "--build", nom_outil],
-                    cwd="/app/project",
-                    capture_output=True, timeout=120,
-                )
+                try:
+                    subprocess.run(
+                        ["docker", "compose", "up", "-d", "--build", nom_outil],
+                        cwd="/app/project",
+                        capture_output=True, timeout=120,
+                    )
+                except Exception as e:
+                    logger.error(f"[deploy] docker compose up {nom_outil} echoue: {e}")
+                    st.error(f"Erreur deploiement Docker : {e}")
 
                 # Attendre healthcheck
                 url = f"http://{nom_outil}:{port}"
