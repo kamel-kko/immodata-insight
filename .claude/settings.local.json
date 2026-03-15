@@ -61,7 +61,13 @@
       "Bash(findstr \"8001 8002 8003 8004 8005 8501\")",
       "Bash(findstr \"8002\")",
       "Bash(python -c \"import server; print\\(''OK''\\)\")",
-      "Bash(curl -s http://localhost:8501/_stcore/health)"
+      "Bash(curl -s http://localhost:8501/_stcore/health)",
+      "Bash(python -m pytest tests/test_tool_runner.py -v)",
+      "Bash(python -c \":*)",
+      "Bash(findstr '8501 8001 8002 8003 8004 8005')",
+      "Bash(tasklist /FI 'PID eq 37952' /FO TABLE)",
+      "Bash(tasklist)",
+      "Bash(wmic process:*)"
     ]
   },
   "hooks": {
