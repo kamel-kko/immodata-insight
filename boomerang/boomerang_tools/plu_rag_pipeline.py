@@ -275,10 +275,17 @@ def indexer_chunks(chunks: list, code_insee: str, force: bool = False) -> Chroma
     collection_name = _collection_id(code_insee)
     embed = _embeddings()
 
+    client = chromadb.PersistentClient(path=CHROMA_DIR)
+
     # Verifier si la collection existe deja
-    if not force:
+    if force:
         try:
-            client = chromadb.PersistentClient(path=CHROMA_DIR)
+            client.delete_collection(collection_name)
+            logger.info(f"Collection {collection_name} supprimee (force=True)")
+        except Exception:
+            pass
+    else:
+        try:
             existing = client.list_collections()
             existing_names = [c.name if hasattr(c, 'name') else c for c in existing]
             if collection_name in existing_names:
