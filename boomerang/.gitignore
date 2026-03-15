@@ -1,0 +1,25 @@
+# Secrets
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Data
+data/
+temp_tools/
+backups/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+data/langfuse_pg/
+
+# OS
+.DS_Store
+Thumbs.db
