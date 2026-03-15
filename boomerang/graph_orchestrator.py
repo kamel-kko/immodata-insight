@@ -631,6 +631,9 @@ def rebuild_graph():
     return _graph
 
 
+GRAPH_TIMEOUT = int(os.getenv("GRAPH_TIMEOUT", "120"))
+
+
 def invoke_graph(user_input: str, thread_id: str, status_widget=None, model_name: str = "") -> dict:
     graph = get_graph()
     config = {
@@ -644,10 +647,26 @@ def invoke_graph(user_input: str, thread_id: str, status_widget=None, model_name
     if status_widget:
         status_widget.update(label="🔍 Agent en réflexion...")
 
-    result = graph.invoke(
-        {"messages": [HumanMessage(content=user_input)]},
-        config=config,
-    )
+    # Execution avec timeout pour eviter les blocages indefinis
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(
+            graph.invoke,
+            {"messages": [HumanMessage(content=user_input)]},
+            config,
+        )
+        try:
+            result = future.result(timeout=GRAPH_TIMEOUT)
+        except concurrent.futures.TimeoutError:
+            logger.error(f"[invoke_graph] Timeout apres {GRAPH_TIMEOUT}s")
+            return {
+                "response": (
+                    f"La requete a depasse le temps limite ({GRAPH_TIMEOUT}s). "
+                    "Essayez de reformuler votre question ou changez de modele."
+                ),
+                "besoin_forge": None,
+                "messages": [],
+            }
 
     messages = result.get("messages", [])
     last_msg = messages[-1] if messages else None
