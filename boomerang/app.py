@@ -440,7 +440,7 @@ def _attendre_health(url, timeout_total=30, intervalle=2):
 
 
 # ══════════════════════════════════════════════════════════
-#  SIDEBAR
+#  SIDEBAR (minimale — les controles sont dans la grille Bento)
 # ══════════════════════════════════════════════════════════
 
 with st.sidebar:
@@ -451,141 +451,20 @@ with st.sidebar:
         st.caption(f"Connecte : **{st.session_state.get('name', '')}**")
         authenticator.logout("Deconnexion", "sidebar")
 
-    # ── Sélecteur de projet ─────────────────────────────
-    projets = lister_projets()
-    options = projets + ["+ Nouveau projet"]
-    choix = st.selectbox("Projet", options, index=0 if projets else 0)
-
-    if choix == "+ Nouveau projet":
-        nouveau_nom = st.text_input("Nom du nouveau projet")
-        if nouveau_nom:
-            if st.session_state.id_projet != nouveau_nom:
-                st.session_state.messages = []  # reset historique affiché
-            st.session_state.id_projet = nouveau_nom
-    else:
-        if st.session_state.id_projet != choix:
-            st.session_state.messages = []  # reset historique lors du changement de projet
-        st.session_state.id_projet = choix
-
-    id_projet = st.session_state.id_projet
-
-    # ── Bouton vider historique ─────────────────────────
-    if id_projet and st.button("🗑️ Vider historique"):
-        count = supprimer_historique(id_projet)
-        st.session_state.messages = []
-        st.success(f"Historique vidé ({count} messages supprimés)")
-        st.rerun()
-
-    # ── Bouton export PDF ──────────────────────────────
-    if id_projet and st.session_state.messages:
-        from pdf_export import generer_pdf_rapport
-        from db_manager import charger_historique_complet
-        messages_complets = charger_historique_complet(id_projet)
-        if messages_complets:
-            pdf_bytes = generer_pdf_rapport(id_projet, messages_complets)
-            st.download_button(
-                label="Exporter PDF",
-                data=pdf_bytes,
-                file_name=f"BOOMERANG_{id_projet}_{datetime.now().strftime('%Y%m%d')}.pdf",
-                mime="application/pdf",
-            )
-
     st.divider()
+    st.caption("[Langfuse](http://localhost:3003)")
 
-    # ── Guide depot PC ────────────────────────────────
-    if id_projet:
-        if st.button("Guide depot Permis de Construire", use_container_width=True):
-            st.session_state.guide_mode = "depot_pc"
-            st.session_state.guide_step = 0
-            st.session_state.guide_data = {}
-            st.rerun()
-
-    st.divider()
-
-    # ── Outils forgés du projet ─────────────────────────
-    if id_projet:
-        outils_projet = lister_outils_projet(id_projet)
-        if outils_projet:
-            st.subheader("Outils forgés")
-            for outil in outils_projet:
-                nom = outil["nom_fichier"]
-                url = TOOL_REGISTRY.get(
-                    nom.replace("tool_", "", 1),
-                    TOOL_REGISTRY.get(nom, "")
-                )
-                if url and _check_health(url):
-                    st.write(f"🟢 {nom} — {outil['statut']}")
-                else:
-                    st.write(f"🔴 {nom} — {outil['statut']}")
-
-    # ── Statut outils natifs ────────────────────────────
-    st.subheader("Outils natifs")
-    for nom, url in TOOL_REGISTRY.items():
-        if _check_health(url):
-            st.write(f"🟢 {nom}")
-        else:
-            st.write(f"🔴 {nom}")
-
-    # ── Langfuse ────────────────────────────────────────
-    st.divider()
-    st.caption("📊 [Langfuse](http://localhost:3003)")
-
-    # ── Cache API ─────────────────────────────────────
-    st.divider()
-    st.subheader("Cache API")
-    settings = load_settings()
-
-    cache_on = st.toggle(
-        "Activer le cache",
-        value=settings.get("cache_enabled", True),
-        key="toggle_cache",
-    )
-    if cache_on != settings.get("cache_enabled", True):
-        save_settings("cache_enabled", cache_on)
-
-    if cache_on:
-        ttl = st.slider(
-            "Duree du cache (jours)",
-            min_value=1, max_value=30,
-            value=settings.get("cache_ttl_jours", 7),
-            key="slider_cache_ttl",
-        )
-        if ttl != settings.get("cache_ttl_jours", 7):
-            save_settings("cache_ttl_jours", ttl)
-
-        try:
-            from db_manager import stats_cache, purge_cache
-            cache_stats = stats_cache()
-            st.caption(f"Entrees actives : {cache_stats['actifs']} | Expirees : {cache_stats['expires']}")
-            if cache_stats["expires"] > 0:
-                if st.button("Purger le cache expire", key="btn_purge_cache"):
-                    n = purge_cache()
-                    st.success(f"{n} entree(s) supprimee(s)")
-                    st.rerun()
-            if cache_stats["actifs"] > 0:
-                if st.button("Vider tout le cache", key="btn_clear_cache"):
-                    from db_manager import purge_cache
-                    # Purger tous les outils
-                    for tool in ["recherche_urbanisme", "recherche_risques_parcelle"]:
-                        purge_cache(tool)
-                    st.success("Cache vide")
-                    st.rerun()
-        except ImportError:
-            st.caption("Cache non disponible (db_manager)")
-
-    # ── Section Rollback ────────────────────────────────
+    # ── Section Rollback (admin) ────────────────────────
     if not SAAS_MODE:
         st.divider()
-        st.subheader("🔄 Restaurer un outil")
+        st.subheader("Restaurer un outil")
 
         backups_dir = os.getenv("BACKUPS_DIR", "/app/backups")
         if os.path.exists(backups_dir):
-            # Scanner les backups : format {nom_outil}_{YYYYMMDD_HHMMSS}/
             backups = {}
             for entry in os.listdir(backups_dir):
                 full_path = os.path.join(backups_dir, entry)
                 if os.path.isdir(full_path) and "_" in entry:
-                    # Séparer nom_outil du timestamp
                     parts = entry.rsplit("_", 2)
                     if len(parts) >= 3:
                         nom_outil = "_".join(parts[:-2])
@@ -603,17 +482,15 @@ with st.sidebar:
                         timestamps,
                         key=f"rollback_{nom_outil}",
                     )
-                    if st.button(f"↩️ Restaurer {nom_outil}", key=f"btn_rollback_{nom_outil}"):
+                    if st.button(f"Restaurer {nom_outil}", key=f"btn_rollback_{nom_outil}"):
                         version = next(v for v in versions if v["timestamp"] == selected)
                         service_name = f"tool_{nom_outil}"
                         try:
-                            # Arrêter le container
                             subprocess.run(
                                 ["docker", "compose", "stop", service_name],
                                 cwd="/app/project",
                                 capture_output=True, timeout=30,
                             )
-                            # Remplacer par le backup
                             dest = os.path.join(
                                 os.getenv("TOOLS_DIR", "/app/boomerang_tools"),
                                 service_name,
@@ -621,7 +498,6 @@ with st.sidebar:
                             if os.path.exists(dest):
                                 shutil.rmtree(dest)
                             shutil.copytree(version["path"], dest)
-                            # Relancer
                             subprocess.run(
                                 ["docker", "compose", "up", "-d", "--build", service_name],
                                 cwd="/app/project",
@@ -630,18 +506,19 @@ with st.sidebar:
                         except Exception as e:
                             logger.error(f"[rollback] Erreur restauration {nom_outil}: {e}")
                             st.error(f"Erreur lors de la restauration : {e}")
-                        # Attendre health
                         url = TOOL_REGISTRY.get(nom_outil, "")
                         if url and _attendre_health(url):
-                            st.success(f"✓ {nom_outil} restauré à {selected}")
+                            st.success(f"{nom_outil} restaure a {selected}")
                         else:
-                            st.warning(f"{nom_outil} restauré mais healthcheck timeout")
+                            st.warning(f"{nom_outil} restaure mais healthcheck timeout")
                         charger_outils()
                         st.rerun()
             else:
                 st.caption("Aucun backup disponible")
         else:
             st.caption("Aucun backup disponible")
+
+id_projet = st.session_state.id_projet
 
 
 # ══════════════════════════════════════════════════════════
