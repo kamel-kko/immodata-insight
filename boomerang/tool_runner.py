@@ -73,9 +73,38 @@ class ContainerTool(BaseTool):
         return self._run(**kwargs)
 
 
+class LocalTool(BaseTool):
+    """Outil local (pas de container Docker), appelle une fonction Python directement."""
+    name: str
+    description: str
+    args_schema: type = QueryInput
+    _func: object = None
+
+    class Config:
+        underscore_attrs_are_private = True
+
+    def __init__(self, name, description, func, args_schema=QueryInput):
+        super().__init__(name=name, description=description, args_schema=args_schema)
+        self._func = func
+
+    def _run(self, **kwargs) -> str:
+        try:
+            result = self._func(**kwargs)
+            if isinstance(result, dict):
+                return result.get("output", str(result))
+            return str(result)
+        except Exception as e:
+            return f"Erreur outil {self.name} : {str(e)}"
+
+    async def _arun(self, **kwargs) -> str:
+        return self._run(**kwargs)
+
+
 def charger_outils() -> list[BaseTool]:
-    """Retourne tous les outils disponibles comme BaseTool HTTP."""
+    """Retourne tous les outils disponibles (containers HTTP + outils locaux)."""
     outils = []
+
+    # Outils containerises (HTTP)
     for nom, url in TOOL_REGISTRY.items():
         try:
             resp = requests.get(f"{url}/health", timeout=5)
@@ -90,4 +119,22 @@ def charger_outils() -> list[BaseTool]:
                 ))
         except Exception:
             pass  # Container outil indisponible — skip silencieux
+
+    # Outils locaux (pas de container)
+    try:
+        from boomerang_tools.tool_demander_dev import tool_demander_dev
+        outils.append(LocalTool(
+            name="tool_demander_dev",
+            description=(
+                "Enregistre une demande de developpement pour un outil manquant. "
+                "Utiliser quand une analyse technique necessite un outil qui n'existe pas "
+                "(ex: calcul thermique, analyse structurelle, calcul de surface). "
+                "Parametres : outil_manquant (nom), description_fonctionnelle (ce qu'il doit faire)."
+            ),
+            func=tool_demander_dev,
+            args_schema=DevRequestInput,
+        ))
+    except ImportError:
+        pass
+
     return outils
