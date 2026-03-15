@@ -575,3 +575,58 @@ def invoke_graph(user_input: str, thread_id: str, status_widget=None, model_name
         "besoin_forge": besoin_forge,
         "messages": messages,
     }
+
+
+async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
+                       on_token=None, on_tool_start=None, on_tool_end=None):
+    """Streaming version de invoke_graph.
+
+    Callbacks :
+        on_token(chunk: str) — appele pour chaque token LLM
+        on_tool_start(tool_name: str) — appele au debut d'un outil
+        on_tool_end(tool_name: str) — appele a la fin d'un outil
+    """
+    graph = get_graph()
+    config = {
+        "configurable": {
+            "thread_id": thread_id,
+            "model_name": model_name,
+        },
+        "callbacks": [get_langfuse_handler()],
+    }
+
+    full_text = ""
+    besoin_forge = None
+
+    async for event in graph.astream_events(
+        {"messages": [HumanMessage(content=user_input)]},
+        config=config,
+        version="v2",
+    ):
+        kind = event.get("event", "")
+
+        if kind == "on_chat_model_stream":
+            chunk = event.get("data", {}).get("chunk")
+            if chunk and hasattr(chunk, "content") and chunk.content:
+                full_text += chunk.content
+                if on_token:
+                    on_token(chunk.content)
+
+        elif kind == "on_tool_start":
+            tool_name = event.get("name", "")
+            if on_tool_start:
+                on_tool_start(tool_name)
+
+        elif kind == "on_tool_end":
+            tool_name = event.get("name", "")
+            if on_tool_end:
+                on_tool_end(tool_name)
+
+    # Detecter besoin forge dans le texte final
+    if full_text:
+        besoin_forge = _detecter_besoin_forge(full_text)
+
+    return {
+        "response": full_text,
+        "besoin_forge": besoin_forge,
+    }
