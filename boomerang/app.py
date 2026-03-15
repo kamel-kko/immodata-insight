@@ -99,24 +99,34 @@ if not SAAS_MODE:
 init_db()
 
 # ── Authentification ────────────────────────────────────
-# Gate d'acces basique via mot de passe. Configure via la variable d'environnement
-# BOOMERANG_PASSWORD. Si non defini, l'application est ouverte (dev local).
+# Deux modes :
+#   1. Auth complete (streamlit-authenticator) si auth_config.yaml existe
+#   2. Acces libre si le fichier n'existe pas (dev local)
 
-_AUTH_PASSWORD = os.getenv("BOOMERANG_PASSWORD", "")
+import yaml
+import streamlit_authenticator as stauth
 
-if _AUTH_PASSWORD:
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
+_AUTH_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "auth_config.yaml")
+_AUTH_ENABLED = os.path.exists(_AUTH_CONFIG_PATH)
 
-    if not st.session_state["authenticated"]:
-        st.markdown("## BOOMERANG — Connexion")
-        _pwd = st.text_input("Mot de passe", type="password", key="auth_pwd")
-        if st.button("Se connecter"):
-            if _pwd == _AUTH_PASSWORD:
-                st.session_state["authenticated"] = True
-                st.rerun()
-            else:
-                st.error("Mot de passe incorrect.")
+if _AUTH_ENABLED:
+    with open(_AUTH_CONFIG_PATH) as f:
+        _auth_config = yaml.safe_load(f)
+
+    authenticator = stauth.Authenticate(
+        _auth_config["credentials"],
+        _auth_config["cookie"]["name"],
+        _auth_config["cookie"]["key"],
+        _auth_config["cookie"]["expiry_days"],
+    )
+
+    authenticator.login()
+
+    if st.session_state.get("authentication_status") is None:
+        st.info("Entrez vos identifiants pour acceder a BOOMERANG.")
+        st.stop()
+    elif st.session_state.get("authentication_status") is False:
+        st.error("Identifiant ou mot de passe incorrect.")
         st.stop()
 
 # ── Session state defaults ──────────────────────────────
