@@ -942,125 +942,269 @@ elif st.session_state.guide_mode == "depot_pc":
 
 else:
 
-    # ── CSS custom inspire de Claude ──────────────────
-    st.markdown("""
+    # ── CSS Bento Grid ──────────────────────────────────
+    BOOMERANG_CSS = """
     <style>
-    /* Masquer le label du file uploader */
-    [data-testid="stFileUploader"] > label { display: none !important; }
-    [data-testid="stFileUploader"] > div { margin-top: -1rem; }
-
-    /* Masquer le label du text_input dans le conteneur de saisie */
-    .input-box [data-testid="stTextInput"] > label { display: none !important; }
-    .input-box [data-testid="stTextInput"] > div { margin-top: 0; }
-
-    /* Conteneur de saisie unifie (texte + actions) */
-    .input-box [data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 1.5rem !important;
-        border-color: rgba(255,255,255,0.2) !important;
-        background: rgba(255,255,255,0.03) !important;
-        padding: 0 !important;
+    /* ── Reset marges Streamlit ── */
+    #root > div:first-child { padding-top: 0 !important; }
+    .block-container {
+        padding: 0.75rem 1rem !important;
+        max-width: 100% !important;
     }
-    .input-box [data-testid="stVerticalBlockBorderWrapper"] > div {
-        padding: 0.8rem 1rem 0.4rem 1rem !important;
+    [data-testid="stAppViewContainer"] {
+        background-color: #1a1d21;
     }
-
-    /* Text input inside : pas de bordure propre */
-    .input-box [data-testid="stTextInput"] input {
-        border: none !important;
-        background: transparent !important;
-        padding: 0.3rem 0 !important;
-        font-size: 1rem;
-        color: rgba(255,255,255,0.9);
-        box-shadow: none !important;
+    /* ── Palette Architecte ── */
+    :root {
+        --bg-app:      #1a1d21;
+        --bg-panel:    #22262c;
+        --bg-deep:     #16191d;
+        --border:      #2e333a;
+        --accent:      #4A90D9;
+        --accent-dark: #1a2633;
+        --accent-border: #2a3d52;
+        --text-primary:   #e8e6e0;
+        --text-secondary: #9ca3af;
+        --text-muted:     #4b5563;
+        --success:     #22c55e;
+        --warning:     #f59e0b;
     }
-    .input-box [data-testid="stTextInput"] input:focus {
-        border: none !important;
-        box-shadow: none !important;
+    /* ── Panneaux Bento ── */
+    .bento-panel {
+        background: var(--bg-panel);
+        border: 0.5px solid var(--border);
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
     }
-    .input-box [data-testid="stTextInput"] input::placeholder {
-        color: rgba(255,255,255,0.4);
+    .bento-head {
+        padding: 8px 14px;
+        border-bottom: 0.5px solid var(--border);
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
-
-    /* Boutons d'action dans la barre */
-    .input-box button[kind="secondary"] {
-        border-radius: 1.2rem !important;
-        font-size: 0.82rem !important;
-        padding: 0.25rem 0.8rem !important;
-        border-color: rgba(255,255,255,0.15) !important;
-        background: transparent !important;
+    .bento-head::before {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
     }
-    .input-box button[kind="secondary"]:hover {
-        background: rgba(255,255,255,0.06) !important;
-        border-color: rgba(255,255,255,0.3) !important;
+    .bento-body {
+        padding: 12px 14px;
     }
-    .input-box button[kind="primary"] {
-        border-radius: 1.2rem !important;
-        font-size: 0.82rem !important;
-        padding: 0.25rem 0.8rem !important;
+    /* ── Topbar ── */
+    .bento-topbar {
+        background: var(--bg-panel);
+        border: 0.5px solid var(--border);
+        border-radius: 10px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
     }
-
-    /* Selectbox compact dans la barre */
-    .input-box [data-testid="stSelectbox"] {
-        min-width: 0 !important;
+    .bento-logo {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: 0.04em;
     }
-    .input-box [data-testid="stSelectbox"] > label { display: none !important; }
-    .input-box [data-testid="stSelectbox"] [data-baseweb="select"] {
-        background: transparent !important;
-        border-color: rgba(255,255,255,0.15) !important;
-        border-radius: 1.2rem !important;
-        font-size: 0.82rem !important;
+    .bento-logo span { color: var(--accent); }
+    .bento-badge {
+        font-size: 10px;
+        padding: 2px 9px;
+        border-radius: 4px;
+        background: var(--accent-dark);
+        color: var(--accent);
+        border: 0.5px solid var(--accent-border);
     }
-
-    /* Separateur discret entre texte et actions */
-    .input-box hr {
-        margin: 0.2rem 0 0.4rem 0;
-        border-color: rgba(255,255,255,0.08);
+    .bento-badge.success {
+        background: #1a2a1a;
+        color: var(--success);
+        border-color: #1f3d1f;
     }
-
-    /* Message de bienvenue centre */
-    .welcome-container {
+    /* ── Quick Actions ── */
+    .qa-strip {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        padding: 8px 14px;
+        border-bottom: 0.5px solid var(--border);
+    }
+    .qa-chip {
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: var(--accent-dark);
+        color: var(--accent);
+        border: 0.5px solid var(--accent-border);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s;
+    }
+    .qa-chip:hover { background: #1e2e45; }
+    /* ── Skeleton loader ── */
+    @keyframes shimmer {
+        0%   { opacity: 0.35; }
+        50%  { opacity: 0.7; }
+        100% { opacity: 0.35; }
+    }
+    .skeleton-wrap {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 6px 0;
+    }
+    .skeleton-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: var(--border);
+        animation: shimmer 1.4s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+    .skeleton-lines {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 35vh;
+        gap: 6px;
+    }
+    .skeleton-line {
+        height: 9px;
+        border-radius: 4px;
+        background: var(--border);
+        animation: shimmer 1.4s ease-in-out infinite;
+    }
+    .skeleton-line:nth-child(2) { width: 72%; animation-delay: 0.2s; }
+    .skeleton-line:nth-child(3) { width: 48%; animation-delay: 0.4s; }
+    /* ── Metadonnees projet ── */
+    .meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 8px;
+        margin-top: 8px;
+    }
+    .meta-item {
+        font-size: 10px;
+        color: var(--text-muted);
+    }
+    .meta-item span {
+        display: block;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-top: 1px;
+    }
+    .meta-divider {
+        height: 0.5px;
+        background: var(--border);
+        margin: 10px 0;
+    }
+    /* ── Zone d'upload ── */
+    .upload-zone {
+        border: 0.5px dashed var(--border);
+        border-radius: 8px;
+        padding: 12px;
         text-align: center;
-        padding: 2rem;
+        font-size: 10px;
+        color: var(--text-muted);
+        cursor: pointer;
+        margin-bottom: 10px;
+        transition: border-color 0.15s;
     }
-    .welcome-title {
-        font-size: 2rem;
-        font-weight: 300;
-        color: rgba(255,255,255,0.9);
-        margin-bottom: 0.5rem;
-        font-family: 'Georgia', serif;
+    .upload-zone:hover { border-color: var(--accent); color: var(--accent); }
+    /* ── Boutons Streamlit dans les panneaux ── */
+    [data-testid="stButton"] > button {
+        background: var(--accent-dark) !important;
+        color: var(--accent) !important;
+        border: 0.5px solid var(--accent-border) !important;
+        border-radius: 6px !important;
+        font-size: 11px !important;
+        padding: 4px 12px !important;
+        font-weight: 400 !important;
+        transition: background 0.15s !important;
     }
-    .welcome-subtitle {
-        font-size: 1rem;
-        color: rgba(255,255,255,0.5);
-        margin-bottom: 1rem;
+    [data-testid="stButton"] > button:hover {
+        background: #1e2e45 !important;
     }
-
-    /* Chips fichier joint */
+    /* ── Bouton primaire ── */
+    button[kind="primary"] {
+        background: var(--accent) !important;
+        color: #ffffff !important;
+        border-color: var(--accent) !important;
+    }
+    /* ── Inputs ── */
+    [data-testid="stTextInput"] input,
+    [data-testid="stSelectbox"] select {
+        background: var(--bg-deep) !important;
+        border: 0.5px solid var(--border) !important;
+        border-radius: 6px !important;
+        color: var(--text-primary) !important;
+        font-size: 12px !important;
+    }
+    /* ── Chat messages ── */
+    [data-testid="stChatMessage"] {
+        background: transparent !important;
+        border: none !important;
+        padding: 4px 0 !important;
+    }
+    /* ── Selectbox ── */
+    [data-testid="stSelectbox"] > div > div {
+        background: var(--bg-deep) !important;
+        border: 0.5px solid var(--border) !important;
+        border-radius: 6px !important;
+        color: var(--text-primary) !important;
+    }
+    /* ── Expanders ── */
+    [data-testid="stExpander"] {
+        background: var(--bg-deep) !important;
+        border: 0.5px solid var(--border) !important;
+        border-radius: 8px !important;
+    }
+    /* ── Status widget ── */
+    [data-testid="stStatus"] {
+        background: var(--bg-deep) !important;
+        border: 0.5px solid var(--border) !important;
+        border-radius: 8px !important;
+    }
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    /* ── File chip ── */
     .file-chip {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 0.75rem;
-        padding: 0.4rem 0.8rem;
-        margin: 0.3rem 0;
-        font-size: 0.85rem;
-        color: rgba(255,255,255,0.8);
+        background: var(--accent-dark);
+        border: 0.5px solid var(--accent-border);
+        border-radius: 0.5rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 10px;
+        color: var(--accent);
     }
+    /* ── Masquer labels inutiles ── */
+    [data-testid="stFileUploader"] > label { display: none !important; }
+    [data-testid="stFileUploader"] > div { margin-top: -0.5rem; }
     </style>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(BOOMERANG_CSS, unsafe_allow_html=True)
 
-    # Initialiser le compteur de cle pour le text_input
+    # ── Initialisation ──────────────────────────────────
     if "input_key" not in st.session_state:
         st.session_state.input_key = 0
     if "pending_input" not in st.session_state:
         st.session_state.pending_input = None
+    if "generating" not in st.session_state:
+        st.session_state.generating = False
 
     # Charger l'historique depuis la DB au premier affichage du projet
     if not st.session_state.messages:
@@ -1070,23 +1214,364 @@ else:
 
     has_messages = bool(st.session_state.messages) or st.session_state.pending_input is not None
 
-    # ── Ecran de bienvenue (pas d'historique) ──────────
-    if not has_messages:
-        st.markdown("""
-        <div class="welcome-container">
-            <div class="welcome-title">Bonjour, bienvenue sur BOOMERANG</div>
-            <div class="welcome-subtitle">Assistant reglementaire pour architectes</div>
+    # ── Topbar ──────────────────────────────────────────
+    plu_info = st.session_state.get("plu_commune", "")
+    topbar_badge = f"PLU charge &middot; {plu_info}" if plu_info else "Aucun projet charge"
+    st.markdown(f"""
+    <div class="bento-topbar">
+      <div class="bento-logo">BOOM<span>ERANG</span></div>
+      <div class="bento-badge">{topbar_badge}</div>
+      <div class="bento-badge success" style="margin-left:auto">Session active</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════
+    #  GRILLE BENTO 3 COLONNES
+    # ══════════════════════════════════════════════════════
+
+    col_left, col_center, col_right = st.columns([1, 2.2, 1], gap="small")
+
+    # ── COLONNE GAUCHE ───────────────────────────────────
+    with col_left:
+        # -- Bloc Projet --
+        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="bento-head">Projet</div>', unsafe_allow_html=True)
+        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+        projets = lister_projets()
+        options = projets + ["+ Nouveau projet"]
+        choix = st.selectbox("Projet", options, index=0 if projets else 0,
+                             label_visibility="collapsed", key="bento_projet_select")
+        if choix == "+ Nouveau projet":
+            nouveau_nom = st.text_input("Nom du nouveau projet", key="bento_new_project",
+                                        label_visibility="collapsed",
+                                        placeholder="Nom du nouveau projet")
+            if nouveau_nom:
+                if st.session_state.id_projet != nouveau_nom:
+                    st.session_state.messages = []
+                st.session_state.id_projet = nouveau_nom
+                id_projet = nouveau_nom
+        else:
+            if st.session_state.id_projet != choix:
+                st.session_state.messages = []
+            st.session_state.id_projet = choix
+            id_projet = choix
+
+        adresse = st.session_state.get("plu_adresse_normalisee", "")
+        commune = st.session_state.get("plu_commune", "")
+        insee = st.session_state.get("plu_code_insee", "")
+        zone = st.session_state.get("plu_zone", "")
+        type_doc = st.session_state.get("plu_type_document", "")
+        georisques = st.session_state.get("georisques_count", "")
+
+        if adresse:
+            st.markdown(f"""
+            <div style="font-size:11px;color:#9ca3af;margin-top:6px">Adresse</div>
+            <div style="font-size:12px;color:#e8e6e0;font-weight:500;line-height:1.4">{adresse}</div>
+            """, unsafe_allow_html=True)
+        if zone:
+            st.markdown(f"""
+            <div style="margin-top:6px;display:inline-block;font-size:10px;
+                        padding:2px 8px;border-radius:4px;
+                        background:#1a2633;color:#4A90D9;border:0.5px solid #2a3d52">
+                Zone {zone} &middot; {type_doc}
+            </div>
+            """, unsafe_allow_html=True)
+        if commune or insee or georisques:
+            st.markdown(f"""
+            <div class="meta-divider"></div>
+            <div class="meta-grid">
+                <div class="meta-item">Commune<span>{commune or "—"}</span></div>
+                <div class="meta-item">INSEE<span>{insee or "—"}</span></div>
+                <div class="meta-item">Georisques
+                    <span style="color:#f59e0b">{georisques or "—"}</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Actions projet
+        if id_projet:
+            btn_cols = st.columns(2)
+            with btn_cols[0]:
+                if st.button("Vider", key="bento_clear_hist", use_container_width=True):
+                    count = supprimer_historique(id_projet)
+                    st.session_state.messages = []
+                    st.rerun()
+            with btn_cols[1]:
+                if st.session_state.messages:
+                    from pdf_export import generer_pdf_rapport
+                    from db_manager import charger_historique_complet
+                    messages_complets = charger_historique_complet(id_projet)
+                    if messages_complets:
+                        pdf_bytes = generer_pdf_rapport(id_projet, messages_complets)
+                        st.download_button(
+                            label="PDF",
+                            data=pdf_bytes,
+                            file_name=f"BOOMERANG_{id_projet}_{datetime.now().strftime('%Y%m%d')}.pdf",
+                            mime="application/pdf",
+                            key="bento_pdf_export",
+                            use_container_width=True,
+                        )
+
+        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.write("")
+
+        # -- Bloc Modele LLM --
+        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="bento-head">Modele LLM</div>', unsafe_allow_html=True)
+        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+        modeles = get_ollama_models()
+        current = st.session_state.ollama_model
+        idx = modeles.index(current) if current in modeles else 0
+        choix_modele = st.selectbox(
+            "Modele",
+            options=modeles,
+            index=idx,
+            format_func=lambda x: x.replace(":latest", ""),
+            label_visibility="collapsed",
+            key="bento_model_select",
+        )
+        if choix_modele != st.session_state.ollama_model:
+            st.session_state.ollama_model = choix_modele
+            save_settings("last_model", choix_modele)
+            if st.session_state.id_projet:
+                rebuild_graph()
+            st.toast(f"Modele : {choix_modele}")
+
+        # Statut Ollama
+        ollama_base = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+        try:
+            _r = requests.get(f"{ollama_base}/api/tags", timeout=2)
+            ollama_ok = _r.status_code == 200
+        except Exception:
+            ollama_ok = False
+        status_color = "#22c55e" if ollama_ok else "#ef4444"
+        status_label = "Ollama connecte" if ollama_ok else "Ollama hors ligne"
+        st.markdown(f"""
+        <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#6b7280;margin-top:6px">
+            <div style="width:5px;height:5px;border-radius:50%;background:{status_color}"></div>
+            {status_label}
         </div>
         """, unsafe_allow_html=True)
 
-    # ── Afficher les messages existants ─────────────────
-    else:
-        for msg in st.session_state.messages:
-            with st.chat_message(msg["role"]):
-                _render_message_content(msg["content"])
+        # Statut outils
+        st.markdown('<div class="meta-divider"></div>', unsafe_allow_html=True)
+        for nom, url in TOOL_REGISTRY.items():
+            ok = _check_health(url)
+            dot = "#22c55e" if ok else "#ef4444"
+            st.markdown(f"""
+            <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#9ca3af;padding:1px 0">
+                <div style="width:4px;height:4px;border-radius:50%;background:{dot};flex-shrink:0"></div>
+                {nom}
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.write("")
+
+        # -- Bloc Guide depot PC --
+        if id_projet:
+            st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+            st.markdown('<div class="bento-head">Actions</div>', unsafe_allow_html=True)
+            st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+            if st.button("Guide depot PC", key="bento_guide_pc", use_container_width=True):
+                st.session_state.guide_mode = "depot_pc"
+                st.session_state.guide_step = 0
+                st.session_state.guide_data = {}
+                st.rerun()
+            st.markdown('</div></div>', unsafe_allow_html=True)
+
+    # ── COLONNE CENTRALE ─────────────────────────────────
+    with col_center:
+        st.markdown('<div class="bento-panel" style="display:flex;flex-direction:column">', unsafe_allow_html=True)
+
+        # Quick Actions (chips decoratifs + vrais boutons)
+        QUICK_ACTIONS = {
+            "Verifier PLU":      "Analyse le PLU de la parcelle et verifie la conformite du projet",
+            "Synthese risques":  "Genere une synthese des risques naturels et technologiques",
+            "Generer schema":    "Cree un schema de principe du projet",
+            "Depot PC":          "Liste les pieces necessaires au depot du permis de construire",
+        }
+        if not SAAS_MODE:
+            QUICK_ACTIONS["FORGE"] = "FORGE — analyse technique approfondie"
+
+        qa_html = '<div class="qa-strip">'
+        for label in QUICK_ACTIONS:
+            qa_html += f'<div class="qa-chip">{label}</div>'
+        qa_html += '</div>'
+        st.markdown(qa_html, unsafe_allow_html=True)
+
+        # Vrais boutons (invisibles visuellement, declenchent l'action)
+        qa_cols = st.columns(len(QUICK_ACTIONS))
+        clicked_action = None
+        for i, (label, prompt) in enumerate(QUICK_ACTIONS.items()):
+            with qa_cols[i]:
+                if st.button(label, key=f"qa_{i}", help=prompt, use_container_width=True):
+                    clicked_action = prompt
+        if clicked_action:
+            st.session_state.messages.append({"role": "user", "content": clicked_action})
+            st.session_state.pending_input = clicked_action
+            st.rerun()
+
+        # Historique chat (conteneur scrollable)
+        chat_container = st.container(height=500)
+        with chat_container:
+            if not has_messages:
+                st.markdown("""
+                <div style="display:flex;flex-direction:column;align-items:center;
+                            justify-content:center;min-height:300px;text-align:center;padding:2rem">
+                    <div style="font-size:1.5rem;font-weight:300;color:#e8e6e0;margin-bottom:0.5rem">
+                        Bonjour, bienvenue sur BOOMERANG
+                    </div>
+                    <div style="font-size:0.9rem;color:#9ca3af">
+                        Assistant reglementaire pour architectes
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                for msg in st.session_state.messages:
+                    with st.chat_message(msg["role"]):
+                        _render_message_content(msg["content"])
+
+            # Skeleton pendant la generation
+            if st.session_state.get("generating", False):
+                st.markdown("""
+                <div class="skeleton-wrap">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-lines">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # ── COLONNE DROITE ───────────────────────────────────
+    with col_right:
+        # -- Bloc Carte --
+        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="bento-head">Localisation</div>', unsafe_allow_html=True)
+        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+        map_url = st.session_state.get("plu_map_url")
+        if map_url:
+            st.image(map_url, use_container_width=True, caption="Geoportail IGN")
+            lat = st.session_state.get("plu_latitude", "")
+            lon = st.session_state.get("plu_longitude", "")
+            if lat and lon:
+                st.markdown(f"""
+                <div style="display:flex;justify-content:space-between;font-size:10px;
+                            color:#6b7280;margin-top:4px">
+                    <span>Lat {lat}</span><span>Lon {lon}</span>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="upload-zone" style="height:80px;display:flex;align-items:center;justify-content:center">
+                Carte disponible apres chargement PLU
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.write("")
+
+        # -- Bloc Documents --
+        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="bento-head">Documents</div>', unsafe_allow_html=True)
+        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+        uploaded = st.file_uploader(
+            "Deposer fichier",
+            type=["pdf", "txt", "jpg", "jpeg", "png", "webp", "ifc", "dxf"],
+            accept_multiple_files=True,
+            label_visibility="collapsed",
+            key="bento_doc_uploader",
+        )
+        if uploaded:
+            for f in uploaded:
+                ext = f.name.split(".")[-1].upper()
+                size = f"{f.size / 1024 / 1024:.1f} Mo" if f.size > 1e6 \
+                       else f"{f.size // 1024} Ko"
+                st.markdown(f"""
+                <div style="display:flex;align-items:center;gap:8px;padding:5px 0;
+                            border-bottom:0.5px solid #2e333a;font-size:10px;color:#9ca3af">
+                    <div style="width:18px;height:18px;border-radius:3px;
+                                background:#1a2633;border:0.5px solid #2a3d52;
+                                display:flex;align-items:center;justify-content:center;
+                                font-size:8px;color:#4A90D9;flex-shrink:0">{ext}</div>
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;
+                                 white-space:nowrap">{f.name}</span>
+                    <span style="color:#4b5563">{size}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                # Attacher le premier fichier au contexte si pas deja fait
+                if not st.session_state.attached_file_ctx:
+                    ctx = _preparer_contexte_fichier(f)
+                    if ctx["type"] != "error":
+                        st.session_state.attached_file_ctx = ctx
+
+        # Chip fichier attache
+        if st.session_state.attached_file_ctx and st.session_state.attached_file_ctx["type"] != "error":
+            ctx = st.session_state.attached_file_ctx
+            icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "TXT" if ctx["filename"].lower().endswith(".txt") else "IMG"
+            st.markdown(f'<div class="file-chip" style="margin-top:6px">{icon} {ctx["filename"]}</div>', unsafe_allow_html=True)
+            if st.button("Retirer", key="bento_remove_file"):
+                st.session_state.attached_file_ctx = None
+                st.rerun()
+
+        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.write("")
+
+        # -- Bloc Cache --
+        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="bento-head">Cache API</div>', unsafe_allow_html=True)
+        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+
+        settings = load_settings()
+        cache_on = st.toggle(
+            "Activer le cache",
+            value=settings.get("cache_enabled", True),
+            key="bento_toggle_cache",
+        )
+        if cache_on != settings.get("cache_enabled", True):
+            save_settings("cache_enabled", cache_on)
+        if cache_on:
+            try:
+                from db_manager import stats_cache, purge_cache
+                cache_stats = stats_cache()
+                st.markdown(f"""
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">
+                    Actifs : {cache_stats['actifs']} &middot; Expires : {cache_stats['expires']}
+                </div>
+                """, unsafe_allow_html=True)
+                if cache_stats["expires"] > 0:
+                    if st.button("Purger", key="bento_purge_cache"):
+                        purge_cache()
+                        st.rerun()
+            except ImportError:
+                pass
+
+        st.markdown('</div></div>', unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════
+    #  INPUT CHAT (hors colonnes pour ancrage bas natif)
+    # ══════════════════════════════════════════════════════
+
+    if st.session_state.get("id_projet"):
+        if user_input := st.chat_input(
+            "Posez votre question reglementaire...",
+            key="main_chat_input",
+        ):
+            st.session_state.pending_input = user_input
+            st.session_state.input_key += 1
+            st.rerun()
 
     # ══════════════════════════════════════════════════════
     #  TRAITEMENT DU MESSAGE PENDING
+    #  (logique LangGraph — NE PAS DEPLACER)
     # ══════════════════════════════════════════════════════
 
     if st.session_state.get("id_projet") and st.session_state.pending_input:
@@ -1118,184 +1603,66 @@ else:
             )
 
         st.session_state.messages.append({"role": "user", "content": display_text})
-        with st.chat_message("user"):
-            st.markdown(display_text)
         sauvegarder_message(id_projet, "user", display_text)
 
         st.session_state.attached_file_ctx = None
-        st.session_state.show_file_uploader = False
+        st.session_state.generating = True
 
         current_model = st.session_state.ollama_model
-        with st.chat_message("assistant"):
-            placeholder = st.empty()
-            status_container = st.container()
 
-            # Verifier si le streaming est active dans les settings
-            settings = load_settings()
-            use_streaming = settings.get("streaming_enabled", True)
+        # Verifier si le streaming est active dans les settings
+        settings = load_settings()
+        use_streaming = settings.get("streaming_enabled", True)
 
-            try:
-                if use_streaming:
-                    result = _run_streaming(
-                        llm_text, thread_id, current_model,
-                        placeholder, status_container,
-                    )
-                else:
-                    with st.status("Agent en reflexion...") as status:
-                        result = invoke_graph(
-                            llm_text, thread_id,
-                            status_widget=status, model_name=current_model,
+        with col_center:
+            with st.chat_message("assistant"):
+                placeholder = st.empty()
+                status_container = st.container()
+
+                try:
+                    if use_streaming:
+                        result = _run_streaming(
+                            llm_text, thread_id, current_model,
+                            placeholder, status_container,
                         )
-                st.session_state.last_working_model = current_model
-                save_settings("last_model", current_model)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).error(f"Erreur invoke/stream: {e}")
+                    else:
+                        with st.status("Agent en reflexion...") as status:
+                            result = invoke_graph(
+                                llm_text, thread_id,
+                                status_widget=status, model_name=current_model,
+                            )
+                    st.session_state.last_working_model = current_model
+                    save_settings("last_model", current_model)
+                except Exception as e:
+                    logger.error(f"Erreur invoke/stream: {e}")
 
-                last_ok = st.session_state.get("last_working_model", "")
-                suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
+                    last_ok = st.session_state.get("last_working_model", "")
+                    suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
 
-                result = {
-                    "response": (
-                        f"Le modele **{current_model}** a rencontre une difficulte "
-                        f"avec votre demande.{suggestion}\n\n"
-                        "Vous pouvez :\n"
-                        "- Reformuler votre question\n"
-                        "- Changer de modele\n"
-                        "- Reessayer dans quelques instants"
-                    ),
-                    "besoin_forge": None,
-                }
+                    result = {
+                        "response": (
+                            f"Le modele **{current_model}** a rencontre une difficulte "
+                            f"avec votre demande.{suggestion}\n\n"
+                            "Vous pouvez :\n"
+                            "- Reformuler votre question\n"
+                            "- Changer de modele\n"
+                            "- Reessayer dans quelques instants"
+                        ),
+                        "besoin_forge": None,
+                    }
 
-            if result.get("besoin_forge") and not SAAS_MODE:
-                st.session_state.besoin_forge = result["besoin_forge"]
-                st.session_state.forge_mode = "pending"
-                st.rerun()
-            else:
-                response = result.get("response", "")
-                # En mode streaming, le texte est deja affiche dans le placeholder
-                # En mode synchrone, on l'affiche ici
-                if not use_streaming:
-                    _render_message_content(response)
-                elif response:
-                    # Re-render avec support Mermaid/Charts/WMS
-                    placeholder.empty()
-                    _render_message_content(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                sauvegarder_message(id_projet, "assistant", response)
+                st.session_state.generating = False
 
-    # ══════════════════════════════════════════════════════
-    #  CONTENEUR DE SAISIE STYLE CLAUDE
-    # ══════════════════════════════════════════════════════
-
-    if st.session_state.get("id_projet"):
-
-        # ── Chip fichier joint (au-dessus du conteneur) ──
-        if st.session_state.attached_file_ctx and st.session_state.attached_file_ctx["type"] != "error":
-            ctx = st.session_state.attached_file_ctx
-            chip_col1, chip_col2 = st.columns([10, 1])
-            with chip_col1:
-                icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "TXT" if ctx["filename"].lower().endswith(".txt") else "IMG"
-                st.markdown(f'<div class="file-chip">{icon} {ctx["filename"]}</div>', unsafe_allow_html=True)
-            with chip_col2:
-                if st.button("x", key="remove_file", help="Retirer le fichier"):
-                    st.session_state.attached_file_ctx = None
-                    st.session_state.show_file_uploader = False
+                if result.get("besoin_forge") and not SAAS_MODE:
+                    st.session_state.besoin_forge = result["besoin_forge"]
+                    st.session_state.forge_mode = "pending"
                     st.rerun()
-
-        # ── Conteneur unifie : texte + actions ───────────
-        st.markdown('<div class="input-box">', unsafe_allow_html=True)
-        with st.container(border=True):
-            user_input = st.text_input(
-                "Message",
-                placeholder="Comment puis-je vous aider ?",
-                label_visibility="collapsed",
-                key=f"user_msg_{st.session_state.input_key}",
-            )
-
-            st.markdown("<hr>", unsafe_allow_html=True)
-
-            act_cols = st.columns([1, 3, 4, 3])
-
-            with act_cols[0]:
-                if st.button("+", key="btn_attach", help="Joindre un fichier"):
-                    st.session_state.show_file_uploader = not st.session_state.show_file_uploader
-                    st.rerun()
-
-            with act_cols[1]:
-                web_label = "Recherche web" if not st.session_state.web_search_enabled else "Recherche web ON"
-                web_type = "primary" if st.session_state.web_search_enabled else "secondary"
-                if st.button(web_label, key="btn_web", type=web_type):
-                    st.session_state.web_search_enabled = not st.session_state.web_search_enabled
-                    st.rerun()
-
-            with act_cols[3]:
-                modeles = get_ollama_models()
-                current = st.session_state.ollama_model
-                idx = modeles.index(current) if current in modeles else 0
-                choix_modele = st.selectbox(
-                    "Modele",
-                    options=modeles,
-                    index=idx,
-                    format_func=lambda x: x.replace(":latest", ""),
-                    label_visibility="collapsed",
-                    key="model_select_bar",
-                )
-                if choix_modele != st.session_state.ollama_model:
-                    st.session_state.ollama_model = choix_modele
-                    save_settings("last_model", choix_modele)
-                    if st.session_state.id_projet:
-                        rebuild_graph()
-                    st.toast(f"Modele : {choix_modele}")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # ── Zone file uploader (visible apres clic +) ────
-        if st.session_state.show_file_uploader:
-            uploaded_file = st.file_uploader(
-                "Joindre un fichier",
-                type=["pdf", "txt", "jpg", "jpeg", "png", "webp"],
-                key="file_uploader",
-                label_visibility="collapsed",
-                help="Formats : PDF, TXT, JPG, PNG, WebP (max 10 Mo)",
-            )
-            if uploaded_file is not None:
-                ctx = _preparer_contexte_fichier(uploaded_file)
-                if ctx["type"] == "error":
-                    st.error(ctx["content"])
-                elif ctx["type"] == "image" and not _modele_supporte_vision(st.session_state.ollama_model):
-                    st.warning(
-                        f"Le modele {st.session_state.ollama_model} ne supporte pas les images. "
-                        "Choisissez un modele vision (llava, qwen2-vl...) ou joignez un PDF/TXT."
-                    )
                 else:
-                    st.session_state.attached_file_ctx = ctx
-                    st.session_state.show_file_uploader = False
-                    st.rerun()
-
-        # ── Detecter nouvelle soumission ─────────────────
-        if user_input:
-            st.session_state.pending_input = user_input
-            st.session_state.input_key += 1
-            st.rerun()
-
-    # ── Suggestions rapides (ecran de bienvenue, sous le conteneur) ──
-    if not has_messages and st.session_state.get("id_projet"):
-        suggestion_cols = st.columns(4)
-        suggestions = [
-            ("Urbanisme", "Zonage PLU pour une adresse"),
-            ("Risques", "Risques naturels d'une parcelle"),
-            ("ERP", "Notice de securite incendie"),
-            ("Recherche", "Reglementation PMR"),
-        ]
-        prompts = [
-            "Quel est le zonage PLU pour mon adresse ?",
-            "Quels sont les risques naturels pour ma parcelle ?",
-            "Genere une notice de securite ERP type M, 300 personnes",
-            "Quelles sont les normes PMR pour un ERP neuf ?",
-        ]
-        for i, (label, hint) in enumerate(suggestions):
-            with suggestion_cols[i]:
-                if st.button(label, key=f"sugg_{i}", use_container_width=True, help=hint):
-                    st.session_state.pending_input = prompts[i]
-                    st.rerun()
+                    response = result.get("response", "")
+                    if not use_streaming:
+                        _render_message_content(response)
+                    elif response:
+                        placeholder.empty()
+                        _render_message_content(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    sauvegarder_message(id_projet, "assistant", response)
