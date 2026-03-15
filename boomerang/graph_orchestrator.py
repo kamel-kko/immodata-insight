@@ -164,35 +164,166 @@ et demande des informations urbanistiques, appelle l'outil IMMEDIATEMENT sans de
 de reformuler. L'adresse fournie par l'utilisateur est suffisante."""
 
 
+# ── Prompt-based tool instructions ─────────────────────
+# Quand le modele ne supporte pas bind_tools(), on injecte les outils
+# comme instructions textuelles dans le system prompt.
+
+PROMPT_BASED_TOOLS_ADDENDUM = """
+
+IMPORTANT — MODE SANS TOOL CALLING :
+Le modele actuel ne supporte pas l'appel d'outils natif.
+Tu ne peux PAS appeler les outils directement.
+A la place, quand tu as besoin d'un outil, reponds EXACTEMENT dans ce format :
+
+[APPEL_OUTIL]
+outil: nom_de_l_outil
+query: la requete ou l'adresse
+[/APPEL_OUTIL]
+
+Exemple :
+[APPEL_OUTIL]
+outil: recherche_urbanisme
+query: 9 Rue des Pyrenees, 40230 Saint-Vincent-de-Tyrosse
+[/APPEL_OUTIL]
+
+Le systeme executera l'outil et te renverra le resultat.
+N'invente JAMAIS de resultats. Utilise toujours le format ci-dessus."""
+
+
+def _parse_prompt_based_tool_call(content: str) -> Optional[dict]:
+    """Parse un appel d'outil au format texte [APPEL_OUTIL]...[/APPEL_OUTIL]."""
+    import re
+    match = re.search(
+        r'\[APPEL_OUTIL\]\s*outil:\s*(.+?)\s*query:\s*(.+?)\s*\[/APPEL_OUTIL\]',
+        content, re.DOTALL
+    )
+    if match:
+        return {"outil": match.group(1).strip(), "query": match.group(2).strip()}
+    return None
+
+
+def _executer_outil_manuellement(nom_outil: str, query: str) -> str:
+    """Execute un outil via HTTP en mode prompt-based (sans tool calling natif)."""
+    import requests as req
+    from tool_runner import TOOL_REGISTRY
+    url = TOOL_REGISTRY.get(nom_outil, "")
+    if not url:
+        return f"Outil '{nom_outil}' introuvable. Outils disponibles : {', '.join(TOOL_REGISTRY.keys())}"
+    try:
+        resp = req.post(f"{url}/run", json={"input": {"query": query}}, timeout=30)
+        resp.raise_for_status()
+        return resp.json().get("output", "Pas de resultat.")
+    except Exception as e:
+        return f"Erreur lors de l'appel a l'outil {nom_outil} : {str(e)}"
+
+
 # ── Noeuds du graphe ────────────────────────────────────
 
 def agent_node(state: dict, config: RunnableConfig) -> dict:
+    from langchain_core.messages import SystemMessage
+
     messages = state.get("messages", [])
     outils = charger_outils()
+    tool_retries = state.get("_tool_retries", 0)
 
     # Recuperer le modele depuis la config (passee par app.py via le selectbox)
     model_name = config.get("configurable", {}).get("model_name", "")
     llm = get_llm(model_name=model_name)
 
-    if outils:
-        llm_with_tools = llm.bind_tools(outils)
+    # Determiner si le modele supporte le tool calling natif
+    use_native_tools = _modele_supporte_tools(model_name) if model_name else True
+
+    # Apres 2 echecs d'outils, forcer le mode sans outils
+    if tool_retries >= 2:
+        use_native_tools = False
+        outils = []
+        logger.warning(f"Fallback: desactivation des outils apres {tool_retries} echecs")
+
+    # Binding d'outils ou mode prompt-based
+    if outils and use_native_tools:
+        try:
+            llm_with_tools = llm.bind_tools(outils)
+        except Exception as e:
+            logger.warning(f"bind_tools echoue pour {model_name}: {e}. Bascule en mode prompt-based.")
+            llm_with_tools = llm
+            use_native_tools = False
     else:
         llm_with_tools = llm
 
-    # Injecter le system prompt si absent
-    from langchain_core.messages import SystemMessage
-    if not messages or not isinstance(messages[0], SystemMessage):
-        messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(messages)
+    # Construire le system prompt
+    sys_content = SYSTEM_PROMPT
+    if outils and not use_native_tools:
+        sys_content += PROMPT_BASED_TOOLS_ADDENDUM
+    if tool_retries >= 2:
+        sys_content += (
+            "\n\nATTENTION : Les outils ont echoue plusieurs fois. "
+            "Reponds uniquement avec tes connaissances internes. "
+            "Ne tente plus d'appeler d'outils."
+        )
 
-    response = llm_with_tools.invoke(messages)
+    # Injecter le system prompt si absent ou le mettre a jour
+    if not messages or not isinstance(messages[0], SystemMessage):
+        messages = [SystemMessage(content=sys_content)] + list(messages)
+    else:
+        messages = [SystemMessage(content=sys_content)] + list(messages[1:])
+
+    # Appel LLM avec gestion d'erreur
+    try:
+        response = llm_with_tools.invoke(messages)
+    except Exception as e:
+        error_str = str(e).lower()
+        logger.error(f"Erreur LLM invoke ({model_name}): {e}")
+
+        if "tool" in error_str or "function" in error_str or "format" in error_str:
+            # Erreur liee aux outils -> retry sans outils
+            logger.warning(f"Retry sans outils pour {model_name}")
+            try:
+                response = llm.invoke(messages)
+            except Exception as e2:
+                logger.error(f"Retry sans outils echoue: {e2}")
+                response = AIMessage(content=(
+                    f"Je rencontre des difficultes avec le modele {model_name}. "
+                    "Essayez un modele compatible comme **qwen3:14b**, "
+                    "**llama3.2:3b** ou **gemma3:12b**."
+                ))
+        else:
+            response = AIMessage(content=(
+                f"Le modele {model_name} a rencontre une erreur. "
+                "Essayez de reformuler votre question ou changez de modele "
+                "(qwen3:14b, llama3.2:3b, gemma3:12b sont recommandes)."
+            ))
+
+    # Gerer les appels d'outils en mode prompt-based
+    if not use_native_tools and isinstance(response.content, str):
+        tool_call = _parse_prompt_based_tool_call(response.content)
+        if tool_call and tool_retries < 2:
+            result_text = _executer_outil_manuellement(tool_call["outil"], tool_call["query"])
+            # Renvoyer le resultat au LLM pour qu'il synthetise
+            followup_msg = HumanMessage(content=(
+                f"Resultat de l'outil {tool_call['outil']} :\n\n{result_text}\n\n"
+                "Synthetise ce resultat pour l'utilisateur de maniere claire et structuree."
+            ))
+            try:
+                response = llm.invoke(messages + [response, followup_msg])
+            except Exception:
+                response = AIMessage(content=result_text)
+
     besoin = None
     if isinstance(response.content, str):
         besoin = _detecter_besoin_forge(response.content)
 
-    return {
+    result = {
         "messages": [response],
         "besoin_forge": besoin,
     }
+
+    # Tracker les echecs d'outils pour le fallback
+    if isinstance(response.content, str) and ("erreur" in response.content.lower() or "error" in response.content.lower()):
+        result["_tool_retries"] = tool_retries + 1
+    else:
+        result["_tool_retries"] = 0
+
+    return result
 
 
 def forge_node(state: dict) -> dict:
