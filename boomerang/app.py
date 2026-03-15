@@ -161,8 +161,12 @@ with st.sidebar:
     if choix == "+ Nouveau projet":
         nouveau_nom = st.text_input("Nom du nouveau projet")
         if nouveau_nom:
+            if st.session_state.id_projet != nouveau_nom:
+                st.session_state.messages = []  # reset historique affiché
             st.session_state.id_projet = nouveau_nom
     else:
+        if st.session_state.id_projet != choix:
+            st.session_state.messages = []  # reset historique lors du changement de projet
         st.session_state.id_projet = choix
 
     id_projet = st.session_state.id_projet
@@ -438,6 +442,7 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
                     result = invoke_graph(
                         "L'outil forgé a été rejeté par l'utilisateur. Continue sans cet outil.",
                         thread_id,
+                        model_name=st.session_state.ollama_model,
                     )
                     sauvegarder_message(id_projet, "assistant", result["response"])
                 st.rerun()
