@@ -8,12 +8,21 @@ boomerang_app ne connait pas les outils directement. Il passe par tool_runner.py
 """
 
 import logging
-import requests
 import os
+import requests
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
+
+try:
+    from db_manager import get_cache, set_cache
+    _CACHE_AVAILABLE = True
+except ImportError:
+    _CACHE_AVAILABLE = False
+
+_CACHE_ENABLED = os.getenv("CACHE_ENABLED", "1") != "0"
+_CACHE_TTL_JOURS = int(os.getenv("CACHE_TTL_JOURS", "7"))
 
 TOOL_REGISTRY = {
     "recherche_web":              "http://tool_recherche_searxng:8001",
