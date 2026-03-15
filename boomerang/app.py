@@ -833,7 +833,16 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
                 nom_outil = st.session_state.nom_outil_temp
                 nom_court = (nom_outil or "").replace("tool_", "", 1)
 
-                # Écrire le code modifié
+                # Validation de securite AVANT ecriture sur disque
+                from forge_claude import _valider_code_forge
+                problemes = _valider_code_forge(code_modifie)
+                if problemes:
+                    st.error("Code rejete — problemes de securite detectes :")
+                    for p in problemes:
+                        st.write(f"- {p}")
+                    st.stop()
+
+                # Écrire le code modifié (valide)
                 temp_dir = os.getenv("TEMP_TOOLS_DIR", "/app/temp_tools")
                 tool_dir = os.path.join(temp_dir, nom_outil or "")
                 os.makedirs(tool_dir, exist_ok=True)
