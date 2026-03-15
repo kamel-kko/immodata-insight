@@ -402,6 +402,7 @@ if not SAAS_MODE and st.session_state.forge_mode is not None:
                     result = invoke_graph(
                         f"L'outil {nom_court} est maintenant disponible. Continue ta réponse.",
                         thread_id,
+                        model_name=st.session_state.ollama_model,
                     )
                     sauvegarder_message(id_projet, "assistant", result["response"])
                 st.rerun()
