@@ -57,6 +57,8 @@ def _parser_coordonnees(query: str) -> tuple[float, float, str]:
     match = re.match(r"^\s*(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*$", query)
     if match:
         lat, lon = float(match.group(1)), float(match.group(2))
+        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+            raise ValueError(f"Coordonnées hors limites : lat={lat}, lon={lon}")
         return lat, lon, f"{lat},{lon}"
     return _geocoder_adresse(query)
 
