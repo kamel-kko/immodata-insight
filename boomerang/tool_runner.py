@@ -7,10 +7,13 @@ boomerang_app ne connait pas les outils directement. Il passe par tool_runner.py
 - Recharge le registre dynamiquement apres validation HITL
 """
 
+import logging
 import requests
 import os
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 TOOL_REGISTRY = {
     "recherche_web":              "http://tool_recherche_searxng:8001",
