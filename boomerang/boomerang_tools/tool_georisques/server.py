@@ -122,7 +122,6 @@ def _risques_argiles(lat: float, lon: float) -> dict:
 @app.post("/run")
 def run(body: RunInput) -> dict:
     query = body.input.get("query", "")
-    force_refresh = body.input.get("force_refresh", False)
     if not query:
         return {"output": "Erreur : paramètre 'query' requis (adresse ou coordonnées lat,lon)."}
 
@@ -140,13 +139,6 @@ def run(body: RunInput) -> dict:
 
     if not code_insee:
         return {"output": f"Impossible de trouver le code INSEE pour '{label}' ({lat}, {lon})."}
-
-    # Verifier le cache avant d'appeler les APIs Georisques
-    if CACHE_AVAILABLE and not force_refresh:
-        cached = get_cache("recherche_risques_parcelle", code_insee)
-        if cached:
-            logger.info(f"[CACHE HIT] recherche_risques_parcelle pour INSEE {code_insee}")
-            return {"output": cached, "_cached": True}
 
     output_parts = [f"RISQUES NATURELS ET TECHNOLOGIQUES — {label} (INSEE: {code_insee})\n"]
 
@@ -184,13 +176,4 @@ def run(body: RunInput) -> dict:
     )
 
     result_text = "\n".join(output_parts)
-
-    # Sauvegarder en cache (cle = code INSEE, car les risques sont par commune)
-    if CACHE_AVAILABLE:
-        try:
-            set_cache("recherche_risques_parcelle", code_insee, result_text, CACHE_TTL_JOURS)
-            logger.info(f"[CACHE SET] recherche_risques_parcelle pour INSEE {code_insee} (TTL {CACHE_TTL_JOURS}j)")
-        except Exception as e:
-            logger.warning(f"[CACHE] Erreur ecriture cache: {e}")
-
     return {"output": result_text}
