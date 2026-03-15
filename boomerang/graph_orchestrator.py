@@ -695,6 +695,8 @@ async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
         on_tool_start(tool_name: str) — appele au debut d'un outil
         on_tool_end(tool_name: str) — appele a la fin d'un outil
     """
+    import asyncio as _asyncio
+
     graph = get_graph()
     config = {
         "configurable": {
@@ -707,6 +709,25 @@ async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
     full_text = ""
     besoin_forge = None
 
+    try:
+        async for event in _asyncio.wait_for(
+            _collect_stream_events(graph, user_input, config, on_token, on_tool_start, on_tool_end),
+            timeout=GRAPH_TIMEOUT,
+        ):
+            pass
+    except _asyncio.TimeoutError:
+        logger.error(f"[stream_graph] Timeout apres {GRAPH_TIMEOUT}s")
+        if on_token:
+            on_token(f"\n\n⚠️ Timeout ({GRAPH_TIMEOUT}s). Reformulez ou changez de modele.")
+        return {"response": full_text, "besoin_forge": None}
+
+    # On utilise un helper interne pour collecter le texte
+    # (la boucle est dans _collect_stream_events pour le timeout)
+    return {"response": full_text, "besoin_forge": besoin_forge}
+
+
+async def _collect_stream_events(graph, user_input, config, on_token, on_tool_start, on_tool_end):
+    """Helper async generator pour stream_graph avec timeout."""
     async for event in graph.astream_events(
         {"messages": [HumanMessage(content=user_input)]},
         config=config,
@@ -717,7 +738,6 @@ async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
         if kind == "on_chat_model_stream":
             chunk = event.get("data", {}).get("chunk")
             if chunk and hasattr(chunk, "content") and chunk.content:
-                full_text += chunk.content
                 if on_token:
                     on_token(chunk.content)
 
@@ -731,11 +751,4 @@ async def stream_graph(user_input: str, thread_id: str, model_name: str = "",
             if on_tool_end:
                 on_tool_end(tool_name)
 
-    # Detecter besoin forge dans le texte final
-    if full_text:
-        besoin_forge = _detecter_besoin_forge(full_text)
-
-    return {
-        "response": full_text,
-        "besoin_forge": besoin_forge,
-    }
+        yield event
