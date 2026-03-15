@@ -64,11 +64,10 @@ def get_llm(model_name: str = ""):
 # ── Langfuse ────────────────────────────────────────────
 
 def get_langfuse_handler() -> CallbackHandler:
-    return CallbackHandler(
-        public_key=os.getenv("LANGFUSE_PUBLIC_KEY", ""),
-        secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""),
-        host=os.getenv("LANGFUSE_HOST", "http://langfuse:3000"),
-    )
+    # Langfuse v4 : le constructeur ne prend plus public_key/secret_key/host.
+    # Ces valeurs sont lues automatiquement depuis les variables d'environnement
+    # LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST (définies dans .env).
+    return CallbackHandler()
 
 
 # ── State ───────────────────────────────────────────────
