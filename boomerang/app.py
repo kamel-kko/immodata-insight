@@ -62,6 +62,7 @@ defaults = {
     "forge_result": None,
     "messages": [],           # historique chat affiché dans la session courante
     "ollama_model": os.getenv("OLLAMA_MODEL", "llama3.2"),
+    "last_working_model": os.getenv("OLLAMA_MODEL", "llama3.2"),  # dernier modele ayant repondu OK
     "attached_file_ctx": None,  # contexte du fichier joint (dict ou None)
 }
 for k, v in defaults.items():
