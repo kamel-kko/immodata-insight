@@ -614,7 +614,8 @@ def build_graph():
     # SqliteSaver.from_conn_string() retourne un context manager, pas l'instance.
     # Comme le graph vit en global (_graph), un bloc `with` fermerait la connexion
     # trop tôt. On crée la connexion manuellement pour maîtriser sa durée de vie.
-    conn = sqlite3.connect("/app/data/langgraph.db", check_same_thread=False)
+    _lg_db = os.path.join(_DATA_DIR, "langgraph.db")
+    conn = sqlite3.connect(_lg_db, check_same_thread=False)
     memory = SqliteSaver(conn)
     memory.setup()  # crée les tables de checkpoint si nécessaire
     graph = workflow.compile(checkpointer=memory, interrupt_before=["hitl_node"])
