@@ -27,6 +27,30 @@ st.set_page_config(
 
 SAAS_MODE = os.getenv("SAAS_MODE", "false").lower() == "true"
 
+# ── Persistance des settings ─────────────────────────
+from pathlib import Path as _Path
+import json as _json
+
+SETTINGS_FILE = _Path("/app/data/settings.json")
+
+
+def load_settings() -> dict:
+    if SETTINGS_FILE.exists():
+        try:
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                return _json.load(f)
+        except (ValueError, IOError):
+            return {}
+    return {}
+
+
+def save_settings(key: str, value: str) -> None:
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    settings = load_settings()
+    settings[key] = value
+    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+        _json.dump(settings, f, ensure_ascii=False, indent=2)
+
 # ── Imports internes ────────────────────────────────────
 
 from db_manager import (
