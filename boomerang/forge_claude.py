@@ -8,6 +8,7 @@ IMPORTANT : Ne pas définir ANTHROPIC_API_KEY dans l'environnement.
 Fonction principale : forger_outil(besoin: str, id_projet: str) -> dict
 """
 
+import ast
 import json
 import logging
 import os
@@ -18,6 +19,68 @@ import time
 from typing import Any, Callable, Optional
 
 from langfuse import Langfuse
+
+
+# ── Validation statique du code genere ────────────────
+
+# Imports et appels interdits dans le code forge (securite)
+_FORBIDDEN_IMPORTS = {
+    "subprocess", "shutil", "ctypes", "importlib",
+    "eval", "exec", "compile", "__import__",
+    "pickle", "shelve", "tempfile",
+}
+
+_FORBIDDEN_CALLS = {
+    "os.system", "os.popen", "os.exec",
+    "os.remove", "os.rmdir", "os.unlink",
+    "open",  # sauf si c'est dans un pattern safe
+}
+
+
+def _valider_code_forge(code: str) -> list[str]:
+    """Analyse statique du code genere par Claude avant ecriture sur disque.
+
+    Verifie via ast.parse que le code ne contient pas d'imports ou appels dangereux.
+
+    Returns:
+        Liste de problemes detectes (vide = code OK).
+    """
+    problemes = []
+
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        return [f"Erreur de syntaxe : {e}"]
+
+    for node in ast.walk(tree):
+        # Verifier les imports interdits
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                module_root = alias.name.split(".")[0]
+                if module_root in _FORBIDDEN_IMPORTS:
+                    problemes.append(f"Import interdit : '{alias.name}' (ligne {node.lineno})")
+
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                module_root = node.module.split(".")[0]
+                if module_root in _FORBIDDEN_IMPORTS:
+                    problemes.append(f"Import interdit : 'from {node.module}' (ligne {node.lineno})")
+
+        # Verifier les appels dangereux (eval, exec, os.system, etc.)
+        elif isinstance(node, ast.Call):
+            func_name = ""
+            if isinstance(node.func, ast.Name):
+                func_name = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                if isinstance(node.func.value, ast.Name):
+                    func_name = f"{node.func.value.id}.{node.func.attr}"
+
+            if func_name in ("eval", "exec", "compile", "__import__"):
+                problemes.append(f"Appel interdit : '{func_name}()' (ligne {node.lineno})")
+            if func_name in _FORBIDDEN_CALLS:
+                problemes.append(f"Appel dangereux : '{func_name}()' (ligne {node.lineno})")
+
+    return problemes
 
 logger = logging.getLogger(__name__)
 
