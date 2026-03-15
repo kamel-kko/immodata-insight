@@ -64,6 +64,8 @@ defaults = {
     "ollama_model": os.getenv("OLLAMA_MODEL", "llama3.2"),
     "last_working_model": os.getenv("OLLAMA_MODEL", "llama3.2"),  # dernier modele ayant repondu OK
     "attached_file_ctx": None,  # contexte du fichier joint (dict ou None)
+    "web_search_enabled": False,  # toggle recherche web
+    "show_file_uploader": False,  # afficher/masquer le file uploader
 }
 for k, v in defaults.items():
     if k not in st.session_state:
