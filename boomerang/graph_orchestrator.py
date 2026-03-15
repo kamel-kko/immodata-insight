@@ -211,10 +211,13 @@ def rebuild_graph():
     return _graph
 
 
-def invoke_graph(user_input: str, thread_id: str, status_widget=None) -> dict:
+def invoke_graph(user_input: str, thread_id: str, status_widget=None, model_name: str = "") -> dict:
     graph = get_graph()
     config = {
-        "configurable": {"thread_id": thread_id},
+        "configurable": {
+            "thread_id": thread_id,
+            "model_name": model_name,
+        },
         "callbacks": [get_langfuse_handler()],
     }
 
