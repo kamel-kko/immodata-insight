@@ -31,6 +31,12 @@ services:
         condition: service_healthy
       tool_notice_securite:
         condition: service_healthy
+      tool_api_urbanisme:
+        condition: service_healthy
+      tool_mcp_legal:
+        condition: service_healthy
+      tool_georisques:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - boomerang_net   # accès Internet et services
