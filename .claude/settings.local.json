@@ -97,7 +97,18 @@
       "Bash(python -c \"import py_compile; py_compile.compile\\(''guide_depot_pc.py'', doraise=True\\); print\\(''OK''\\)\")",
       "Bash(python -m pytest tests/test_guide_depot_pc.py -v)",
       "Bash(pip list:*)",
-      "Bash(ollama list:*)"
+      "Bash(ollama list:*)",
+      "Bash(curl -s \"https://apicarto.ign.fr/api/gpu/document-urbanisme?code_insee=40327\")",
+      "Bash(curl -s \"https://apicarto.ign.fr/api/gpu/document?code_insee=40327\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[''''features''''][0][''''properties''''] if d.get\\(''''features''''\\) else d, indent=2\\)[:800]\\)\")",
+      "Bash(curl -s \"https://apicarto.ign.fr/api/gpu/document?partition=DU_40327\")",
+      "Bash(curl -s \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/details\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/file/40327_reglement_20250715.pdf\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://www.geoportail-urbanisme.gouv.fr/document/download-by-name/6c4be31ba85ff877d2aaed385ce0b841/40327_reglement_20250715.pdf\")",
+      "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/download/40327_reglement_20250715.pdf\")",
+      "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/file?fileName=40327_reglement_20250715.pdf\")",
+      "Bash(curl -sI \"https://data.geopf.fr/annexes/gpu/documents/DU_40327/40327_reglement_20250715.pdf\")",
+      "Bash(curl -sI \"https://www.geoportail-urbanisme.gouv.fr/api/document/6c4be31ba85ff877d2aaed385ce0b841/download/40327_PLU_20250715.zip\")"
     ]
   },
   "hooks": {
