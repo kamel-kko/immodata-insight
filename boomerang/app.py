@@ -164,6 +164,67 @@ def _preparer_contexte_fichier(uploaded_file) -> dict:
         }
 
 
+# ── Rendu riche des messages (Mermaid, Matplotlib, WMS) ──
+
+def _render_message_content(content: str):
+    """Affiche le contenu d'un message avec support Mermaid, charts et cartes WMS."""
+    import re as _re
+
+    # Detecter les blocs Mermaid dans le contenu
+    mermaid_blocks = _re.findall(r'```mermaid\s*\n(.*?)```', content, _re.DOTALL)
+    if mermaid_blocks:
+        # Afficher le texte avant le bloc Mermaid
+        before = content.split("```mermaid")[0]
+        if before.strip():
+            st.markdown(before)
+        for mermaid_code in mermaid_blocks:
+            html = (
+                '<div class="mermaid">\n'
+                f'{mermaid_code.strip()}\n'
+                '</div>\n'
+                '<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>\n'
+                '<script>mermaid.initialize({startOnLoad:true, theme:"dark"});</script>'
+            )
+            st.components.v1.html(html, height=400, scrolling=True)
+        # Texte apres le dernier bloc Mermaid
+        after_parts = content.split("```")
+        if len(after_parts) > 2:
+            trailing = after_parts[-1].strip()
+            if trailing:
+                st.markdown(trailing)
+        return
+
+    # Detecter les graphiques Matplotlib (chemin de fichier)
+    if "CHART:" in content:
+        parts = content.split("CHART:")
+        if parts[0].strip():
+            st.markdown(parts[0])
+        chemin = parts[1].strip().split("\n")[0].strip()
+        if os.path.exists(chemin):
+            st.image(chemin, caption="Graphique genere par BOOMERANG")
+        else:
+            st.warning(f"Graphique introuvable : {chemin}")
+        remaining = "\n".join(parts[1].strip().split("\n")[1:])
+        if remaining.strip():
+            st.markdown(remaining)
+        return
+
+    # Detecter les URLs de carte WMS
+    if "MAP_URL:" in content:
+        parts = content.split("MAP_URL:")
+        if parts[0].strip():
+            st.markdown(parts[0])
+        url = parts[1].strip().split("\n")[0].strip()
+        st.image(url, caption="Localisation cadastrale — Geoportail IGN")
+        remaining = "\n".join(parts[1].strip().split("\n")[1:])
+        if remaining.strip():
+            st.markdown(remaining)
+        return
+
+    # Contenu standard : affichage Markdown classique
+    st.markdown(content)
+
+
 # ── Langfuse handler (une seule fois) ──────────────────
 
 if "langfuse_handler" not in st.session_state:
