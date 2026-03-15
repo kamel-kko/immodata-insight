@@ -912,6 +912,7 @@ else:
                         model_name=current_model,
                     )
                     st.session_state.last_working_model = current_model
+                    save_settings("last_model", current_model)
                 except Exception as e:
                     import logging
                     logging.getLogger(__name__).error(f"Erreur invoke_graph: {e}")
