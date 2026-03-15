@@ -66,7 +66,8 @@ services:
       - "8002:8002"
     restart: unless-stopped
     networks:
-      - tools_net       # réseau interne isolé — pas d'accès Internet
+      - tools_net       # réseau interne outils
+      - boomerang_net   # requis pour le port forwarding vers l'hôte
     # ↑ REQUIERT_INTERNET: non — calcul local uniquement
 
   tool_api_urbanisme:
