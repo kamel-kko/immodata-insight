@@ -87,6 +87,79 @@ def get_ollama_models() -> list[str]:
         return ["llama3.2"]
 
 
+# ── Helpers fichiers joints ───────────────────────────
+
+MAX_FILE_SIZE_MB = 10
+
+VISION_MODELS = [
+    "llava", "llava-llama3", "llava-phi3", "bakllava",
+    "moondream", "qwen2-vl", "llama3.2-vision", "minicpm-v",
+    "cogvlm2", "internvl2",
+]
+
+
+def _modele_supporte_vision(model_name: str) -> bool:
+    """Verifie si le modele Ollama selectionne supporte les images."""
+    model_lower = model_name.lower()
+    for v in VISION_MODELS:
+        if v in model_lower:
+            return True
+    return False
+
+
+def _extraire_texte_pdf(file_bytes: bytes) -> str:
+    """Extrait le texte d'un fichier PDF."""
+    try:
+        from PyPDF2 import PdfReader
+        reader = PdfReader(io.BytesIO(file_bytes))
+        texte = []
+        for page in reader.pages:
+            t = page.extract_text()
+            if t:
+                texte.append(t)
+        return "\n\n".join(texte) if texte else "(PDF sans texte extractible)"
+    except Exception as e:
+        return f"(Erreur extraction PDF : {str(e)})"
+
+
+def _preparer_contexte_fichier(uploaded_file) -> dict:
+    """Prepare le contexte a injecter dans le message utilisateur.
+
+    Retourne {"type": "text"|"image"|"error", "content": str, "filename": str}
+    """
+    filename = uploaded_file.name
+    file_bytes = uploaded_file.read()
+    size_mb = len(file_bytes) / (1024 * 1024)
+
+    if size_mb > MAX_FILE_SIZE_MB:
+        return {
+            "type": "error",
+            "content": f"Le fichier {filename} depasse la limite de {MAX_FILE_SIZE_MB} Mo ({size_mb:.1f} Mo).",
+            "filename": filename,
+        }
+
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+    if ext == "pdf":
+        texte = _extraire_texte_pdf(file_bytes)
+        return {"type": "text", "content": texte, "filename": filename}
+    elif ext == "txt":
+        try:
+            texte = file_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            texte = file_bytes.decode("latin-1", errors="replace")
+        return {"type": "text", "content": texte, "filename": filename}
+    elif ext in ("jpg", "jpeg", "png", "webp"):
+        b64 = base64.b64encode(file_bytes).decode("utf-8")
+        return {"type": "image", "content": b64, "filename": filename, "ext": ext}
+    else:
+        return {
+            "type": "error",
+            "content": f"Format de fichier non supporte : .{ext}. Formats acceptes : PDF, TXT, JPG, PNG.",
+            "filename": filename,
+        }
+
+
 # ── Langfuse handler (une seule fois) ──────────────────
 
 if "langfuse_handler" not in st.session_state:
