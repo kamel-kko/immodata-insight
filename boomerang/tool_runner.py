@@ -78,14 +78,10 @@ class LocalTool(BaseTool):
     name: str
     description: str
     args_schema: type = QueryInput
-    _func: object = None
-
-    class Config:
-        underscore_attrs_are_private = True
+    local_func: object = None
 
     def __init__(self, name, description, func, args_schema=QueryInput):
-        super().__init__(name=name, description=description, args_schema=args_schema)
-        self._func = func
+        super().__init__(name=name, description=description, args_schema=args_schema, local_func=func)
 
     def _run(self, **kwargs) -> str:
         try:
