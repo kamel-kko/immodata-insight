@@ -47,39 +47,52 @@ def test_container_tool_run_http_error():
 
 
 def test_container_tool_cache_hit():
-    with patch("tool_runner.get_cache", return_value="Resultat cache") as mock_get, \
-         patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
-         patch.object(tool_runner, "_CACHE_ENABLED", True):
-        tool = ContainerTool(
-            name="recherche_urbanisme",
-            description="Test cache",
-            tool_url="http://fake:8003",
-        )
-        result = tool._run(query="12 rue de Rivoli Paris")
-        assert result == "Resultat cache"
-        mock_get.assert_called_once_with("recherche_urbanisme", "12 rue de rivoli paris")
+    mock_get_cache = MagicMock(return_value="Resultat cache")
+    tool_runner.get_cache = mock_get_cache
+    try:
+        with patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
+             patch.object(tool_runner, "_CACHE_ENABLED", True):
+            tool = ContainerTool(
+                name="recherche_urbanisme",
+                description="Test cache",
+                tool_url="http://fake:8003",
+            )
+            result = tool._run(query="12 rue de Rivoli Paris")
+            assert result == "Resultat cache"
+            mock_get_cache.assert_called_once_with("recherche_urbanisme", "12 rue de rivoli paris")
+    finally:
+        if hasattr(tool_runner, "get_cache"):
+            delattr(tool_runner, "get_cache")
 
 
 def test_container_tool_cache_miss_then_store():
-    with patch("tool_runner.get_cache", return_value=None) as mock_get, \
-         patch("tool_runner.set_cache") as mock_set, \
-         patch("tool_runner.requests.post") as mock_post, \
-         patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
-         patch.object(tool_runner, "_CACHE_ENABLED", True):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = {"output": "Zone UA fraiche"}
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
+    mock_get_cache = MagicMock(return_value=None)
+    mock_set_cache = MagicMock()
+    tool_runner.get_cache = mock_get_cache
+    tool_runner.set_cache = mock_set_cache
+    try:
+        with patch("tool_runner.requests.post") as mock_post, \
+             patch.object(tool_runner, "_CACHE_AVAILABLE", True), \
+             patch.object(tool_runner, "_CACHE_ENABLED", True):
+            mock_resp = MagicMock()
+            mock_resp.json.return_value = {"output": "Zone UA fraiche"}
+            mock_resp.raise_for_status = MagicMock()
+            mock_post.return_value = mock_resp
 
-        tool = ContainerTool(
-            name="recherche_urbanisme",
-            description="Test cache miss",
-            tool_url="http://fake:8003",
-        )
-        result = tool._run(query="Paris centre")
-        assert result == "Zone UA fraiche"
-        mock_get.assert_called_once()
-        mock_set.assert_called_once()
+            tool = ContainerTool(
+                name="recherche_urbanisme",
+                description="Test cache miss",
+                tool_url="http://fake:8003",
+            )
+            result = tool._run(query="Paris centre")
+            assert result == "Zone UA fraiche"
+            mock_get_cache.assert_called_once()
+            mock_set_cache.assert_called_once()
+    finally:
+        if hasattr(tool_runner, "get_cache"):
+            delattr(tool_runner, "get_cache")
+        if hasattr(tool_runner, "set_cache"):
+            delattr(tool_runner, "set_cache")
 
 
 def test_container_tool_cache_disabled():
