@@ -238,7 +238,12 @@ def forger_outil(
 
     _status("⚙️ Claude analyse le besoin...")
 
-    prompt = PROMPT_FORGE.format(besoin=besoin)
+    # Assainir le besoin utilisateur avant injection dans le prompt Claude CLI
+    besoin_sanitise = besoin.replace('"', '\\"').replace("'", "\\'").replace("\n", " ").replace("\r", "")
+    if len(besoin_sanitise) > 2000:
+        besoin_sanitise = besoin_sanitise[:2000]
+
+    prompt = PROMPT_FORGE.format(besoin=besoin_sanitise)
 
     start_time = time.time()
     try:
