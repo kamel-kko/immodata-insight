@@ -1171,7 +1171,7 @@ else:
                     from db_manager import charger_historique_complet
                     messages_complets = charger_historique_complet(id_projet)
                     if messages_complets:
-                        pdf_bytes = generer_pdf_rapport(id_projet, messages_complets)
+                        pdf_bytes = bytes(generer_pdf_rapport(id_projet, messages_complets))
                         st.download_button(
                             label="PDF",
                             data=pdf_bytes,
