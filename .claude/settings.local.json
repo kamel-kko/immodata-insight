@@ -138,7 +138,11 @@
       "Bash(pkill -f streamlit)",
       "Bash(mkdir -p backup_20260315)",
       "Bash(cp app.py graph_orchestrator.py requirements.txt backup_20260315/)",
-      "Bash(cp -r boomerang_tools backup_20260315/)"
+      "Bash(cp -r boomerang_tools backup_20260315/)",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py''\\); print\\(''Syntaxe OK''\\)\")",
+      "Bash(curl -s http://localhost:8502/_stcore/health)",
+      "Bash(ls boomerang_tools/*.py)",
+      "Bash(python -c \"import fitz, chromadb, requests; print\\(''deps OK''\\)\")"
     ]
   },
   "hooks": {

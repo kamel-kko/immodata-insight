@@ -19,7 +19,8 @@ BAN_URL = "https://api-adresse.data.gouv.fr/search/"
 GPU_APICARTO_DOC = "https://apicarto.ign.fr/api/gpu/document"
 GPU_APICARTO_ZONE = "https://apicarto.ign.fr/api/gpu/zone-urba"
 GPU_DETAILS = "https://www.geoportail-urbanisme.gouv.fr/api/document/{doc_id}/details"
-CACHE_DIR = os.environ.get("PLU_CACHE_DIR", "/app/data/plu_cache")
+_DEFAULT_CACHE = os.path.join(os.path.dirname(__file__), "..", "data", "plu_cache")
+CACHE_DIR = os.environ.get("PLU_CACHE_DIR", _DEFAULT_CACHE)
 CACHE_TTL_JOURS = 30
 
 
