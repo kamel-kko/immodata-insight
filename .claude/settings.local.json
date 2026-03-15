@@ -114,7 +114,14 @@
       "Bash(python -c \"from langchain_community.embeddings import OllamaEmbeddings; print\\(''OllamaEmbeddings OK''\\)\")",
       "Bash(python -c \"import fitz; print\\(''pymupdf'', fitz.version\\)\")",
       "Bash(curl -s http://localhost:11434/api/tags)",
-      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''Syntaxe OK''\\)\")"
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''Syntaxe OK''\\)\")",
+      "Bash(tasklist /FI 'IMAGENAME eq python.exe' /FO CSV)",
+      "Bash(findstr -i streamlit)",
+      "Bash(findstr \":8501 \")",
+      "Bash(findstr -v \"^$\")",
+      "Bash(timeout 8)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8502)",
+      "Bash(python -m streamlit run app.py --server.port 8502 --server.headless true)"
     ]
   },
   "hooks": {

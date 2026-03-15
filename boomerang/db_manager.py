@@ -22,7 +22,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////app/data/boomerang.db")
+_default_db = "sqlite:////app/data/boomerang.db"
+DATABASE_URL = os.getenv("DATABASE_URL", _default_db)
+
+# En local (Windows), le chemin Docker /app/data/ n'existe pas.
+# On redirige vers ./data/boomerang.db relatif au projet.
+if DATABASE_URL == _default_db and not os.path.exists("/app/data"):
+    _local_data = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(_local_data, exist_ok=True)
+    DATABASE_URL = f"sqlite:///{os.path.join(_local_data, 'boomerang.db')}"
 
 engine = create_engine(
     DATABASE_URL,
