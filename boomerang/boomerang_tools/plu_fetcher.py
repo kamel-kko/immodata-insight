@@ -64,13 +64,44 @@ def geocoder_adresse(adresse: str) -> dict:
 
 # ── 1B — Recherche PLU sur le GPU ───────────────────────
 
-def rechercher_plu_gpu(code_insee: str) -> dict:
+def rechercher_plu_gpu(code_insee: str, lat: float = None, lon: float = None) -> dict:
     """Interroge le Geoportail de l'Urbanisme pour trouver le PLU d'une commune.
 
+    Utilise d'abord zone-urba (si lat/lon fournis) pour obtenir la partition
+    exacte (gere les PLUi intercommunaux), puis tombe en fallback sur le
+    code INSEE communal.
+
     Retourne un dict avec : nom_commune, type_document, date_approbation,
-    gpu_doc_id, archive_url, fichiers_pdf[], statut.
+    gpu_doc_id, archive_url, fichiers_pdf[], statut, zone_parcelle, nomfic.
     """
-    partition = f"DU_{code_insee}"
+    partition = None
+    zone_parcelle = ""
+    nomfic = ""
+    idurba = ""
+
+    # Etape 0 : si on a des coordonnees, interroger zone-urba pour la
+    # partition reelle (gere les PLUi)
+    if lat is not None and lon is not None:
+        try:
+            geom = json.dumps({"type": "Point", "coordinates": [lon, lat]})
+            resp_z = requests.get(
+                GPU_APICARTO_ZONE,
+                params={"geom": geom},
+                timeout=15,
+            )
+            resp_z.raise_for_status()
+            zones = resp_z.json().get("features", [])
+            if zones:
+                zprops = zones[0]["properties"]
+                partition = zprops.get("partition", "")
+                zone_parcelle = zprops.get("libelle", "")
+                nomfic = zprops.get("nomfic", "")
+                idurba = zprops.get("idurba", "")
+        except Exception as e:
+            logger.warning(f"zone-urba echoue, fallback sur code_insee : {e}")
+
+    if not partition:
+        partition = f"DU_{code_insee}"
 
     # Etape 1 : chercher le document via APICarto
     try:
