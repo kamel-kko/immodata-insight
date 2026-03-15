@@ -159,6 +159,21 @@ def charger_historique(id_projet: str, limite: int = 50) -> List[Dict]:
         return [{"role": r.role, "content": r.content} for r in rows]
 
 
+def charger_historique_complet(id_projet: str, limite: int = 200) -> List[Dict]:
+    with SessionLocal() as db:
+        rows = (
+            db.query(Message)
+            .filter(Message.id_projet == id_projet)
+            .order_by(Message.created_at.asc())
+            .limit(limite)
+            .all()
+        )
+        return [
+            {"role": r.role, "content": r.content, "created_at": r.created_at}
+            for r in rows
+        ]
+
+
 def supprimer_historique(id_projet: str) -> int:
     with SessionLocal() as db:
         count = db.query(Message).filter(Message.id_projet == id_projet).delete()
