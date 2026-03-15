@@ -12,7 +12,7 @@ services:
       - ./tests:/app/tests
       - ./backups:/app/backups
       - ~/.claude:/root/.claude:ro          # Auth Claude Code depuis l'hôte (Pro/Max)
-      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker : pilotage des containers outils
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker-in-Docker : lecture seule (securite)
       - .:/app/project:ro                          # Accès au docker-compose.yml de l'hôte
     env_file: .env
     environment:
