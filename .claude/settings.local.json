@@ -81,7 +81,9 @@
       "Bash(do echo:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:$port/health)",
       "Bash(findstr \":8002\")",
-      "Bash(findstr -A5 \"tool_notice_securite\")"
+      "Bash(findstr -A5 \"tool_notice_securite\")",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(curl -s --max-time 3 http://localhost:$port/health)"
     ]
   },
   "hooks": {

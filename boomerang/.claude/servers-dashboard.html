@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOOMERANG — Serveurs</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e4e4e7;
+    min-height: 100vh;
+    padding: 32px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .subtitle {
+    color: #71717a;
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 16px;
+    max-width: 960px;
+  }
+
+  .card {
+    background: #1a1d23;
+    border: 1px solid #27272a;
+    border-radius: 14px;
+    padding: 22px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: #3f3f46;
+    box-shadow: 0 0 20px rgba(74, 144, 217, 0.08);
+  }
+
+  .card.main {
+    grid-column: span 2;
+    grid-row: span 2;
+    background: linear-gradient(135deg, #1a1d23 0%, #1e2330 100%);
+    border-color: #4A90D9;
+  }
+
+  .card.docker {
+    grid-column: span 3;
+    background: linear-gradient(90deg, #1a1d23 0%, #1a2318 100%);
+    border-color: #2ea043;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+  }
+
+  .card-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card.main .card-icon {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+  }
+
+  .card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .card.main .card-name {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: #a1a1aa;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .card.main .card-desc {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .tag.port {
+    background: #4A90D920;
+    color: #7ab4f0;
+    border: 1px solid #4A90D940;
+  }
+
+  .tag.runtime {
+    background: #a855f720;
+    color: #c084fc;
+    border: 1px solid #a855f740;
+  }
+
+  .tag.status-ok {
+    background: #2ea04320;
+    color: #4ade80;
+    border: 1px solid #2ea04340;
+  }
+
+  .tag.status-checking {
+    background: #eab30820;
+    color: #fbbf24;
+    border: 1px solid #eab30840;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .dot.green {
+    background: #4ade80;
+    box-shadow: 0 0 6px #4ade8080;
+    animation: pulse 2s infinite;
+  }
+
+  .dot.yellow {
+    background: #fbbf24;
+    box-shadow: 0 0 6px #fbbf2480;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .cmd {
+    background: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    color: #a1a1aa;
+    margin-top: 12px;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+
+  .card.main .cmd {
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+
+  .cmd span { color: #4ade80; }
+
+  .docker-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .docker-left .card-icon {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .docker-info .card-name { margin-bottom: 2px; }
+  .docker-info .card-desc { margin: 0; font-size: 0.8rem; }
+
+  .docker-cmd {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: #4ade80;
+    background: #09090b;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #27272a;
+  }
+</style>
+</head>
+<body>
+
+<h1>BOOMERANG — Dev Servers</h1>
+<p class="subtitle">.claude/launch.json — 7 configurations detectees</p>
+
+<div class="bento">
+
+  <!-- Main app: spans 2 cols, 2 rows -->
+  <div class="card main" id="card-8501">
+    <span class="card-icon">&#127959;</span>
+    <div class="card-name">boomerang_app</div>
+    <div class="card-desc">Application Streamlit principale.<br>Interface architecte avec Bento Grid, LangGraph orchestrator, chat IA et outils integres.</div>
+    <div class="tag-row">
+      <span class="tag port">:8501</span>
+      <span class="tag runtime">streamlit</span>
+      <span class="tag status-checking" id="status-8501"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> streamlit run app.py --server.headless=true</div>
+  </div>
+
+  <!-- Tool 1 -->
+  <div class="card" id="card-8001">
+    <span class="card-icon">&#128269;</span>
+    <div class="card-name">tool_recherche_searxng</div>
+    <div class="card-desc">Recherche web via SearXNG (urbanisme, reglementation).</div>
+    <div class="tag-row">
+      <span class="tag port">:8001</span>
+      <span class="tag runtime">uvicorn</span>
+      <span class="tag status-checking" id="status-8001"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> uvicorn server:app --host 0.0.0.0 --port 8001</div>
+  </div>
+
+  <!-- Tool 2 -->
+  <div class="card" id="card-8002">
+    <span class="card-icon">&#128700;</span>
+    <div class="card-name">tool_notice_securite</div>
+    <div class="card-desc">Notice securite incendie ERP. Calcul local, sans Internet.</div>
+    <div class="tag-row">
+      <span class="tag port">:8002</span>
+      <span class="tag runtime">uvicorn</span>
+      <span class="tag status-checking" id="status-8002"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> uvicorn server:app --host 0.0.0.0 --port 8002</div>
+  </div>
+
+  <!-- Tool 3 -->
+  <div class="card" id="card-8003">
+    <span class="card-icon">&#127963;</span>
+    <div class="card-name">tool_api_urbanisme</div>
+    <div class="card-desc">Interroge le Geoportail de l'Urbanisme (PLU, zonage, BAN).</div>
+    <div class="tag-row">
+      <span class="tag port">:8003</span>
+      <span class="tag runtime">uvicorn</span>
+      <span class="tag status-checking" id="status-8003"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> uvicorn server:app --host 0.0.0.0 --port 8003</div>
+  </div>
+
+  <!-- Tool 4 -->
+  <div class="card" id="card-8004">
+    <span class="card-icon">&#9878;</span>
+    <div class="card-name">tool_mcp_legal</div>
+    <div class="card-desc">Recherche juridique (Legifrance, JORF, codes).</div>
+    <div class="tag-row">
+      <span class="tag port">:8004</span>
+      <span class="tag runtime">uvicorn</span>
+      <span class="tag status-checking" id="status-8004"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> uvicorn server:app --host 0.0.0.0 --port 8004</div>
+  </div>
+
+  <!-- Tool 5 -->
+  <div class="card" id="card-8005">
+    <span class="card-icon">&#127755;</span>
+    <div class="card-name">tool_georisques</div>
+    <div class="card-desc">Risques naturels et technologiques (API Georisques BRGM).</div>
+    <div class="tag-row">
+      <span class="tag port">:8005</span>
+      <span class="tag runtime">uvicorn</span>
+      <span class="tag status-checking" id="status-8005"><span class="dot yellow"></span> check...</span>
+    </div>
+    <div class="cmd"><span>$</span> uvicorn server:app --host 0.0.0.0 --port 8005</div>
+  </div>
+
+  <!-- Docker all: full width -->
+  <div class="card docker">
+    <div class="docker-left">
+      <span class="card-icon">&#128051;</span>
+      <div class="docker-info">
+        <div class="card-name">docker_all</div>
+        <div class="card-desc">Lance tous les services via Docker Compose (recommande).</div>
+      </div>
+    </div>
+    <div class="docker-cmd">$ docker compose up</div>
+  </div>
+
+</div>
+
+<script>
+const checks = [
+  { port: 8501, url: "http://localhost:8501/_stcore/health" },
+  { port: 8001, url: "http://localhost:8001/health" },
+  { port: 8002, url: "http://localhost:8002/health" },
+  { port: 8003, url: "http://localhost:8003/health" },
+  { port: 8004, url: "http://localhost:8004/health" },
+  { port: 8005, url: "http://localhost:8005/health" },
+];
+
+checks.forEach(({ port, url }) => {
+  const el = document.getElementById(`status-${port}`);
+  fetch(url, { mode: "no-cors", signal: AbortSignal.timeout(3000) })
+    .then(() => {
+      el.className = "tag status-ok";
+      el.innerHTML = '<span class="dot green"></span> en ligne';
+    })
+    .catch(() => {
+      el.innerHTML = '<span class="dot yellow"></span> hors ligne';
+    });
+});
+</script>
+
+</body>
+</html>
