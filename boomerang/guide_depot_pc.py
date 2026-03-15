@@ -148,7 +148,8 @@ def _etape_plu(tool_registry: dict):
                 data["resultat_plu"] = resultat
 
         st.markdown("### Resultat PLU")
-        st.markdown(data["resultat_plu"])
+        with st.expander("Voir les resultats", expanded=True):
+            st.text(data["resultat_plu"])
     else:
         st.warning(
             "L'outil urbanisme n'est pas disponible. "
