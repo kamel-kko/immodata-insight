@@ -58,10 +58,31 @@ defaults = {
     "nom_outil_temp": None,
     "besoin_forge": None,
     "forge_result": None,
+    "messages": [],           # historique chat affiché dans la session courante
+    "ollama_model": os.getenv("OLLAMA_MODEL", "llama3.2"),
 }
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+
+# ── Helper : liste des modèles Ollama disponibles ───────
+
+def get_ollama_models() -> list[str]:
+    """Interroge l'API Ollama pour lister les modèles installés.
+
+    Appelle GET http://<OLLAMA_BASE_URL>/api/tags.
+    Si l'API est inaccessible, retourne une liste par défaut.
+    """
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+    try:
+        resp = requests.get(f"{base_url}/api/tags", timeout=3)
+        resp.raise_for_status()
+        models = resp.json().get("models", [])
+        noms = [m["name"] for m in models if "name" in m]
+        return noms if noms else ["llama3.2"]
+    except Exception:
+        return ["llama3.2"]
 
 
 # ── Langfuse handler (une seule fois) ──────────────────
