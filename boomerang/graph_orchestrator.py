@@ -105,10 +105,13 @@ def _detecter_besoin_forge(contenu: str) -> Optional[str]:
 
 # ── Noeuds du graphe ────────────────────────────────────
 
-def agent_node(state: dict) -> dict:
+def agent_node(state: dict, config: RunnableConfig) -> dict:
     messages = state.get("messages", [])
     outils = charger_outils()
-    llm = get_llm()
+
+    # Récupérer le modèle depuis la config (passée par app.py via le selectbox)
+    model_name = config.get("configurable", {}).get("model_name", "")
+    llm = get_llm(model_name=model_name)
 
     if outils:
         llm_with_tools = llm.bind_tools(outils)
