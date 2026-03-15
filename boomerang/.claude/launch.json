@@ -44,6 +44,13 @@
       "autoPort": true
     },
     {
+      "name": "servers_dashboard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "--directory", ".claude"],
+      "port": 9000,
+      "autoPort": true
+    },
+    {
       "name": "docker_all",
       "runtimeExecutable": "docker",
       "runtimeArgs": ["compose", "up"],
