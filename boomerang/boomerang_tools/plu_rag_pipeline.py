@@ -489,3 +489,64 @@ def pipeline_indexation_plu(
         "collection": _collection_id(code_insee),
         "articles_detectes": len([c for c in chunks if not c["article"].startswith("section_")]),
     }
+
+
+def preparer_plu_pour_rag(code_insee: str, force_reindex: bool = False) -> dict:
+    """Orchestrateur complet : lecture cache -> extraction -> chunking -> indexation -> retriever.
+
+    Retourne : code_insee, commune, nb_chunks_indexes,
+               zones_trouvees[], retriever, avertissements[]
+    """
+    import json as _json
+
+    cache_dir = os.path.join(
+        os.path.dirname(__file__), "..", "data", "plu_cache", code_insee
+    )
+    meta_path = os.path.join(cache_dir, "metadata.json")
+    avertissements = []
+    commune = ""
+
+    if not os.path.exists(meta_path):
+        return {
+            "code_insee": code_insee,
+            "commune": "",
+            "nb_chunks_indexes": 0,
+            "zones_trouvees": [],
+            "retriever": None,
+            "avertissements": [f"Pas de cache PLU pour {code_insee}. Lancez d'abord le telechargement."],
+        }
+
+    with open(meta_path, "r") as f:
+        meta = _json.load(f)
+
+    # Pipeline indexation
+    result = pipeline_indexation_plu(cache_dir, code_insee, force=force_reindex)
+
+    if result["statut"] != "ok":
+        avertissements.append(result.get("message", "Erreur indexation"))
+
+    # Creer le retriever
+    retriever = creer_retriever(code_insee)
+
+    # Detecter les zones dans les chunks
+    zones = set()
+    docs_texte = extraire_texte_tous_pdfs(cache_dir)
+    chunks = chunker_documents_plu(docs_texte)
+    for chunk in chunks:
+        article = chunk.get("article", "")
+        # Extraire la zone du nom d'article (ex: "UA 1" -> "UA")
+        import re as _re
+        zone_match = _re.match(r"([A-Z]{1,4})", article)
+        if zone_match:
+            z = zone_match.group(1)
+            if z not in ("TITRE", "CHAPITRE", "SECTION"):
+                zones.add(z)
+
+    return {
+        "code_insee": code_insee,
+        "commune": commune,
+        "nb_chunks_indexes": result.get("nb_chunks", 0),
+        "zones_trouvees": sorted(zones),
+        "retriever": retriever,
+        "avertissements": avertissements,
+    }
