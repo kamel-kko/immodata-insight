@@ -648,29 +648,99 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Chat input — actif uniquement si un projet est sélectionné
+    # ── Zone de pieces jointes ─────────────────────────
     if st.session_state.get("id_projet"):
-        user_input = st.chat_input("Votre question réglementaire...")
+        uploaded_file = st.file_uploader(
+            "Joindre un fichier (PDF, image, texte)",
+            type=["pdf", "txt", "jpg", "jpeg", "png", "webp"],
+            key="file_uploader",
+            label_visibility="collapsed",
+            help="Formats : PDF, TXT, JPG, PNG (max 10 Mo)",
+        )
+
+        # Traiter le fichier joint
+        if uploaded_file is not None:
+            ctx = _preparer_contexte_fichier(uploaded_file)
+            st.session_state.attached_file_ctx = ctx
+
+            if ctx["type"] == "error":
+                st.error(ctx["content"])
+                st.session_state.attached_file_ctx = None
+            elif ctx["type"] == "image":
+                if not _modele_supporte_vision(st.session_state.ollama_model):
+                    st.warning(
+                        f"Le modele selectionne ({st.session_state.ollama_model}) "
+                        "ne supporte pas les images. Choisissez un modele vision "
+                        "(llava, qwen2-vl, moondream...) ou joignez un PDF/TXT."
+                    )
+                    st.session_state.attached_file_ctx = None
+                else:
+                    st.caption(f"Image jointe : {ctx['filename']}")
+            else:
+                st.caption(f"Fichier joint : {ctx['filename']} ({len(ctx['content'])} caracteres)")
+        else:
+            st.session_state.attached_file_ctx = None
+
+        # Chat input
+        user_input = st.chat_input("Votre question reglementaire...")
     else:
         user_input = None
 
     if user_input:
+        file_ctx = st.session_state.attached_file_ctx
+
+        # Construire le message complet avec le contexte du fichier
+        display_text = user_input
+        llm_text = user_input
+
+        if file_ctx and file_ctx["type"] == "text":
+            llm_text = (
+                f"{user_input}\n\n"
+                f"--- CONTENU DU FICHIER JOINT : {file_ctx['filename']} ---\n"
+                f"{file_ctx['content'][:15000]}"
+            )
+            display_text = f"{user_input}\n\n*Fichier joint : {file_ctx['filename']}*"
+
+        elif file_ctx and file_ctx["type"] == "image":
+            # Pour les modeles vision, on passe l'image en base64 dans le message
+            llm_text = (
+                f"{user_input}\n\n"
+                f"[Image jointe : {file_ctx['filename']}]"
+            )
+            display_text = f"{user_input}\n\n*Image jointe : {file_ctx['filename']}*"
+
         # Ajouter et afficher le message utilisateur
-        st.session_state.messages.append({"role": "user", "content": user_input})
+        st.session_state.messages.append({"role": "user", "content": display_text})
         with st.chat_message("user"):
-            st.markdown(user_input)
+            st.markdown(display_text)
 
-        sauvegarder_message(id_projet, "user", user_input)
+        sauvegarder_message(id_projet, "user", display_text)
 
-        # Invoquer le graphe avec le modèle sélectionné
+        # Reinitialiser le fichier joint apres envoi
+        st.session_state.attached_file_ctx = None
+
+        # Invoquer le graphe avec le modele selectionne
         with st.chat_message("assistant"):
-            with st.status("🤔 Agent en réflexion...") as status:
-                result = invoke_graph(
-                    user_input,
-                    thread_id,
-                    status_widget=status,
-                    model_name=st.session_state.ollama_model,
-                )
+            with st.status("Agent en reflexion...") as status:
+                try:
+                    result = invoke_graph(
+                        llm_text,
+                        thread_id,
+                        status_widget=status,
+                        model_name=st.session_state.ollama_model,
+                    )
+                except Exception as e:
+                    result = {
+                        "response": (
+                            "Desole, une erreur s'est produite lors du traitement "
+                            "de votre demande. Veuillez reformuler votre question "
+                            "ou reessayer dans quelques instants."
+                        ),
+                        "besoin_forge": None,
+                    }
+                    logger_msg = f"Erreur invoke_graph: {str(e)}"
+                    import logging
+                    logging.getLogger(__name__).error(logger_msg)
 
             if result.get("besoin_forge") and not SAAS_MODE:
                 st.session_state.besoin_forge = result["besoin_forge"]
