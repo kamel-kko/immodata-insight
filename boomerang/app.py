@@ -167,9 +167,18 @@ with st.sidebar:
 
     id_projet = st.session_state.id_projet
 
+    # ── Sélecteur modèle Ollama ────────────────────────
+    if os.getenv("LLM_PROVIDER", "ollama") == "ollama":
+        modeles = get_ollama_models()
+        current = st.session_state.ollama_model
+        idx = modeles.index(current) if current in modeles else 0
+        choix_modele = st.selectbox("Modèle Ollama", options=modeles, index=idx)
+        st.session_state.ollama_model = choix_modele
+
     # ── Bouton vider historique ─────────────────────────
     if id_projet and st.button("🗑️ Vider historique"):
         count = supprimer_historique(id_projet)
+        st.session_state.messages = []
         st.success(f"Historique vidé ({count} messages supprimés)")
         st.rerun()
 
