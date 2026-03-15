@@ -31,8 +31,12 @@ from tool_runner import charger_outils
 
 load_dotenv()
 
-# Garantir que le dossier de persistance SQLite existe
-os.makedirs("/app/data", exist_ok=True)
+# Dossier de persistance : Docker = /app/data, local = ./data
+if os.path.exists("/app/data"):
+    _DATA_DIR = "/app/data"
+else:
+    _DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+os.makedirs(_DATA_DIR, exist_ok=True)
 
 logger = logging.getLogger(__name__)
 

@@ -121,7 +121,19 @@
       "Bash(findstr -v \"^$\")",
       "Bash(timeout 8)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8502)",
-      "Bash(python -m streamlit run app.py --server.port 8502 --server.headless true)"
+      "Bash(python -m streamlit run app.py --server.port 8502 --server.headless true)",
+      "Bash(python -c \"from langgraph.checkpoint.sqlite import SqliteSaver; print\\(''OK: langgraph.checkpoint.sqlite''\\)\")",
+      "Bash(timeout 10)",
+      "Bash(ping -n 8 127.0.0.1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8503)",
+      "Bash(findstr \"850\")",
+      "Bash(curl -s http://localhost:8502)",
+      "Bash(taskkill /PID 2904 /F)",
+      "Bash(cmd.exe /c \"taskkill /PID 2904 /F\")",
+      "Bash(cmd.exe /c \"taskkill /PID 2904 /F && echo DONE\")",
+      "Bash(findstr \":8502\")",
+      "Bash(mkdir -p ~/.streamlit)",
+      "Bash(~/.streamlit/credentials.toml:*)"
     ]
   },
   "hooks": {
