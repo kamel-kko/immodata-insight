@@ -180,3 +180,37 @@ class PLUChatbot:
         """Remet a zero l'historique de conversation."""
         self.history = []
         self._derniers_sources = []
+
+
+def creer_chatbot_plu(retriever, code_insee: str, zone_parcelle: str = None,
+                      commune: str = "", type_document: str = "",
+                      model: str = None):
+    """Cree une instance PLUChatbot configuree. Wrapper conforme au spec."""
+    return PLUChatbot(
+        retriever=retriever,
+        commune=commune,
+        zone=zone_parcelle or "",
+        type_document=type_document,
+        model=model,
+    )
+
+
+def interroger_chatbot(chatbot, question: str, historique: list = None) -> dict:
+    """Pose une question et retourne un dict structure. Wrapper conforme au spec."""
+    reponse = chatbot.poser_question(question)
+    sources = chatbot.get_sources()
+
+    # Evaluer la confiance basee sur les sources
+    if sources and len(sources) >= 3:
+        confiance = "haute"
+    elif sources:
+        confiance = "moyenne"
+    else:
+        confiance = "faible"
+
+    return {
+        "reponse": reponse,
+        "sources": sources,
+        "confiance": confiance,
+        "question_reformulee": question,
+    }
