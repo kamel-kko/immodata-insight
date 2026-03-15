@@ -99,9 +99,22 @@ def generer_url_carte_wms(lat: float, lon: float, zoom: int = 17) -> str:
     )
 
 
+CACHE_TTL_JOURS = int(os.getenv("CACHE_TTL_JOURS", "7"))
+
+
+def _cache_key_from_coords(lat: float, lon: float) -> str:
+    """Genere une cle de cache a partir de coordonnees arrondies.
+
+    On arrondit a 3 decimales (~111m) car le PLU couvre des zones entieres.
+    Deux adresses dans la meme rue auront la meme cle = meme resultat PLU.
+    """
+    return f"{round(lat, 3)},{round(lon, 3)}"
+
+
 @app.post("/run")
 def run(body: RunInput) -> dict:
     query = body.input.get("query", "")
+    force_refresh = body.input.get("force_refresh", False)
     if not query:
         return {"output": "Erreur : paramètre 'query' requis (adresse ou coordonnées lat,lon)."}
 
@@ -111,6 +124,14 @@ def run(body: RunInput) -> dict:
         return {"output": str(e)}
     except Exception as e:
         return {"output": f"Erreur géocodage : {str(e)}"}
+
+    # Verifier le cache avant d'appeler l'API
+    cache_id = _cache_key_from_coords(lat, lon)
+    if CACHE_AVAILABLE and not force_refresh:
+        cached = get_cache("recherche_urbanisme", cache_id)
+        if cached:
+            logger.info(f"[CACHE HIT] recherche_urbanisme pour {cache_id}")
+            return {"output": cached, "_cached": True}
 
     try:
         features = _interroger_gpu(lat, lon)
@@ -149,4 +170,14 @@ def run(body: RunInput) -> dict:
     carte_url = generer_url_carte_wms(lat, lon)
     output_parts.append(f"\nMAP_URL:{carte_url}")
 
-    return {"output": "\n\n".join(output_parts)}
+    result_text = "\n\n".join(output_parts)
+
+    # Sauvegarder en cache pour les prochaines requetes
+    if CACHE_AVAILABLE:
+        try:
+            set_cache("recherche_urbanisme", cache_id, result_text, CACHE_TTL_JOURS)
+            logger.info(f"[CACHE SET] recherche_urbanisme pour {cache_id} (TTL {CACHE_TTL_JOURS}j)")
+        except Exception as e:
+            logger.warning(f"[CACHE] Erreur ecriture cache: {e}")
+
+    return {"output": result_text}
