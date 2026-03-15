@@ -133,7 +133,9 @@
       "Bash(cmd.exe /c \"taskkill /PID 2904 /F && echo DONE\")",
       "Bash(findstr \":8502\")",
       "Bash(mkdir -p ~/.streamlit)",
-      "Bash(~/.streamlit/credentials.toml:*)"
+      "Bash(~/.streamlit/credentials.toml:*)",
+      "Bash(taskkill //F //IM streamlit.exe)",
+      "Bash(pkill -f streamlit)"
     ]
   },
   "hooks": {
