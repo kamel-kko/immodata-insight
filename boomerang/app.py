@@ -28,8 +28,9 @@ load_dotenv()
 
 st.set_page_config(
     page_title="BOOMERANG",
-    page_icon="🪃",
+    page_icon="🏗️",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 SAAS_MODE = os.getenv("SAAS_MODE", "false").lower() == "true"
