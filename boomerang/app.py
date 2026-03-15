@@ -1023,7 +1023,14 @@ else:
                 st.rerun()
             else:
                 response = result.get("response", "")
-                _render_message_content(response)
+                # En mode streaming, le texte est deja affiche dans le placeholder
+                # En mode synchrone, on l'affiche ici
+                if not use_streaming:
+                    _render_message_content(response)
+                elif response:
+                    # Re-render avec support Mermaid/Charts/WMS
+                    placeholder.empty()
+                    _render_message_content(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 sauvegarder_message(id_projet, "assistant", response)
 
