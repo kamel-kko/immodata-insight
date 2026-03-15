@@ -476,6 +476,16 @@ with st.sidebar:
 
     st.divider()
 
+    # ── Guide depot PC ────────────────────────────────
+    if id_projet:
+        if st.button("Guide depot Permis de Construire", use_container_width=True):
+            st.session_state.guide_mode = "depot_pc"
+            st.session_state.guide_step = 0
+            st.session_state.guide_data = {}
+            st.rerun()
+
+    st.divider()
+
     # ── Outils forgés du projet ─────────────────────────
     if id_projet:
         outils_projet = lister_outils_projet(id_projet)
