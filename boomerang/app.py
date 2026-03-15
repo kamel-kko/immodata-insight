@@ -518,16 +518,153 @@ if user_input := st.chat_input("Question reglementaire, analyse de site…"):
     st.rerun()
 
 
-# ── Traitement LLM — placeholder (module chat a venir) ───
+# ── Chargement PLU (declenche par le bouton Analyser) ─────
+
+if st.session_state.plu_loading:
+    st.session_state.plu_loading = False
+    addr = st.session_state.project_address
+
+    with st.status("Analyse en cours...", expanded=True) as status:
+        try:
+            from boomerang_tools.plu_fetcher import (
+                geocoder_adresse, rechercher_plu_gpu, telecharger_plu,
+            )
+            from boomerang_tools.plu_rag_pipeline import preparer_plu_pour_rag
+            from boomerang_tools.plu_synthese import generer_fiche_synthese
+            from boomerang_tools.plu_chatbot import creer_chatbot_plu
+
+            # 1. Geocodage
+            st.write("Geocodage de l'adresse...")
+            geo = geocoder_adresse(addr)
+            st.session_state.project_commune = geo["commune"]
+            st.session_state.project_insee = geo["code_insee"]
+            st.session_state.project_dept = geo["departement"]
+            st.session_state.project_lat = geo["latitude"]
+            st.session_state.project_lon = geo["longitude"]
+
+            # 2. Recherche PLU
+            st.write("Recherche sur le Geoportail de l'Urbanisme...")
+            plu = rechercher_plu_gpu(
+                geo["code_insee"], geo["latitude"], geo["longitude"],
+            )
+            st.session_state.plu_infos = plu
+
+            if plu["statut"] != "trouve":
+                status.update(label=plu.get("message", "PLU non trouve"), state="error")
+                st.session_state.plu_loaded = False
+                st.stop()
+
+            st.session_state.project_zone = plu.get("zone_parcelle", "")
+            st.session_state.plu_type_doc = plu.get("type_document", "")
+            st.session_state.plu_date_appro = plu.get("date_approbation", "")
+
+            # 3. Telechargement
+            st.write("Telechargement des documents PLU...")
+            dl = telecharger_plu(plu, geo["code_insee"])
+            nb_fichiers = len(dl.get("fichiers", []))
+            st.write(f"{nb_fichiers} fichiers telecharges.")
+
+            if nb_fichiers == 0:
+                status.update(label="Aucun PDF disponible", state="error")
+                st.session_state.plu_loaded = True
+                st.stop()
+
+            # 4. Indexation RAG
+            st.write("Indexation RAG (embeddings)...")
+            rag = preparer_plu_pour_rag(geo["code_insee"])
+            st.session_state.plu_retriever = rag.get("retriever")
+            st.session_state.plu_nb_chunks = rag.get("nb_chunks_indexes", 0)
+            st.session_state.plu_zones = rag.get("zones_trouvees", [])
+            st.session_state.chroma_chunks = rag.get("nb_chunks_indexes", 0)
+
+            # 5. Creer le chatbot
+            if rag.get("retriever"):
+                bot = creer_chatbot_plu(
+                    rag["retriever"],
+                    geo["code_insee"],
+                    zone_parcelle=plu.get("zone_parcelle", ""),
+                    commune=geo["commune"],
+                    type_document=plu.get("type_document", ""),
+                    model=st.session_state.model_choice or None,
+                )
+                st.session_state.plu_chatbot = bot
+
+            # 6. Fiche synthese
+            fiche = generer_fiche_synthese(geo, plu)
+            st.session_state.plu_fiche = fiche
+
+            st.session_state.plu_loaded = True
+            st.session_state.plu_messages = []
+
+            # Message d'accueil dans le chat
+            zone = plu.get("zone_parcelle", "?")
+            type_doc = plu.get("type_document", "PLU")
+            accueil = (
+                f"J'ai charge le {type_doc} de {geo['commune']} "
+                f"(approuve {st.session_state.plu_date_appro[:4] if st.session_state.plu_date_appro else '?'}). "
+                f"La parcelle est en zone **{zone}**. "
+                f"{st.session_state.plu_nb_chunks} articles indexes. "
+                f"Que souhaitez-vous analyser ?"
+            )
+            st.session_state.messages.append({"role": "assistant", "content": accueil})
+
+            status.update(label="PLU charge", state="complete")
+        except ValueError as e:
+            status.update(label=str(e), state="error")
+        except Exception as e:
+            status.update(label=f"Erreur : {e}", state="error")
+
+    st.rerun()
+
+
+# ── Traitement LLM (chat Ollama ou RAG PLU) ──────────────
 
 if st.session_state.generating:
-    last = st.session_state.messages[-1]["content"]
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": (
-            f"*Module LLM non encore connecte.* "
-            f"Votre message : « {last} »"
-        ),
-    })
     st.session_state.generating = False
+    last = st.session_state.messages[-1]["content"]
+
+    # Si le PLU est charge et un chatbot RAG existe, l'utiliser
+    if st.session_state.plu_chatbot:
+        try:
+            from boomerang_tools.plu_chatbot import interroger_chatbot
+            rep = interroger_chatbot(st.session_state.plu_chatbot, last)
+            reponse = rep["reponse"]
+            # Ajouter les sources
+            if rep.get("sources"):
+                reponse += "\n\n---\n*Sources :*\n"
+                for s in rep["sources"][:3]:
+                    art = s.get("article", "?")
+                    fichier = s.get("fichier", "").split("/")[-1]
+                    reponse += f"- Article {art} ({fichier})\n"
+        except Exception as e:
+            reponse = f"Erreur chatbot RAG : {e}"
+    else:
+        # Fallback : appel direct Ollama
+        import requests as _req
+        try:
+            ollama_msgs = [
+                {"role": "system", "content": (
+                    "Tu es BOOMERANG, un assistant expert en reglementation francaise "
+                    "pour architectes (PLU, ERP, PMR, risques naturels). "
+                    "Reponds toujours en francais. Sois precis et structure."
+                )},
+            ] + [
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ]
+            resp = _req.post(
+                "http://localhost:11434/api/chat",
+                json={
+                    "model": st.session_state.model_choice or "mistral-small",
+                    "messages": ollama_msgs,
+                    "stream": False,
+                },
+                timeout=120,
+            )
+            resp.raise_for_status()
+            reponse = resp.json().get("message", {}).get("content", "Pas de reponse.")
+        except Exception as e:
+            reponse = f"Erreur Ollama : {e}"
+
+    st.session_state.messages.append({"role": "assistant", "content": reponse})
     st.rerun()
