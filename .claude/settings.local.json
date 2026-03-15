@@ -34,7 +34,15 @@
       "Bash(curl -s -o /dev/null -w \"searxng: %{http_code}\\\\n\" http://localhost:8080)",
       "Bash(curl -s -o /dev/null -w \"langfuse: %{http_code}\\\\n\" http://localhost:3003)",
       "Bash(docker exec boomerang_app python -c \":*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(curl -s http://localhost:8003/health)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s http://localhost:8004/health)",
+      "Bash(curl -s http://localhost:8005/health)",
+      "Bash(curl -s -X POST http://localhost:8003/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"43.6047,1.4442\"\"\"\"}}')",
+      "Bash(curl -s -X POST http://localhost:8005/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"12 rue de Rivoli Paris\"\"\"\"}}')",
+      "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"Réglementation incendie ERP type M\"\"\"\"}}')",
+      "Bash(curl -s -X POST http://localhost:8004/run -H \"Content-Type: application/json; charset=utf-8\" -d '{\"\"\"\"input\"\"\"\":{\"\"\"\"query\"\"\"\":\"\"\"\"ERP type M\"\"\"\"}}')"
     ]
   },
   "hooks": {

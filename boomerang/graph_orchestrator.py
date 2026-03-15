@@ -11,11 +11,13 @@ Observabilité : CallbackHandler Langfuse passé dans config["callbacks"]
 """
 
 import os
+import sqlite3
 import logging
 from typing import Annotated, Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END, START
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
@@ -25,6 +27,9 @@ from langfuse.langchain import CallbackHandler
 from tool_runner import charger_outils
 
 load_dotenv()
+
+# Garantir que le dossier de persistance SQLite existe
+os.makedirs("/app/data", exist_ok=True)
 
 logger = logging.getLogger(__name__)
 
