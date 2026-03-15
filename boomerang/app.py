@@ -62,6 +62,7 @@ defaults = {
     "forge_result": None,
     "messages": [],           # historique chat affiché dans la session courante
     "ollama_model": os.getenv("OLLAMA_MODEL", "llama3.2"),
+    "attached_file_ctx": None,  # contexte du fichier joint (dict ou None)
 }
 for k, v in defaults.items():
     if k not in st.session_state:
