@@ -487,6 +487,49 @@ with st.sidebar:
     st.divider()
     st.caption("📊 [Langfuse](http://localhost:3003)")
 
+    # ── Cache API ─────────────────────────────────────
+    st.divider()
+    st.subheader("Cache API")
+    settings = load_settings()
+
+    cache_on = st.toggle(
+        "Activer le cache",
+        value=settings.get("cache_enabled", True),
+        key="toggle_cache",
+    )
+    if cache_on != settings.get("cache_enabled", True):
+        save_settings("cache_enabled", cache_on)
+
+    if cache_on:
+        ttl = st.slider(
+            "Duree du cache (jours)",
+            min_value=1, max_value=30,
+            value=settings.get("cache_ttl_jours", 7),
+            key="slider_cache_ttl",
+        )
+        if ttl != settings.get("cache_ttl_jours", 7):
+            save_settings("cache_ttl_jours", ttl)
+
+        try:
+            from db_manager import stats_cache, purge_cache
+            cache_stats = stats_cache()
+            st.caption(f"Entrees actives : {cache_stats['actifs']} | Expirees : {cache_stats['expires']}")
+            if cache_stats["expires"] > 0:
+                if st.button("Purger le cache expire", key="btn_purge_cache"):
+                    n = purge_cache()
+                    st.success(f"{n} entree(s) supprimee(s)")
+                    st.rerun()
+            if cache_stats["actifs"] > 0:
+                if st.button("Vider tout le cache", key="btn_clear_cache"):
+                    from db_manager import purge_cache
+                    # Purger tous les outils
+                    for tool in ["recherche_urbanisme", "recherche_risques_parcelle"]:
+                        purge_cache(tool)
+                    st.success("Cache vide")
+                    st.rerun()
+        except ImportError:
+            st.caption("Cache non disponible (db_manager)")
+
     # ── Section Rollback ────────────────────────────────
     if not SAAS_MODE:
         st.divider()
