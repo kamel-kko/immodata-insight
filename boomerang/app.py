@@ -811,267 +811,171 @@ elif id_projet and st.session_state.guide_mode == "depot_pc":
     from guide_depot_pc import render_guide
     render_guide(id_projet, TOOL_REGISTRY)
 
-# ── État NORMAL (et page d'accueil) ─────────────────────
+# ── Etat NORMAL (et page d'accueil) ─────────────────────
 
 else:
 
-    # ── CSS Bento Grid ──────────────────────────────────
-    BOOMERANG_CSS = """
+    # ══════════════════════════════════════════════════════
+    #  CSS BENTO GRID v2 — Design professionnel "Architecte"
+    # ══════════════════════════════════════════════════════
+    st.markdown("""
     <style>
-    /* ── Reset marges Streamlit ── */
+    /* ── Reset Streamlit ── */
     #root > div:first-child { padding-top: 0 !important; }
-    .block-container {
-        padding: 0.75rem 1rem !important;
-        max-width: 100% !important;
-    }
-    [data-testid="stAppViewContainer"] {
-        background-color: #1a1d21;
-    }
-    /* ── Palette Architecte ── */
+    .block-container { padding: 0.5rem 0.8rem !important; max-width: 100% !important; }
+    [data-testid="stAppViewContainer"] { background: #111317; }
+    [data-testid="stHeader"] { background: transparent !important; }
+    [data-testid="stSidebar"] { background: #16191d !important; }
+
+    /* ── Palette ── */
     :root {
-        --bg-app:      #1a1d21;
-        --bg-panel:    #22262c;
-        --bg-deep:     #16191d;
-        --border:      #2e333a;
-        --accent:      #4A90D9;
-        --accent-dark: #1a2633;
-        --accent-border: #2a3d52;
-        --text-primary:   #e8e6e0;
-        --text-secondary: #9ca3af;
-        --text-muted:     #4b5563;
-        --success:     #22c55e;
-        --warning:     #f59e0b;
+        --bg-app:    #111317;
+        --bg-card:   #1a1d23;
+        --bg-deep:   #13151a;
+        --bg-hover:  #1f2229;
+        --border:    #252930;
+        --accent:    #3b82f6;
+        --accent-soft: rgba(59,130,246,0.08);
+        --accent-border: rgba(59,130,246,0.15);
+        --text-1:    #f0f0f0;
+        --text-2:    #a1a7b4;
+        --text-3:    #555b68;
+        --green:     #22c55e;
+        --red:       #ef4444;
+        --orange:    #f59e0b;
     }
-    /* ── Panneaux Bento ── */
-    .bento-panel {
-        background: var(--bg-panel);
-        border: 0.5px solid var(--border);
-        border-radius: 12px;
-        padding: 0;
+    /* ── Carte Bento ── */
+    .tile {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
         overflow: hidden;
-    }
-    .bento-head {
-        padding: 8px 14px;
-        border-bottom: 0.5px solid var(--border);
-        font-size: 10px;
-        font-weight: 500;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .bento-head::before {
-        content: '';
-        display: block;
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: var(--accent);
-        flex-shrink: 0;
-    }
-    .bento-body {
-        padding: 12px 14px;
-    }
-    /* ── Topbar ── */
-    .bento-topbar {
-        background: var(--bg-panel);
-        border: 0.5px solid var(--border);
-        border-radius: 10px;
-        padding: 8px 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
-    }
-    .bento-logo {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-primary);
-        letter-spacing: 0.04em;
-    }
-    .bento-logo span { color: var(--accent); }
-    .bento-badge {
-        font-size: 10px;
-        padding: 2px 9px;
-        border-radius: 4px;
-        background: var(--accent-dark);
-        color: var(--accent);
-        border: 0.5px solid var(--accent-border);
-    }
-    .bento-badge.success {
-        background: #1a2a1a;
-        color: var(--success);
-        border-color: #1f3d1f;
-    }
-    /* ── Quick Actions ── */
-    .qa-strip {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        padding: 8px 14px;
-        border-bottom: 0.5px solid var(--border);
-    }
-    .qa-chip {
-        font-size: 10px;
-        padding: 3px 10px;
-        border-radius: 20px;
-        background: var(--accent-dark);
-        color: var(--accent);
-        border: 0.5px solid var(--accent-border);
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.15s;
-    }
-    .qa-chip:hover { background: #1e2e45; }
-    /* ── Skeleton loader ── */
-    @keyframes shimmer {
-        0%   { opacity: 0.35; }
-        50%  { opacity: 0.7; }
-        100% { opacity: 0.35; }
-    }
-    .skeleton-wrap {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 6px 0;
-    }
-    .skeleton-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        background: var(--border);
-        animation: shimmer 1.4s ease-in-out infinite;
-        flex-shrink: 0;
-    }
-    .skeleton-lines {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-    .skeleton-line {
-        height: 9px;
-        border-radius: 4px;
-        background: var(--border);
-        animation: shimmer 1.4s ease-in-out infinite;
-    }
-    .skeleton-line:nth-child(2) { width: 72%; animation-delay: 0.2s; }
-    .skeleton-line:nth-child(3) { width: 48%; animation-delay: 0.4s; }
-    /* ── Metadonnees projet ── */
-    .meta-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px 8px;
-        margin-top: 8px;
-    }
-    .meta-item {
-        font-size: 10px;
-        color: var(--text-muted);
-    }
-    .meta-item span {
-        display: block;
-        color: var(--text-secondary);
-        font-weight: 500;
-        margin-top: 1px;
-    }
-    .meta-divider {
-        height: 0.5px;
-        background: var(--border);
-        margin: 10px 0;
-    }
-    /* ── Zone d'upload ── */
-    .upload-zone {
-        border: 0.5px dashed var(--border);
-        border-radius: 8px;
-        padding: 12px;
-        text-align: center;
-        font-size: 10px;
-        color: var(--text-muted);
-        cursor: pointer;
         margin-bottom: 10px;
-        transition: border-color 0.15s;
     }
-    .upload-zone:hover { border-color: var(--accent); color: var(--accent); }
-    /* ── Boutons Streamlit dans les panneaux ── */
+    .tile-hd {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-3);
+        display: flex; align-items: center; gap: 8px;
+    }
+    .tile-hd .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .tile-bd { padding: 14px 16px; }
+
+    /* ── Topbar ── */
+    .topbar {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 20px;
+        display: flex; align-items: center; gap: 14px;
+        margin-bottom: 10px;
+    }
+    .topbar-logo { font-size: 16px; font-weight: 700; color: var(--text-1); letter-spacing: 0.03em; }
+    .topbar-logo b { color: var(--accent); }
+    .badge {
+        font-size: 10px; padding: 3px 10px; border-radius: 6px;
+        background: var(--accent-soft); color: var(--accent);
+        border: 1px solid var(--accent-border); white-space: nowrap;
+    }
+    .badge-ok { background: rgba(34,197,94,0.08); color: var(--green); border-color: rgba(34,197,94,0.15); }
+    .badge-warn { background: rgba(245,158,11,0.08); color: var(--orange); border-color: rgba(245,158,11,0.15); }
+
+    /* ── Quick-action chips ── */
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+    .chip {
+        font-size: 10px; padding: 4px 12px; border-radius: 20px;
+        background: var(--accent-soft); color: var(--accent);
+        border: 1px solid var(--accent-border);
+        cursor: pointer; transition: background 0.15s;
+    }
+    .chip:hover { background: rgba(59,130,246,0.15); }
+
+    /* ── Metadata grille ── */
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin-top: 8px; }
+    .meta-k { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta-v { font-size: 11px; color: var(--text-2); font-weight: 500; }
+    .sep { height: 1px; background: var(--border); margin: 10px 0; }
+
+    /* ── Status dot ── */
+    .sdot { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-3); padding: 2px 0; }
+    .sdot i { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .sdot i.on  { background: var(--green); }
+    .sdot i.off { background: var(--red); }
+
+    /* ── Boutons ── */
     [data-testid="stButton"] > button {
-        background: var(--accent-dark) !important;
+        background: var(--accent-soft) !important;
         color: var(--accent) !important;
-        border: 0.5px solid var(--accent-border) !important;
-        border-radius: 6px !important;
+        border: 1px solid var(--accent-border) !important;
+        border-radius: 8px !important;
         font-size: 11px !important;
-        padding: 4px 12px !important;
-        font-weight: 400 !important;
-        transition: background 0.15s !important;
+        padding: 6px 14px !important;
+        font-weight: 500 !important;
+        transition: all 0.15s !important;
     }
-    [data-testid="stButton"] > button:hover {
-        background: #1e2e45 !important;
-    }
-    /* ── Bouton primaire ── */
+    [data-testid="stButton"] > button:hover { background: rgba(59,130,246,0.15) !important; }
     button[kind="primary"] {
-        background: var(--accent) !important;
-        color: #ffffff !important;
-        border-color: var(--accent) !important;
+        background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important;
     }
     /* ── Inputs ── */
     [data-testid="stTextInput"] input,
-    [data-testid="stSelectbox"] select {
-        background: var(--bg-deep) !important;
-        border: 0.5px solid var(--border) !important;
-        border-radius: 6px !important;
-        color: var(--text-primary) !important;
-        font-size: 12px !important;
-    }
-    /* ── Chat messages ── */
-    [data-testid="stChatMessage"] {
-        background: transparent !important;
-        border: none !important;
-        padding: 4px 0 !important;
-    }
-    /* ── Selectbox ── */
+    [data-testid="stSelectbox"] select,
     [data-testid="stSelectbox"] > div > div {
         background: var(--bg-deep) !important;
-        border: 0.5px solid var(--border) !important;
-        border-radius: 6px !important;
-        color: var(--text-primary) !important;
-    }
-    /* ── Expanders ── */
-    [data-testid="stExpander"] {
-        background: var(--bg-deep) !important;
-        border: 0.5px solid var(--border) !important;
+        border: 1px solid var(--border) !important;
         border-radius: 8px !important;
+        color: var(--text-1) !important;
+        font-size: 12px !important;
     }
-    /* ── Status widget ── */
-    [data-testid="stStatus"] {
+    /* ── Chat ── */
+    [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 6px 0 !important; }
+    [data-testid="stChatInput"] textarea {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        color: var(--text-1) !important;
+    }
+    /* ── Expander / Status ── */
+    [data-testid="stExpander"], [data-testid="stStatus"] {
         background: var(--bg-deep) !important;
-        border: 0.5px solid var(--border) !important;
-        border-radius: 8px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
     }
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     /* ── File chip ── */
-    .file-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: var(--accent-dark);
-        border: 0.5px solid var(--accent-border);
-        border-radius: 0.5rem;
-        padding: 0.3rem 0.6rem;
-        font-size: 10px;
-        color: var(--accent);
+    .fchip {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--accent-soft); border: 1px solid var(--accent-border);
+        border-radius: 8px; padding: 4px 10px; font-size: 10px; color: var(--accent);
     }
-    /* ── Masquer labels inutiles ── */
+    /* ── Upload ── */
+    .drop-zone {
+        border: 1px dashed var(--border); border-radius: 10px;
+        padding: 14px; text-align: center; font-size: 10px;
+        color: var(--text-3); transition: border-color 0.15s;
+    }
+    .drop-zone:hover { border-color: var(--accent); color: var(--accent); }
+    /* ── Hide Streamlit labels ── */
     [data-testid="stFileUploader"] > label { display: none !important; }
     [data-testid="stFileUploader"] > div { margin-top: -0.5rem; }
+    /* ── Skeleton ── */
+    @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:0.7} }
+    .skel { display:flex; gap:10px; padding:8px 0; }
+    .skel-av { width:28px; height:28px; border-radius:8px; background:var(--border); animation:pulse 1.5s infinite; }
+    .skel-ln { height:9px; border-radius:4px; background:var(--border); animation:pulse 1.5s infinite; }
+    .skel-ln:nth-child(2) { width:70%; animation-delay:0.2s; }
+    .skel-ln:nth-child(3) { width:45%; animation-delay:0.4s; }
     </style>
-    """
-    st.markdown(BOOMERANG_CSS, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-    # ── Initialisation ──────────────────────────────────
+    # ── Init ──────────────────────────────────────────────
     if "input_key" not in st.session_state:
         st.session_state.input_key = 0
     if "pending_input" not in st.session_state:
@@ -1080,7 +984,7 @@ else:
         st.session_state.generating = False
 
     # Charger l'historique depuis la DB au premier affichage du projet
-    if not st.session_state.messages:
+    if not st.session_state.messages and id_projet:
         historique = charger_historique(id_projet)
         if historique:
             st.session_state.messages = historique
@@ -1088,37 +992,44 @@ else:
     has_messages = bool(st.session_state.messages) or st.session_state.pending_input is not None
 
     # ── Topbar ──────────────────────────────────────────
-    plu_info = st.session_state.get("plu_commune", "")
-    topbar_badge = f"PLU charge &middot; {plu_info}" if plu_info else "Aucun projet charge"
+    _plu_commune = st.session_state.get("plu_commune", "")
+    _model_short = st.session_state.ollama_model.replace(":latest", "")
+    _topbar_proj = f"<div class='badge'>{id_projet}</div>" if id_projet else ""
+    _topbar_plu = f"<div class='badge badge-ok'>PLU {_plu_commune}</div>" if _plu_commune else ""
     st.markdown(f"""
-    <div class="bento-topbar">
-      <div class="bento-logo">BOOM<span>ERANG</span></div>
-      <div class="bento-badge">{topbar_badge}</div>
-      <div class="bento-badge success" style="margin-left:auto">Session active</div>
+    <div class="topbar">
+        <div class="topbar-logo">BOOM<b>ERANG</b></div>
+        {_topbar_proj}
+        {_topbar_plu}
+        <div class="badge" style="margin-left:auto">{_model_short}</div>
     </div>
     """, unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════
-    #  GRILLE BENTO 3 COLONNES
+    #  GRILLE BENTO — 3 colonnes
+    #  Gauche: Tuile A (Dashboard) + Tuile E (Forge/Statut)
+    #  Centre: Tuile B (Chat)
+    #  Droite: Tuile C (Visualiseur) + Tuile D (Documents)
     # ══════════════════════════════════════════════════════
 
-    col_left, col_center, col_right = st.columns([1, 2.2, 1], gap="small")
+    col_left, col_center, col_right = st.columns([1, 2.4, 1], gap="small")
 
-    # ── COLONNE GAUCHE ───────────────────────────────────
+    # ──────────────────────────────────────────────────────
+    #  TUILE A — Dashboard Projet (colonne gauche)
+    # ──────────────────────────────────────────────────────
     with col_left:
-        # -- Bloc Projet --
-        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="bento-head">Projet</div>', unsafe_allow_html=True)
-        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+        st.markdown('<div class="tile">', unsafe_allow_html=True)
+        st.markdown('<div class="tile-hd"><span class="dot"></span>Dashboard Projet</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
 
         projets = lister_projets()
         options = projets + ["+ Nouveau projet"]
         choix = st.selectbox("Projet", options, index=0 if projets else 0,
                              label_visibility="collapsed", key="bento_projet_select")
         if choix == "+ Nouveau projet":
-            nouveau_nom = st.text_input("Nom du nouveau projet", key="bento_new_project",
+            nouveau_nom = st.text_input("Nom", key="bento_new_project",
                                         label_visibility="collapsed",
-                                        placeholder="Nom du nouveau projet")
+                                        placeholder="Nom du projet...")
             if nouveau_nom:
                 if st.session_state.id_projet != nouveau_nom:
                     st.session_state.messages = []
@@ -1130,80 +1041,78 @@ else:
             st.session_state.id_projet = choix
             id_projet = choix
 
+        # Infos contextuelles du projet
         adresse = st.session_state.get("plu_adresse_normalisee", "")
         commune = st.session_state.get("plu_commune", "")
         insee = st.session_state.get("plu_code_insee", "")
         zone = st.session_state.get("plu_zone", "")
         type_doc = st.session_state.get("plu_type_document", "")
-        georisques = st.session_state.get("georisques_count", "")
 
         if adresse:
             st.markdown(f"""
-            <div style="font-size:11px;color:#9ca3af;margin-top:6px">Adresse</div>
-            <div style="font-size:12px;color:#e8e6e0;font-weight:500;line-height:1.4">{adresse}</div>
+            <div class="meta-k" style="margin-top:8px">Adresse</div>
+            <div class="meta-v" style="line-height:1.4">{adresse}</div>
             """, unsafe_allow_html=True)
         if zone:
             st.markdown(f"""
-            <div style="margin-top:6px;display:inline-block;font-size:10px;
-                        padding:2px 8px;border-radius:4px;
-                        background:#1a2633;color:#4A90D9;border:0.5px solid #2a3d52">
-                Zone {zone} &middot; {type_doc}
+            <div style="margin-top:8px">
+                <span class="badge">Zone {zone}</span>
+                <span class="badge" style="margin-left:4px">{type_doc}</span>
             </div>
             """, unsafe_allow_html=True)
-        if commune or insee or georisques:
+        if commune or insee:
             st.markdown(f"""
-            <div class="meta-divider"></div>
-            <div class="meta-grid">
-                <div class="meta-item">Commune<span>{commune or "—"}</span></div>
-                <div class="meta-item">INSEE<span>{insee or "—"}</span></div>
-                <div class="meta-item">Georisques
-                    <span style="color:#f59e0b">{georisques or "—"}</span>
-                </div>
+            <div class="sep"></div>
+            <div class="meta">
+                <div><div class="meta-k">Commune</div><div class="meta-v">{commune or "—"}</div></div>
+                <div><div class="meta-k">INSEE</div><div class="meta-v">{insee or "—"}</div></div>
             </div>
             """, unsafe_allow_html=True)
 
         # Actions projet
         if id_projet:
+            st.markdown('<div class="sep"></div>', unsafe_allow_html=True)
             btn_cols = st.columns(2)
             with btn_cols[0]:
                 if st.button("Vider", key="bento_clear_hist", use_container_width=True):
-                    count = supprimer_historique(id_projet)
+                    supprimer_historique(id_projet)
                     st.session_state.messages = []
                     st.rerun()
             with btn_cols[1]:
                 if st.session_state.messages:
-                    from pdf_export import generer_pdf_rapport
-                    from db_manager import charger_historique_complet
-                    messages_complets = charger_historique_complet(id_projet)
-                    if messages_complets:
-                        pdf_bytes = bytes(generer_pdf_rapport(id_projet, messages_complets))
-                        st.download_button(
-                            label="PDF",
-                            data=pdf_bytes,
-                            file_name=f"BOOMERANG_{id_projet}_{datetime.now().strftime('%Y%m%d')}.pdf",
-                            mime="application/pdf",
-                            key="bento_pdf_export",
-                            use_container_width=True,
-                        )
+                    try:
+                        from pdf_export import generer_pdf_rapport
+                        from db_manager import charger_historique_complet
+                        messages_complets = charger_historique_complet(id_projet)
+                        if messages_complets:
+                            pdf_bytes = bytes(generer_pdf_rapport(id_projet, messages_complets))
+                            st.download_button(
+                                label="PDF",
+                                data=pdf_bytes,
+                                file_name=f"BOOMERANG_{id_projet}_{datetime.now().strftime('%Y%m%d')}.pdf",
+                                mime="application/pdf",
+                                key="bento_pdf_export",
+                                use_container_width=True,
+                            )
+                    except Exception:
+                        pass
 
         st.markdown('</div></div>', unsafe_allow_html=True)
-        st.write("")
 
-        # -- Bloc Modele LLM --
-        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="bento-head">Modele LLM</div>', unsafe_allow_html=True)
-        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+        # ──────────────────────────────────────────────────
+        #  Selecteur Modele LLM
+        # ──────────────────────────────────────────────────
+        st.markdown('<div class="tile">', unsafe_allow_html=True)
+        st.markdown('<div class="tile-hd"><span class="dot"></span>Modele LLM</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
 
         modeles = get_ollama_models()
         current = st.session_state.ollama_model
         idx = modeles.index(current) if current in modeles else 0
         choix_modele = st.selectbox(
-            "Modele",
-            options=modeles,
-            index=idx,
+            "Modele", options=modeles, index=idx,
             format_func=lambda x: x.replace(":latest", ""),
-            label_visibility="collapsed",
-            key="bento_model_select",
+            label_visibility="collapsed", key="bento_model_select",
         )
         if choix_modele != st.session_state.ollama_model:
             st.session_state.ollama_model = choix_modele
@@ -1219,64 +1128,66 @@ else:
             ollama_ok = _r.status_code == 200
         except Exception:
             ollama_ok = False
-        status_color = "#22c55e" if ollama_ok else "#ef4444"
-        status_label = "Ollama connecte" if ollama_ok else "Ollama hors ligne"
         st.markdown(f"""
-        <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#6b7280;margin-top:6px">
-            <div style="width:5px;height:5px;border-radius:50%;background:{status_color}"></div>
-            {status_label}
+        <div class="sdot"><i class="{'on' if ollama_ok else 'off'}"></i>
+            {'Ollama connecte' if ollama_ok else 'Ollama hors ligne'}
         </div>
         """, unsafe_allow_html=True)
 
-        # Statut outils
-        st.markdown('<div class="meta-divider"></div>', unsafe_allow_html=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
+
+        # ──────────────────────────────────────────────────
+        #  TUILE E — Statut Forge / Outils
+        # ──────────────────────────────────────────────────
+        st.markdown('<div class="tile">', unsafe_allow_html=True)
+        st.markdown('<div class="tile-hd"><span class="dot"></span>Outils &amp; Forge</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
+
+        # Statut de chaque outil
         for nom, url in TOOL_REGISTRY.items():
-            ok = _check_health(url)
-            dot = "#22c55e" if ok else "#ef4444"
+            try:
+                ok = _check_health(url)
+            except Exception:
+                ok = False
             st.markdown(f"""
-            <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#9ca3af;padding:1px 0">
-                <div style="width:4px;height:4px;border-radius:50%;background:{dot};flex-shrink:0"></div>
-                {nom}
-            </div>
+            <div class="sdot"><i class="{'on' if ok else 'off'}"></i>{nom}</div>
             """, unsafe_allow_html=True)
 
-        st.markdown('</div></div>', unsafe_allow_html=True)
-        st.write("")
-
-        # -- Bloc Guide depot PC --
+        # Actions
         if id_projet:
-            st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-            st.markdown('<div class="bento-head">Actions</div>', unsafe_allow_html=True)
-            st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+            st.markdown('<div class="sep"></div>', unsafe_allow_html=True)
             if st.button("Guide depot PC", key="bento_guide_pc", use_container_width=True):
                 st.session_state.guide_mode = "depot_pc"
                 st.session_state.guide_step = 0
                 st.session_state.guide_data = {}
                 st.rerun()
-            st.markdown('</div></div>', unsafe_allow_html=True)
 
-    # ── COLONNE CENTRALE ─────────────────────────────────
+        st.markdown('</div></div>', unsafe_allow_html=True)
+
+    # ──────────────────────────────────────────────────────
+    #  TUILE B — Chat Central (colonne centre)
+    # ──────────────────────────────────────────────────────
     with col_center:
-        st.markdown('<div class="bento-panel" style="display:flex;flex-direction:column">', unsafe_allow_html=True)
+        st.markdown('<div class="tile" style="display:flex;flex-direction:column">', unsafe_allow_html=True)
 
         if id_projet:
-            # Quick Actions (chips decoratifs + vrais boutons)
+            # Quick Actions
             QUICK_ACTIONS = {
-                "Verifier PLU":      "Analyse le PLU de la parcelle et verifie la conformite du projet",
-                "Synthese risques":  "Genere une synthese des risques naturels et technologiques",
-                "Generer schema":    "Cree un schema de principe du projet",
-                "Depot PC":          "Liste les pieces necessaires au depot du permis de construire",
+                "Verifier PLU":     "Analyse le PLU de la parcelle et verifie la conformite du projet",
+                "Risques naturels": "Genere une synthese des risques naturels et technologiques pour cette parcelle",
+                "Schema technique": "Cree un schema de principe technique du projet",
+                "Depot PC":         "Liste les pieces necessaires au depot du permis de construire",
             }
             if not SAAS_MODE:
-                QUICK_ACTIONS["FORGE"] = "FORGE — analyse technique approfondie"
+                QUICK_ACTIONS["FORGE"] = "FORGE — cree un outil technique manquant"
 
-            qa_html = '<div class="qa-strip">'
+            chips_html = '<div class="chips">'
             for label in QUICK_ACTIONS:
-                qa_html += f'<div class="qa-chip">{label}</div>'
-            qa_html += '</div>'
-            st.markdown(qa_html, unsafe_allow_html=True)
+                chips_html += f'<div class="chip">{label}</div>'
+            chips_html += '</div>'
+            st.markdown(chips_html, unsafe_allow_html=True)
 
-            # Vrais boutons (invisibles visuellement, declenchent l'action)
+            # Vrais boutons Streamlit (declencheurs)
             qa_cols = st.columns(len(QUICK_ACTIONS))
             clicked_action = None
             for i, (label, prompt) in enumerate(QUICK_ACTIONS.items()):
@@ -1288,34 +1199,35 @@ else:
                 st.session_state.pending_input = clicked_action
                 st.rerun()
 
-        # Historique chat (conteneur scrollable)
-        chat_container = st.container(height=500)
+        # Historique chat
+        chat_container = st.container(height=520)
         with chat_container:
             if not id_projet:
                 st.markdown("""
                 <div style="display:flex;flex-direction:column;align-items:center;
-                            justify-content:center;min-height:380px;text-align:center;padding:2rem">
-                    <div style="font-size:2.2rem;font-weight:300;color:#e8e6e0;margin-bottom:0.5rem">
-                        BOOM<span style="color:#4A90D9">ERANG</span>
+                            justify-content:center;min-height:400px;text-align:center;padding:2rem">
+                    <div style="font-size:2.5rem;font-weight:300;color:#f0f0f0;margin-bottom:0.6rem">
+                        BOOM<span style="color:#3b82f6">ERANG</span>
                     </div>
-                    <div style="font-size:1rem;color:#9ca3af;margin-bottom:1.5rem">
+                    <div style="font-size:1rem;color:#a1a7b4;margin-bottom:1.5rem">
                         Assistant reglementaire pour architectes
                     </div>
-                    <div style="font-size:0.82rem;color:#4b5563;max-width:340px;line-height:1.6">
+                    <div style="font-size:0.85rem;color:#555b68;max-width:360px;line-height:1.6">
                         Selectionnez ou creez un projet dans le panneau
-                        <span style="color:#4A90D9">Projet</span> a gauche pour commencer.
+                        <span style="color:#3b82f6">Dashboard</span> pour commencer.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             elif not has_messages:
                 st.markdown("""
                 <div style="display:flex;flex-direction:column;align-items:center;
-                            justify-content:center;min-height:300px;text-align:center;padding:2rem">
-                    <div style="font-size:1.5rem;font-weight:300;color:#e8e6e0;margin-bottom:0.5rem">
-                        Bonjour, bienvenue sur BOOMERANG
+                            justify-content:center;min-height:340px;text-align:center;padding:2rem">
+                    <div style="font-size:1.6rem;font-weight:300;color:#f0f0f0;margin-bottom:0.5rem">
+                        Posez votre premiere question
                     </div>
-                    <div style="font-size:0.9rem;color:#9ca3af">
-                        Assistant reglementaire pour architectes
+                    <div style="font-size:0.9rem;color:#a1a7b4;max-width:400px;line-height:1.5">
+                        PLU, risques naturels, normes ERP/PMR, depot de permis...
+                        utilisez le chat ou les raccourcis ci-dessus.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1327,24 +1239,25 @@ else:
             # Skeleton pendant la generation
             if st.session_state.get("generating", False):
                 st.markdown("""
-                <div class="skeleton-wrap">
-                    <div class="skeleton-avatar"></div>
-                    <div class="skeleton-lines">
-                        <div class="skeleton-line"></div>
-                        <div class="skeleton-line"></div>
-                        <div class="skeleton-line"></div>
+                <div class="skel">
+                    <div class="skel-av"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                        <div class="skel-ln" style="width:100%"></div>
+                        <div class="skel-ln"></div>
+                        <div class="skel-ln"></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── COLONNE DROITE ───────────────────────────────────
+    # ──────────────────────────────────────────────────────
+    #  TUILE C — Visualiseur (colonne droite)
+    # ──────────────────────────────────────────────────────
     with col_right:
-        # -- Bloc Carte --
-        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="bento-head">Localisation</div>', unsafe_allow_html=True)
-        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+        st.markdown('<div class="tile">', unsafe_allow_html=True)
+        st.markdown('<div class="tile-hd"><span class="dot"></span>Visualiseur</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
 
         map_url = st.session_state.get("plu_map_url")
         if map_url:
@@ -1353,30 +1266,27 @@ else:
             lon = st.session_state.get("plu_longitude", "")
             if lat and lon:
                 st.markdown(f"""
-                <div style="display:flex;justify-content:space-between;font-size:10px;
-                            color:#6b7280;margin-top:4px">
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px">
                     <span>Lat {lat}</span><span>Lon {lon}</span>
                 </div>
                 """, unsafe_allow_html=True)
         else:
             st.markdown("""
-            <div class="upload-zone" style="height:80px;display:flex;align-items:center;justify-content:center">
-                Carte disponible apres chargement PLU
+            <div class="drop-zone" style="height:80px;display:flex;align-items:center;justify-content:center">
+                Carte / schema disponible apres analyse
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown('</div></div>', unsafe_allow_html=True)
-        st.write("")
 
-        # -- Bloc Analyse PLU RAG --
+        # ── Analyse PLU RAG ──
         if id_projet:
-            st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-            st.markdown('<div class="bento-head">Analyse PLU</div>', unsafe_allow_html=True)
-            st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+            st.markdown('<div class="tile">', unsafe_allow_html=True)
+            st.markdown('<div class="tile-hd"><span class="dot"></span>Analyse PLU</div>', unsafe_allow_html=True)
+            st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
 
-            # Initialiser les etats PLU RAG
             if "plu_rag_status" not in st.session_state:
-                st.session_state.plu_rag_status = None  # None | "loading" | "ready" | "error"
+                st.session_state.plu_rag_status = None
             if "plu_rag_chatbot" not in st.session_state:
                 st.session_state.plu_rag_chatbot = None
             if "plu_rag_fiche" not in st.session_state:
@@ -1385,14 +1295,11 @@ else:
                 st.session_state.plu_rag_history = []
 
             adresse_plu = st.text_input(
-                "Adresse a analyser",
-                placeholder="12 rue de la Paix, 64000 Pau",
-                key="plu_rag_adresse_input",
-                label_visibility="collapsed",
+                "Adresse PLU", placeholder="12 rue de la Paix, 64000 Pau",
+                key="plu_rag_adresse_input", label_visibility="collapsed",
             )
-
-            if st.button("Analyser PLU", key="btn_plu_rag", use_container_width=True,
-                         disabled=not adresse_plu):
+            if st.button("Analyser PLU", key="btn_plu_rag",
+                         use_container_width=True, disabled=not adresse_plu):
                 st.session_state.plu_rag_status = "loading"
                 st.session_state.plu_rag_chatbot = None
                 st.session_state.plu_rag_fiche = None
@@ -1401,10 +1308,9 @@ else:
 
             # Pipeline PLU RAG
             if st.session_state.plu_rag_status == "loading" and adresse_plu:
-                import os as _os
-                _os.environ.setdefault("PLU_CACHE_DIR", os.path.join(
+                os.environ.setdefault("PLU_CACHE_DIR", os.path.join(
                     os.path.dirname(__file__), "data", "plu_cache"))
-                _os.environ.setdefault("PLU_CHROMA_DIR", os.path.join(
+                os.environ.setdefault("PLU_CHROMA_DIR", os.path.join(
                     os.path.dirname(__file__), "data", "plu_chroma"))
 
                 with st.status("Analyse PLU en cours...", expanded=True) as plu_status:
@@ -1420,37 +1326,34 @@ else:
                         )
                         from boomerang_tools.plu_chatbot import PLUChatbot
 
-                        # Etape 1 : Geocodage
                         st.write("Geocodage de l'adresse...")
                         geo = geocoder_adresse(adresse_plu)
                         code_insee = geo["code_insee"]
-
-                        # Mettre a jour les infos projet
                         st.session_state.plu_adresse_normalisee = geo["adresse_normalisee"]
                         st.session_state.plu_commune = geo["commune"]
                         st.session_state.plu_code_insee = code_insee
                         st.session_state.plu_latitude = geo["latitude"]
                         st.session_state.plu_longitude = geo["longitude"]
 
-                        # Etape 2 : Recherche PLU
-                        st.write("Recherche du PLU sur le GPU...")
+                        st.write("Recherche du PLU...")
                         plu = rechercher_plu_gpu(
                             code_insee, lat=geo["latitude"], lon=geo["longitude"]
                         )
                         st.session_state.plu_zone = plu.get("zone_parcelle", "")
                         st.session_state.plu_type_document = plu.get("type_document", "")
 
-                        # Carte WMS
-                        from boomerang_tools.tool_api_urbanisme.server import generer_url_carte_wms
-                        st.session_state.plu_map_url = generer_url_carte_wms(
-                            geo["latitude"], geo["longitude"]
-                        )
+                        try:
+                            from boomerang_tools.tool_api_urbanisme.server import generer_url_carte_wms
+                            st.session_state.plu_map_url = generer_url_carte_wms(
+                                geo["latitude"], geo["longitude"]
+                            )
+                        except Exception:
+                            pass
 
                         if plu.get("statut") != "trouve":
                             st.session_state.plu_rag_status = "error"
                             st.error(plu.get("message", "PLU non trouve"))
                         else:
-                            # Etape 3 : Telechargement
                             st.write("Telechargement des documents PLU...")
                             dl = telecharger_plu(plu, code_insee)
                             cache_dir = dl["chemin_cache"]
@@ -1459,7 +1362,6 @@ else:
                                 st.warning("Aucun PDF telecharge")
                                 st.session_state.plu_rag_status = "error"
                             else:
-                                # Etape 4 : Indexation RAG
                                 st.write(f"Indexation de {len(dl['fichiers'])} PDFs...")
                                 stats = pipeline_indexation_plu(cache_dir, code_insee)
 
@@ -1468,27 +1370,18 @@ else:
                                     st.session_state.plu_rag_status = "error"
                                 else:
                                     st.write(f"{stats['nb_chunks']} articles indexes")
-
-                                    # Etape 5 : Creer retriever + chatbot
                                     retriever = creer_retriever(code_insee, k=6)
                                     if retriever:
                                         bot = PLUChatbot(
-                                            retriever,
-                                            commune=geo["commune"],
+                                            retriever, commune=geo["commune"],
                                             zone=plu.get("zone_parcelle", ""),
                                             type_document=plu.get("type_document", ""),
                                         )
                                         st.session_state.plu_rag_chatbot = bot
-
-                                        # Generer la fiche de synthese
                                         fiche = generer_fiche_synthese(geo, plu)
                                         st.session_state.plu_rag_fiche = fiche
-
                                         st.session_state.plu_rag_status = "ready"
-                                        plu_status.update(
-                                            label="PLU analyse avec succes",
-                                            state="complete",
-                                        )
+                                        plu_status.update(label="PLU analyse", state="complete")
                                     else:
                                         st.session_state.plu_rag_status = "error"
                                         st.error("Impossible de creer le retriever")
@@ -1498,141 +1391,119 @@ else:
                         st.error(str(ve))
                     except Exception as ex:
                         st.session_state.plu_rag_status = "error"
-                        st.error(f"Erreur: {ex}")
+                        st.error(f"Erreur : {ex}")
 
-            # Affichage fiche + chatbot si pret
+            # Affichage fiche + chatbot
             if st.session_state.plu_rag_status == "ready":
                 fiche = st.session_state.plu_rag_fiche
                 if fiche:
                     plu_sec = fiche.get("plu", {})
-                    zone_txt = plu_sec.get("zone", "")
-                    type_txt = plu_sec.get("type_document", "")
-                    if zone_txt or type_txt:
-                        st.markdown(f"""
-                        <div style="display:inline-block;font-size:10px;padding:2px 8px;
-                                    border-radius:4px;background:#1a2633;color:#4A90D9;
-                                    border:0.5px solid #2a3d52;margin:4px 0">
-                            Zone {zone_txt} - {type_txt}
-                        </div>
-                        """, unsafe_allow_html=True)
+                    z = plu_sec.get("zone", "")
+                    t = plu_sec.get("type_document", "")
+                    if z or t:
+                        st.markdown(f'<div class="badge" style="margin:6px 0">Zone {z} - {t}</div>',
+                                    unsafe_allow_html=True)
 
-                # Mini-chatbot PLU
-                st.markdown('<div class="meta-divider"></div>', unsafe_allow_html=True)
-                st.markdown("""<div style="font-size:10px;color:#6b7280;margin-bottom:4px">
-                    Posez une question sur le reglement PLU :
-                </div>""", unsafe_allow_html=True)
+                st.markdown('<div class="sep"></div>', unsafe_allow_html=True)
+                st.markdown('<div class="meta-k">Question PLU</div>', unsafe_allow_html=True)
 
-                # Historique du chat PLU
                 for msg in st.session_state.plu_rag_history:
                     role_label = "Vous" if msg["role"] == "user" else "PLU"
-                    color = "#9ca3af" if msg["role"] == "user" else "#4A90D9"
-                    st.markdown(f"""<div style="font-size:10px;color:{color};margin:2px 0">
+                    color = "#a1a7b4" if msg["role"] == "user" else "#3b82f6"
+                    st.markdown(f"""<div style="font-size:10px;color:{color};margin:3px 0">
                         <b>{role_label}:</b> {msg['content'][:300]}
                     </div>""", unsafe_allow_html=True)
 
                 question_plu = st.text_input(
-                    "Question PLU",
-                    placeholder="Hauteur max? Reculs? Stationnement?",
-                    key="plu_rag_question",
-                    label_visibility="collapsed",
+                    "Q", placeholder="Hauteur max? Reculs? Stationnement?",
+                    key="plu_rag_question", label_visibility="collapsed",
                 )
-                if st.button("Demander", key="btn_plu_ask", use_container_width=True,
-                             disabled=not question_plu):
+                if st.button("Demander", key="btn_plu_ask",
+                             use_container_width=True, disabled=not question_plu):
                     bot = st.session_state.plu_rag_chatbot
                     if bot:
                         with st.spinner("Recherche dans le PLU..."):
                             reponse = bot.poser_question(question_plu)
                         st.session_state.plu_rag_history.append(
-                            {"role": "user", "content": question_plu}
-                        )
+                            {"role": "user", "content": question_plu})
                         st.session_state.plu_rag_history.append(
-                            {"role": "assistant", "content": reponse}
-                        )
-                        # Afficher les sources
+                            {"role": "assistant", "content": reponse})
                         sources = bot.get_sources()
                         if sources:
-                            src_txt = ", ".join(
-                                s["article"] for s in sources if s["article"]
-                            )
-                            st.markdown(f"""<div style="font-size:9px;color:#4b5563;margin-top:2px">
-                                Sources: {src_txt}
-                            </div>""", unsafe_allow_html=True)
+                            src_txt = ", ".join(s["article"] for s in sources if s["article"])
+                            st.markdown(f'<div style="font-size:9px;color:var(--text-3)">Sources: {src_txt}</div>',
+                                        unsafe_allow_html=True)
                         st.rerun()
 
-                # Export fiche PDF
                 if st.session_state.plu_rag_fiche:
-                    from boomerang_tools.plu_synthese import exporter_fiche_pdf
-                    fiche_pdf = exporter_fiche_pdf(st.session_state.plu_rag_fiche)
-                    st.download_button(
-                        "Fiche PLU (PDF)",
-                        data=fiche_pdf,
-                        file_name=f"Fiche_PLU_{st.session_state.get('plu_code_insee','')}.pdf",
-                        mime="application/pdf",
-                        key="btn_plu_pdf",
-                        use_container_width=True,
-                    )
+                    try:
+                        from boomerang_tools.plu_synthese import exporter_fiche_pdf
+                        fiche_pdf = exporter_fiche_pdf(st.session_state.plu_rag_fiche)
+                        st.download_button(
+                            "Fiche PLU (PDF)", data=fiche_pdf,
+                            file_name=f"Fiche_PLU_{st.session_state.get('plu_code_insee','')}.pdf",
+                            mime="application/pdf", key="btn_plu_pdf",
+                            use_container_width=True,
+                        )
+                    except Exception:
+                        pass
 
             st.markdown('</div></div>', unsafe_allow_html=True)
-            st.write("")
 
-        # -- Bloc Documents --
-        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="bento-head">Documents</div>', unsafe_allow_html=True)
-        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
+        # ──────────────────────────────────────────────────
+        #  TUILE D — Bibliotheque Documentaire
+        # ──────────────────────────────────────────────────
+        st.markdown('<div class="tile">', unsafe_allow_html=True)
+        st.markdown('<div class="tile-hd"><span class="dot"></span>Documents</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tile-bd">', unsafe_allow_html=True)
 
         uploaded = st.file_uploader(
-            "Deposer fichier",
-            type=["pdf", "txt", "jpg", "jpeg", "png", "webp", "ifc", "dxf"],
-            accept_multiple_files=True,
-            label_visibility="collapsed",
+            "Deposer", type=["pdf", "txt", "jpg", "jpeg", "png", "webp"],
+            accept_multiple_files=True, label_visibility="collapsed",
             key="bento_doc_uploader",
         )
         if uploaded:
             for f in uploaded:
                 ext = f.name.split(".")[-1].upper()
-                size = f"{f.size / 1024 / 1024:.1f} Mo" if f.size > 1e6 \
-                       else f"{f.size // 1024} Ko"
+                size = f"{f.size / 1024 / 1024:.1f} Mo" if f.size > 1e6 else f"{f.size // 1024} Ko"
                 st.markdown(f"""
                 <div style="display:flex;align-items:center;gap:8px;padding:5px 0;
-                            border-bottom:0.5px solid #2e333a;font-size:10px;color:#9ca3af">
-                    <div style="width:18px;height:18px;border-radius:3px;
-                                background:#1a2633;border:0.5px solid #2a3d52;
+                            border-bottom:1px solid var(--border);font-size:10px;color:var(--text-2)">
+                    <div style="width:20px;height:20px;border-radius:4px;
+                                background:var(--accent-soft);border:1px solid var(--accent-border);
                                 display:flex;align-items:center;justify-content:center;
-                                font-size:8px;color:#4A90D9;flex-shrink:0">{ext}</div>
-                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;
-                                 white-space:nowrap">{f.name}</span>
-                    <span style="color:#4b5563">{size}</span>
+                                font-size:8px;color:var(--accent)">{ext}</div>
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{f.name}</span>
+                    <span style="color:var(--text-3)">{size}</span>
                 </div>
                 """, unsafe_allow_html=True)
-                # Attacher le premier fichier au contexte si pas deja fait
                 if not st.session_state.attached_file_ctx:
                     ctx = _preparer_contexte_fichier(f)
                     if ctx["type"] != "error":
                         st.session_state.attached_file_ctx = ctx
 
-        # Chip fichier attache
         if st.session_state.attached_file_ctx and st.session_state.attached_file_ctx["type"] != "error":
             ctx = st.session_state.attached_file_ctx
-            icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "TXT" if ctx["filename"].lower().endswith(".txt") else "IMG"
-            st.markdown(f'<div class="file-chip" style="margin-top:6px">{icon} {ctx["filename"]}</div>', unsafe_allow_html=True)
+            icon = "PDF" if ctx["filename"].lower().endswith(".pdf") else "IMG"
+            st.markdown(f'<div class="fchip" style="margin-top:8px">{icon} {ctx["filename"]}</div>',
+                        unsafe_allow_html=True)
             if st.button("Retirer", key="bento_remove_file"):
                 st.session_state.attached_file_ctx = None
                 st.rerun()
 
-        st.markdown('</div></div>', unsafe_allow_html=True)
-        st.write("")
+        # Statut ChromaDB
+        st.markdown('<div class="sep"></div>', unsafe_allow_html=True)
+        _chroma_dir = os.path.join(os.path.dirname(__file__), "data", "plu_chroma")
+        _chroma_ok = os.path.isdir(_chroma_dir) and bool(os.listdir(_chroma_dir)) if os.path.exists(_chroma_dir) else False
+        st.markdown(f"""
+        <div class="sdot"><i class="{'on' if _chroma_ok else 'off'}"></i>
+            Base vectorielle {'active' if _chroma_ok else 'vide'}
+        </div>
+        """, unsafe_allow_html=True)
 
-        # -- Bloc Cache --
-        st.markdown('<div class="bento-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="bento-head">Cache API</div>', unsafe_allow_html=True)
-        st.markdown('<div class="bento-body">', unsafe_allow_html=True)
-
+        # Cache
         settings = load_settings()
-        cache_on = st.toggle(
-            "Activer le cache",
-            value=settings.get("cache_enabled", True),
-            key="bento_toggle_cache",
-        )
+        cache_on = st.toggle("Cache API", value=settings.get("cache_enabled", True), key="bento_toggle_cache")
         if cache_on != settings.get("cache_enabled", True):
             save_settings("cache_enabled", cache_on)
         if cache_on:
@@ -1640,8 +1511,8 @@ else:
                 from db_manager import stats_cache, purge_cache
                 cache_stats = stats_cache()
                 st.markdown(f"""
-                <div style="font-size:10px;color:#9ca3af;margin-top:4px">
-                    Actifs : {cache_stats['actifs']} &middot; Expires : {cache_stats['expires']}
+                <div style="font-size:10px;color:var(--text-3);margin-top:4px">
+                    {cache_stats['actifs']} actifs / {cache_stats['expires']} expires
                 </div>
                 """, unsafe_allow_html=True)
                 if cache_stats["expires"] > 0:
@@ -1654,7 +1525,7 @@ else:
         st.markdown('</div></div>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════
-    #  INPUT CHAT (hors colonnes pour ancrage bas natif)
+    #  INPUT CHAT (ancre en bas, pleine largeur)
     # ══════════════════════════════════════════════════════
 
     if st.session_state.get("id_projet"):
@@ -1667,8 +1538,7 @@ else:
             st.rerun()
 
     # ══════════════════════════════════════════════════════
-    #  TRAITEMENT DU MESSAGE PENDING
-    #  (logique LangGraph — NE PAS DEPLACER)
+    #  TRAITEMENT DU MESSAGE PENDING (logique LangGraph)
     # ══════════════════════════════════════════════════════
 
     if st.session_state.get("id_projet") and st.session_state.pending_input:
@@ -1688,8 +1558,7 @@ else:
             display_text = f"{user_input_text}\n\n*Fichier joint : {file_ctx['filename']}*"
         elif file_ctx and file_ctx["type"] == "image":
             llm_text = (
-                f"{user_input_text}\n\n"
-                f"[Image jointe : {file_ctx['filename']}]"
+                f"{user_input_text}\n\n[Image jointe : {file_ctx['filename']}]"
             )
             display_text = f"{user_input_text}\n\n*Image jointe : {file_ctx['filename']}*"
 
@@ -1701,13 +1570,10 @@ else:
 
         st.session_state.messages.append({"role": "user", "content": display_text})
         sauvegarder_message(id_projet, "user", display_text)
-
         st.session_state.attached_file_ctx = None
         st.session_state.generating = True
 
         current_model = st.session_state.ollama_model
-
-        # Verifier si le streaming est active dans les settings
         settings = load_settings()
         use_streaming = settings.get("streaming_enabled", True)
 
@@ -1732,14 +1598,11 @@ else:
                     save_settings("last_model", current_model)
                 except Exception as e:
                     logger.error(f"Erreur invoke/stream: {e}")
-
                     last_ok = st.session_state.get("last_working_model", "")
-                    suggestion = f" Essayez **{last_ok}** qui a fonctionne precedemment." if last_ok and last_ok != current_model else ""
-
+                    suggestion = f" Essayez **{last_ok}**." if last_ok and last_ok != current_model else ""
                     result = {
                         "response": (
-                            f"Le modele **{current_model}** a rencontre une difficulte "
-                            f"avec votre demande.{suggestion}\n\n"
+                            f"Le modele **{current_model}** a rencontre une difficulte.{suggestion}\n\n"
                             "Vous pouvez :\n"
                             "- Reformuler votre question\n"
                             "- Changer de modele\n"
