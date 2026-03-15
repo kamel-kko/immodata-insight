@@ -9,9 +9,10 @@ Double rôle :
 NB : distinct du SqliteSaver LangGraph qui gère l'état du graphe
 """
 
+import hashlib
 import os
-from datetime import datetime
-from typing import List, Dict
+from datetime import datetime, timedelta
+from typing import List, Dict, Optional
 
 from sqlalchemy import (
     create_engine, Column, Integer, String, Text, DateTime, Index
