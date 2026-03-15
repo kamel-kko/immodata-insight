@@ -460,6 +460,11 @@ def refine_intent_node(state: dict) -> dict:
 def router_apres_refine(state: dict) -> str:
     if state.get("_skip_agent"):
         return END
+
+    # Si needs_forge est True dans le state, court-circuiter vers forge_node
+    if state.get("needs_forge"):
+        return "forge_node"
+
     # Si le message contient FORGE (casse insensible), court-circuiter vers forge_node
     messages = state.get("messages", [])
     if messages:
