@@ -521,6 +521,9 @@ def router_apres_refine(state: dict) -> str:
 
 from concurrent.futures import ThreadPoolExecutor
 
+# Pool de threads persistent (evite de recreer un pool a chaque appel)
+_TOOL_EXECUTOR = ThreadPoolExecutor(max_workers=4)
+
 
 def _parallel_action_node(state: dict) -> dict:
     """Noeud d'action qui parallelise les appels si plusieurs tool_calls simultanes."""
