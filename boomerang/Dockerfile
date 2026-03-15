@@ -12,8 +12,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /app/boomerang_tools /app/temp_tools /app/tests /app/backups /app/data \
-    && touch /app/boomerang_tools/__init__.py \
+# Copier explicitement les fichiers Python des outils locaux
+# (le volume mount peut ne pas fonctionner sur certains chemins Windows)
+COPY boomerang_tools/__init__.py /app/boomerang_tools/__init__.py
+COPY boomerang_tools/tool_demander_dev.py /app/boomerang_tools/tool_demander_dev.py
+COPY boomerang_tools/tool_generer_schema.py /app/boomerang_tools/tool_generer_schema.py
+
+RUN mkdir -p /app/temp_tools /app/tests /app/backups /app/data \
     && touch /app/temp_tools/__init__.py \
     && touch /app/tests/__init__.py
 
