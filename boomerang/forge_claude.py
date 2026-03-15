@@ -53,7 +53,10 @@ _FORBIDDEN_STRING_PATTERNS = [
 def _valider_code_forge(code: str) -> list[str]:
     """Analyse statique du code genere par Claude avant ecriture sur disque.
 
-    Verifie via ast.parse que le code ne contient pas d'imports ou appels dangereux.
+    Trois niveaux de verification :
+      1. ast.parse : imports et appels dangereux
+      2. Chaines de caracteres : URLs internes, IPs privees
+      3. Patterns textuels : contournements connus
 
     Returns:
         Liste de problemes detectes (vide = code OK).
@@ -79,7 +82,7 @@ def _valider_code_forge(code: str) -> list[str]:
                 if module_root in _FORBIDDEN_IMPORTS:
                     problemes.append(f"Import interdit : 'from {node.module}' (ligne {node.lineno})")
 
-        # Verifier les appels dangereux (eval, exec, os.system, etc.)
+        # Verifier les appels dangereux
         elif isinstance(node, ast.Call):
             func_name = ""
             if isinstance(node.func, ast.Name):
@@ -88,10 +91,16 @@ def _valider_code_forge(code: str) -> list[str]:
                 if isinstance(node.func.value, ast.Name):
                     func_name = f"{node.func.value.id}.{node.func.attr}"
 
-            if func_name in ("eval", "exec", "compile", "__import__"):
-                problemes.append(f"Appel interdit : '{func_name}()' (ligne {node.lineno})")
             if func_name in _FORBIDDEN_CALLS:
                 problemes.append(f"Appel dangereux : '{func_name}()' (ligne {node.lineno})")
+
+        # Verifier les chaines de caracteres (URLs internes, IPs privees)
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+            for pattern in _FORBIDDEN_STRING_PATTERNS:
+                if pattern in node.value:
+                    problemes.append(
+                        f"Chaine suspecte : '{pattern}' detectee (ligne {node.lineno})"
+                    )
 
     return problemes
 
