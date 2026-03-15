@@ -38,9 +38,16 @@ class NoticeInput(BaseModel):
     description: str = Field(default="", description="Description du projet")
 
 
+class DevRequestInput(BaseModel):
+    """Schema d'entree pour l'outil de demande de developpement."""
+    outil_manquant: str = Field(description="Nom de l'outil manquant a developper")
+    description_fonctionnelle: str = Field(description="Description fonctionnelle de ce que l'outil doit faire")
+
+
 # Mapping des schemas d'entree par nom d'outil
 _INPUT_SCHEMAS = {
     "notice_securite": NoticeInput,
+    "tool_demander_dev": DevRequestInput,
 }
 
 
