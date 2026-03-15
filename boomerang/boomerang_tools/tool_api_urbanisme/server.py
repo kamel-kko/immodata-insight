@@ -119,4 +119,9 @@ def run(body: RunInput) -> dict:
     output_parts.append(
         "\nSource : Géoportail de l'Urbanisme (gpu.developpement-durable.gouv.fr)"
     )
+
+    # Ajouter l'URL de la carte cadastrale WMS
+    carte_url = generer_url_carte_wms(lat, lon)
+    output_parts.append(f"\nMAP_URL:{carte_url}")
+
     return {"output": "\n\n".join(output_parts)}
