@@ -7,7 +7,7 @@ services:
       - "8501:8501"
     volumes:
       - ./data:/app/data
-      - ./boomerang_tools:/app/boomerang_tools
+      - boomerang_tools_vol:/app/boomerang_tools
       - ./temp_tools:/app/temp_tools
       - ./tests:/app/tests
       - ./backups:/app/backups
