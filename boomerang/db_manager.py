@@ -66,6 +66,21 @@ class PortRegistre(Base):
     created_at  = Column(DateTime,    default=datetime.utcnow)
 
 
+class CacheAPI(Base):
+    """Cache des resultats d'outils par cle (code_insee + type_requete).
+
+    Evite de re-appeler les APIs publiques (GPU, Georisques) pour une
+    meme commune. Les donnees PLU/risques changent rarement (1 fois/an max).
+    """
+    __tablename__ = "cache_api"
+    id          = Column(Integer, primary_key=True)
+    cache_key   = Column(String(256), nullable=False, unique=True, index=True)
+    tool_name   = Column(String(100), nullable=False)
+    output      = Column(Text,        nullable=False)
+    created_at  = Column(DateTime,    default=datetime.utcnow)
+    expires_at  = Column(DateTime,    nullable=False)
+
+
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
 
