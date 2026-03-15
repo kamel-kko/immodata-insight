@@ -475,17 +475,62 @@ def router_apres_refine(state: dict) -> str:
     return "agent_node"
 
 
+# ── Execution parallele des outils ────────────────────
+
+from concurrent.futures import ThreadPoolExecutor
+
+
+def _parallel_action_node(state: dict) -> dict:
+    """Noeud d'action qui parallelise les appels si plusieurs tool_calls simultanes."""
+    messages = state.get("messages", [])
+    last = messages[-1] if messages else None
+
+    if not last or not hasattr(last, "tool_calls") or not last.tool_calls:
+        return state
+
+    tool_calls = last.tool_calls
+    outils = charger_outils()
+    tools_map = {t.name: t for t in outils}
+
+    def run_one_tool(call):
+        tool_name = call.get("name", "")
+        tool_args = call.get("args", {})
+        call_id = call.get("id", tool_name)
+        tool = tools_map.get(tool_name)
+        if not tool:
+            return ToolMessage(
+                content=f"Outil '{tool_name}' non trouve.",
+                tool_call_id=call_id,
+            )
+        try:
+            result = tool.invoke(tool_args)
+            return ToolMessage(content=str(result), tool_call_id=call_id)
+        except Exception as e:
+            return ToolMessage(
+                content=f"Erreur outil {tool_name}: {str(e)}",
+                tool_call_id=call_id,
+            )
+
+    if len(tool_calls) > 1:
+        logger.info(f"Execution parallele de {len(tool_calls)} outils: {[c.get('name') for c in tool_calls]}")
+        with ThreadPoolExecutor(max_workers=min(len(tool_calls), 4)) as executor:
+            tool_messages = list(executor.map(run_one_tool, tool_calls))
+    else:
+        tool_messages = [run_one_tool(tool_calls[0])]
+
+    return {"messages": tool_messages}
+
+
 # ── Construction du graphe ──────────────────────────────
 
 def build_graph():
     outils = charger_outils()
-    action_node = ToolNode(outils) if outils else ToolNode([])
 
     workflow = StateGraph(dict)
 
     workflow.add_node("refine_intent_node", refine_intent_node)
     workflow.add_node("agent_node", agent_node)
-    workflow.add_node("action_node", action_node)
+    workflow.add_node("action_node", _parallel_action_node)
     workflow.add_node("forge_node", forge_node)
     workflow.add_node("hitl_node", hitl_node)
 
