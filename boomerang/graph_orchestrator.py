@@ -268,7 +268,9 @@ def agent_node(state: dict, config: RunnableConfig) -> dict:
 
     # Recuperer le modele depuis la config (passee par app.py via le selectbox)
     model_name = config.get("configurable", {}).get("model_name", "")
-    llm = get_llm(model_name=model_name)
+    # agent_node = noeud de synthese finale -> modele "slow" (lourd)
+    llm = get_llm(model_name=model_name, speed="slow")
+    logger.info(f"[agent_node] modele: {llm.model if hasattr(llm, 'model') else 'unknown'}")
 
     # Determiner si le modele supporte le tool calling natif
     use_native_tools = _modele_supporte_tools(model_name) if model_name else True
