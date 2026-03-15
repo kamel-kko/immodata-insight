@@ -113,7 +113,8 @@
       "Bash(python -c \"import chromadb; print\\(''chromadb'', chromadb.__version__\\)\")",
       "Bash(python -c \"from langchain_community.embeddings import OllamaEmbeddings; print\\(''OllamaEmbeddings OK''\\)\")",
       "Bash(python -c \"import fitz; print\\(''pymupdf'', fitz.version\\)\")",
-      "Bash(curl -s http://localhost:11434/api/tags)"
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''Syntaxe OK''\\)\")"
     ]
   },
   "hooks": {
