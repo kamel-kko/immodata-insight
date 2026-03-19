@@ -142,7 +142,23 @@
       "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py''\\); print\\(''Syntaxe OK''\\)\")",
       "Bash(curl -s http://localhost:8502/_stcore/health)",
       "Bash(ls boomerang_tools/*.py)",
-      "Bash(python -c \"import fitz, chromadb, requests; print\\(''deps OK''\\)\")"
+      "Bash(python -c \"import fitz, chromadb, requests; print\\(''deps OK''\\)\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py''\\); print\\(''OK''\\)\")",
+      "Bash(taskkill //F //PID 51812)",
+      "WebFetch(domain:claude.ai)",
+      "Bash(pip show:*)",
+      "Bash(pip index:*)",
+      "WebSearch",
+      "WebFetch(domain:open-jarvis.github.io)",
+      "Bash(uv --version)",
+      "Bash(python -m uv --version)",
+      "Bash(python -m uv sync)",
+      "Bash(.venv/Scripts/python -c \"import jarvis; print\\(''OpenJarvis OK:'', jarvis.__version__\\)\")",
+      "Bash(.venv/Scripts/python -c \"import openjarvis; print\\(''OK''\\)\")",
+      "Bash(.venv/Scripts/python -c \"from jarvis import Agent; print\\(''OK''\\)\")",
+      "Bash(.venv/Scripts/python -c \"import importlib; print\\([m for m in dir\\(importlib.import_module\\(''openjarvis''\\)\\) if not m.startswith\\(''_''\\)]\\)\")",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(.venv/Scripts/python -c \":*)"
     ]
   },
   "hooks": {
