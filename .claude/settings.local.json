@@ -203,7 +203,11 @@
       "Bash(taskkill //PID 29984 //F)",
       "Bash(taskkill //PID 1744 //F)",
       "Bash(curl -s http://localhost:8222/health)",
-      "Bash(echo \"OLLAMA_HOST=$OLLAMA_HOST\")"
+      "Bash(echo \"OLLAMA_HOST=$OLLAMA_HOST\")",
+      "Bash(OLLAMA_HOST=http://localhost:11434 .venv/Scripts/python -c \":*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(timeout 30 .venv/Scripts/python run_server.py)",
+      "Bash(taskkill //PID 29416 //F)"
     ]
   },
   "hooks": {
