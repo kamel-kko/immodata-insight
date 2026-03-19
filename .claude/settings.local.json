@@ -185,7 +185,9 @@
       "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
       "Read(//c/Users/H7606/.claude/skills/gstack/**)",
       "Bash(bunx playwright:*)",
-      "Bash(bun x:*)"
+      "Bash(bun x:*)",
+      "Bash(MSYS_NO_PATHCONV=1 tasklist //FI \"PID eq 29984\")",
+      "Bash(cmd.exe /c \"tasklist /FI \"\"PID eq 29984\"\"\")"
     ]
   },
   "hooks": {
