@@ -173,7 +173,8 @@
       "Bash(python -m uv add \"openjarvis[memory-faiss]\")",
       "Bash(python -m uv sync --extra memory-faiss)",
       "Bash(python -m uv add chromadb)",
-      "Bash(python -m uv add ollama)"
+      "Bash(python -m uv add ollama)",
+      "Bash(git config:*)"
     ]
   },
   "hooks": {
