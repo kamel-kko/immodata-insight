@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "boomerang_app",
-      "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "-f", "boomerang/docker-compose.yml", "up", "-d", "--build", "boomerang_app"],
-      "port": 8501,
-      "autoPort": false
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5173", "--host"],
+      "port": 5173,
+      "cwd": "boomerang-v2/frontend"
     }
   ]
 }

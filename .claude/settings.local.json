@@ -207,7 +207,11 @@
       "Bash(OLLAMA_HOST=http://localhost:11434 .venv/Scripts/python -c \":*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
       "Bash(timeout 30 .venv/Scripts/python run_server.py)",
-      "Bash(taskkill //PID 29416 //F)"
+      "Bash(taskkill //PID 29416 //F)",
+      "Bash(curl -s http://localhost:5173/health)",
+      "Bash(curl -s http://localhost:5173/v1/models)",
+      "Bash(curl -s http://localhost:8222/v1/models)",
+      "Bash(taskkill //PID 3744 //F)"
     ]
   },
   "hooks": {
