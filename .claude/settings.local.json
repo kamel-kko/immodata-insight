@@ -211,7 +211,9 @@
       "Bash(curl -s http://localhost:5173/health)",
       "Bash(curl -s http://localhost:5173/v1/models)",
       "Bash(curl -s http://localhost:8222/v1/models)",
-      "Bash(taskkill //PID 3744 //F)"
+      "Bash(taskkill //PID 3744 //F)",
+      "Bash(ls \"P:/CLAUDE CODE/boomerang-v2/frontend/src/lib/profanity\"*)",
+      "Bash(curl -s http://localhost:5173)"
     ]
   },
   "hooks": {
