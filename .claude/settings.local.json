@@ -162,7 +162,9 @@
       "Bash(python -m uv pip install pymupdf)",
       "Bash(.venv/Scripts/pip install:*)",
       "Bash(.venv/Scripts/python -m pip install pymupdf)",
-      "Bash(python -m uv add pymupdf)"
+      "Bash(python -m uv add pymupdf)",
+      "Bash(mkdir -p data)",
+      "Bash(PYTHONIOENCODING=utf-8 .venv/Scripts/python -c \":*)"
     ]
   },
   "hooks": {
