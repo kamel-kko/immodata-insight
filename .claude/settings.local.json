@@ -218,7 +218,8 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8222/bento)",
       "Bash(python -c \"import sys,json; [print\\(m[''''id'''']\\) for m in json.load\\(sys.stdin\\).get\\(''''data'''',[]\\)]\")",
       "Bash(taskkill //PID 34664 //F)",
-      "Bash(cmd.exe /c \"where uv\")"
+      "Bash(cmd.exe /c \"where uv\")",
+      "Bash(taskkill //PID 4396 //F)"
     ]
   },
   "hooks": {
