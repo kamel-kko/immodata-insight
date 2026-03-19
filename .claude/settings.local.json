@@ -190,7 +190,18 @@
       "Bash(cmd.exe /c \"tasklist /FI \"\"PID eq 29984\"\"\")",
       "Bash(cp -Rf ~/.claude/skills/gstack \"P:/CLAUDE CODE/.claude/skills/gstack\")",
       "Bash(rm -rf \"P:/CLAUDE CODE/.claude/skills/gstack/.git\")",
-      "Bash(mkdir -p \"P:/CLAUDE CODE/.claude/skills\")"
+      "Bash(mkdir -p \"P:/CLAUDE CODE/.claude/skills\")",
+      "Bash(mkdir -p \"P:/CLAUDE CODE/boomerang-v2/.claude/skills\")",
+      "Bash(cp -Rf ~/.claude/skills/gstack \"P:/CLAUDE CODE/boomerang-v2/.claude/skills/gstack\")",
+      "Bash(rm -rf \"P:/CLAUDE CODE/boomerang-v2/.claude/skills/gstack/.git\")",
+      "Bash(npm install:*)",
+      "Bash(python -c \"from openjarvis.server.app import create_app; print\\(''Server import OK''\\)\")",
+      "Bash(.venv/Scripts/python -m pip install fastapi uvicorn[standard])",
+      "Bash(uv sync:*)",
+      "Bash(python -m uv sync --directory \"P:/CLAUDE CODE/boomerang-v2\" --extra server)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8222/health)",
+      "Bash(taskkill //PID 29984 //F)",
+      "Bash(taskkill //PID 1744 //F)"
     ]
   },
   "hooks": {
