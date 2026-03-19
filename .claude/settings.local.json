@@ -215,7 +215,8 @@
       "Bash(ls \"P:/CLAUDE CODE/boomerang-v2/frontend/src/lib/profanity\"*)",
       "Bash(curl -s http://localhost:5173)",
       "Bash(taskkill //PID 29660 //F)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8222/bento)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8222/bento)",
+      "Bash(python -c \"import sys,json; [print\\(m[''''id'''']\\) for m in json.load\\(sys.stdin\\).get\\(''''data'''',[]\\)]\")"
     ]
   },
   "hooks": {
