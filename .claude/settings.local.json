@@ -174,7 +174,18 @@
       "Bash(python -m uv sync --extra memory-faiss)",
       "Bash(python -m uv add chromadb)",
       "Bash(python -m uv add ollama)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(PYTHONIOENCODING=utf-8 .venv/Scripts/python boomerang.py)",
+      "Bash(claude --version)",
+      "Bash(git --version)",
+      "Bash(bun --version)",
+      "Bash(curl -fsSL https://bun.sh/install)",
+      "Bash(bash)",
+      "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
+      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
+      "Read(//c/Users/H7606/.claude/skills/gstack/**)",
+      "Bash(bunx playwright:*)",
+      "Bash(bun x:*)"
     ]
   },
   "hooks": {
