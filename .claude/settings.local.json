@@ -201,7 +201,9 @@
       "Bash(python -m uv sync --directory \"P:/CLAUDE CODE/boomerang-v2\" --extra server)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8222/health)",
       "Bash(taskkill //PID 29984 //F)",
-      "Bash(taskkill //PID 1744 //F)"
+      "Bash(taskkill //PID 1744 //F)",
+      "Bash(curl -s http://localhost:8222/health)",
+      "Bash(echo \"OLLAMA_HOST=$OLLAMA_HOST\")"
     ]
   },
   "hooks": {
