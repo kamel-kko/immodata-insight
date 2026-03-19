@@ -4,7 +4,7 @@
     {
       "name": "boomerang_app",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/.bin/vite", "--port", "5173", "--host"],
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port", "5173", "--host"],
       "port": 5173,
       "cwd": "boomerang-v2/frontend"
     }
