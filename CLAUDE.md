@@ -67,3 +67,30 @@ This file contains standing instructions for Claude Code when working in this pr
 - Consult `~/.claude/projects/P--CLAUDE-CODE/memory/MEMORY.md` for notes from past sessions.
 - When a new stable pattern or user preference is discovered, save it to memory.
 - Do not save session-specific or speculative information to memory.
+
+---
+
+## gstack
+Utilise toujours /browse pour la navigation web (jamais mcp__claude-in-chrome__*).
+Si un skill ne fonctionne pas : cd ~/.claude/skills/gstack && ./setup
+Skills disponibles :
+- /office-hours         : brainstorming libre, nouvelles idées
+- /plan-ceo-review      : revue stratégique du plan
+- /plan-eng-review      : revue technique + génère plan de tests
+- /plan-design-review   : valide états vides, erreurs, mobile, dark mode
+- /design-consultation  : génère maquettes + écrit DESIGN.md
+- /design-review        : audit visuel 80 critères sur site live
+- /review               : code review + sécurité (smart routing)
+- /ship                 : crée PR + déploiement automatisé
+- /browse               : Chromium headless 100-200ms, screenshots
+- /qa                   : tests visuels + fixes + tests de régression
+- /qa-only              : QA sans autres actions
+- /retro                : retrospective, mesure signal/bruit
+- /investigate          : debug avec auto-freeze du module concerné
+- /document-release     : documentation de release
+- /codex                : référence codebase
+- /careful              : avertit avant commande destructive
+- /freeze               : verrouille éditions à un répertoire
+- /guard                : active /careful + /freeze
+- /unfreeze             : désactive /freeze
+- /gstack-upgrade       : met à jour gstack

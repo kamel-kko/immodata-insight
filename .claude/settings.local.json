@@ -187,7 +187,10 @@
       "Bash(bunx playwright:*)",
       "Bash(bun x:*)",
       "Bash(MSYS_NO_PATHCONV=1 tasklist //FI \"PID eq 29984\")",
-      "Bash(cmd.exe /c \"tasklist /FI \"\"PID eq 29984\"\"\")"
+      "Bash(cmd.exe /c \"tasklist /FI \"\"PID eq 29984\"\"\")",
+      "Bash(cp -Rf ~/.claude/skills/gstack \"P:/CLAUDE CODE/.claude/skills/gstack\")",
+      "Bash(rm -rf \"P:/CLAUDE CODE/.claude/skills/gstack/.git\")",
+      "Bash(mkdir -p \"P:/CLAUDE CODE/.claude/skills\")"
     ]
   },
   "hooks": {
