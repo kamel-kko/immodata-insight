@@ -158,7 +158,11 @@
       "Bash(.venv/Scripts/python -c \"from jarvis import Agent; print\\(''OK''\\)\")",
       "Bash(.venv/Scripts/python -c \"import importlib; print\\([m for m in dir\\(importlib.import_module\\(''openjarvis''\\)\\) if not m.startswith\\(''_''\\)]\\)\")",
       "Bash(grep -E \"\\\\.py$\")",
-      "Bash(.venv/Scripts/python -c \":*)"
+      "Bash(.venv/Scripts/python -c \":*)",
+      "Bash(python -m uv pip install pymupdf)",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python -m pip install pymupdf)",
+      "Bash(python -m uv add pymupdf)"
     ]
   },
   "hooks": {
