@@ -164,7 +164,15 @@
       "Bash(.venv/Scripts/python -m pip install pymupdf)",
       "Bash(python -m uv add pymupdf)",
       "Bash(mkdir -p data)",
-      "Bash(PYTHONIOENCODING=utf-8 .venv/Scripts/python -c \":*)"
+      "Bash(PYTHONIOENCODING=utf-8 .venv/Scripts/python -c \":*)",
+      "Bash(rm -rf plu_cache)",
+      "Bash(cp -r \"P:/CLAUDE CODE/boomerang/data/plu_cache\" plu_cache)",
+      "Bash(mkdir -p plu_cache)",
+      "Bash(cp -r 'P:/CLAUDE CODE/boomerang/data/plu_cache/40317' plu_cache/40317)",
+      "Bash(python -m uv add faiss-cpu)",
+      "Bash(python -m uv add \"openjarvis[memory-faiss]\")",
+      "Bash(python -m uv sync --extra memory-faiss)",
+      "Bash(python -m uv add chromadb)"
     ]
   },
   "hooks": {
