@@ -219,7 +219,10 @@
       "Bash(python -c \"import sys,json; [print\\(m[''''id'''']\\) for m in json.load\\(sys.stdin\\).get\\(''''data'''',[]\\)]\")",
       "Bash(taskkill //PID 34664 //F)",
       "Bash(cmd.exe /c \"where uv\")",
-      "Bash(taskkill //PID 4396 //F)"
+      "Bash(taskkill //PID 4396 //F)",
+      "Bash(taskkill //PID 33784 //F)",
+      "Bash(taskkill //PID 23196 //F)",
+      "Bash(taskkill //PID 26696 //F)"
     ]
   },
   "hooks": {
