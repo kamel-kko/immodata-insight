@@ -222,7 +222,9 @@
       "Bash(taskkill //PID 4396 //F)",
       "Bash(taskkill //PID 33784 //F)",
       "Bash(taskkill //PID 23196 //F)",
-      "Bash(taskkill //PID 26696 //F)"
+      "Bash(taskkill //PID 26696 //F)",
+      "WebFetch(domain:www.geoportail-urbanisme.gouv.fr)",
+      "WebFetch(domain:wxs-gpu.mongeoportail.ign.fr)"
     ]
   },
   "hooks": {
