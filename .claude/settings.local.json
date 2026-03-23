@@ -224,7 +224,10 @@
       "Bash(taskkill //PID 23196 //F)",
       "Bash(taskkill //PID 26696 //F)",
       "WebFetch(domain:www.geoportail-urbanisme.gouv.fr)",
-      "WebFetch(domain:wxs-gpu.mongeoportail.ign.fr)"
+      "WebFetch(domain:wxs-gpu.mongeoportail.ign.fr)",
+      "Bash(taskkill //PID 55412 //F)",
+      "Bash(.venv/Scripts/python.exe run_server.py)",
+      "Bash(curl -s http://localhost:8222/bento)"
     ]
   },
   "hooks": {
