@@ -227,7 +227,8 @@
       "WebFetch(domain:wxs-gpu.mongeoportail.ign.fr)",
       "Bash(taskkill //PID 55412 //F)",
       "Bash(.venv/Scripts/python.exe run_server.py)",
-      "Bash(curl -s http://localhost:8222/bento)"
+      "Bash(curl -s http://localhost:8222/bento)",
+      "Bash(curl -sI -H \"Origin: http://localhost:8501\" \"http://localhost:8222/proxy-pdf?url=https://www.geoportail-urbanisme.gouv.fr/api/document/95241a6ae0ff23951661bd057e902c37/files/200067254_reglement_20220804.pdf\")"
     ]
   },
   "hooks": {
