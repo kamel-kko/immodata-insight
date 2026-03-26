@@ -237,7 +237,8 @@
       "Bash(findstr :8222)",
       "Bash(taskkill //F //PID 38168)",
       "Bash(python run_server.py)",
-      "Bash(curl -sv http://127.0.0.1:8222/v1/models)"
+      "Bash(curl -sv http://127.0.0.1:8222/v1/models)",
+      "Bash(taskkill //F //PID 37268)"
     ]
   },
   "hooks": {
