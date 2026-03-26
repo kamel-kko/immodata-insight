@@ -4,7 +4,7 @@
     {
       "name": "boomerang_app",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{require('http').request({hostname:'127.0.0.1',port:8222,path:q.url,method:q.method,headers:q.headers},p=>{r.writeHead(p.statusCode,p.headers);p.pipe(r)}).end()}).listen(8501)"],
+      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{var u=require('http').request({hostname:'127.0.0.1',port:8222,path:q.url,method:q.method,headers:q.headers},p=>{r.writeHead(p.statusCode,p.headers);p.pipe(r)});q.pipe(u)}).listen(8501)"],
       "port": 8501,
       "autoPort": false
     }
