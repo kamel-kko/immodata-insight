@@ -257,7 +257,12 @@
       "Bash(curl -s -X POST http://localhost:8223/api/plan-to-dwg/analyze)",
       "Bash(curl -s -X POST http://localhost:8223/api/plan-to-dwg/analyze -F \"files=@test_plan.png\" -F \"types=plan\")",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''Stats:'''', json.dumps\\(d.get\\(''''stats'''',{}\\)\\)\\)\")",
-      "Bash(curl -s -X POST http://localhost:8223/api/plan-to-dwg/analyze -F \"files=@test_plan.png\" -F \"types=plan\" -o analysis.json)"
+      "Bash(curl -s -X POST http://localhost:8223/api/plan-to-dwg/analyze -F \"files=@test_plan.png\" -F \"types=plan\" -o analysis.json)",
+      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@P:/CLAUDE CODE/boomerang-v2/test_plan.png\" -F \"types=plan\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''Stats:'''', d.get\\(''''stats'''',{}\\)\\); print\\(''''Walls:'''', len\\(d.get\\(''''floor_plan'''',{}\\).get\\(''''walls'''',[]\\)\\)\\)\")",
+      "Bash(choco install:*)",
+      "Bash(conda install:*)",
+      "Bash(python -c \"import fitz; print\\(''PyMuPDF OK:'', fitz.version\\)\")"
     ]
   },
   "hooks": {
