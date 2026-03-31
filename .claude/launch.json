@@ -4,8 +4,9 @@
     {
       "name": "boomerang_app",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8501", "--directory", "boomerang-v2"],
-      "port": 8501
+      "runtimeArgs": ["run_server.py"],
+      "cwd": "boomerang-v2",
+      "port": 8222
     }
   ]
 }
