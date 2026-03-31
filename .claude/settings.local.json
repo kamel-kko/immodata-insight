@@ -275,7 +275,8 @@
       "Bash(taskkill //F //PID 4628)",
       "Bash(taskkill //F //PID 51264)",
       "Bash(PYTHONPATH=src python -c \":*)",
-      "Bash(taskkill //F //PID 40440)"
+      "Bash(taskkill //F //PID 40440)",
+      "Bash(taskkill //F //PID 53360)"
     ]
   },
   "hooks": {
