@@ -272,7 +272,8 @@
       "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@/dev/null;filename=test.txt\")",
       "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@/dev/null;filename=test.txt\" -w \"\\\\nHTTP_CODE: %{http_code}\\\\n\")",
       "Bash(curl -v -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@P:/CLAUDE CODE/boomerang-v2/server.log;filename=test.txt\")",
-      "Bash(taskkill //F //PID 4628)"
+      "Bash(taskkill //F //PID 4628)",
+      "Bash(taskkill //F //PID 51264)"
     ]
   },
   "hooks": {
