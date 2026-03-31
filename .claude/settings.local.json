@@ -281,7 +281,8 @@
       "Bash(cmd /c \"tasklist /FI \"\"PID eq 52992\"\"\")",
       "Bash(cmd /c \"wmic process where processid=52992 get name,commandline\")",
       "Bash(curl -s -v http://localhost:8222/bento)",
-      "Bash(python -c \"import networkx; print\\(''networkx'', networkx.__version__\\)\")"
+      "Bash(python -c \"import networkx; print\\(''networkx'', networkx.__version__\\)\")",
+      "Bash(curl -s -w \"\\\\n%{http_code}\" -X POST \"http://localhost:8222/api/plan-to-dwg/analyze\" -F \"files=@C:\\\\Users\\\\H7606\\\\AppData\\\\Local\\\\Temp\\\\test_plan.pdf\" -F \"model=gemini-2.5-flash\")"
     ]
   },
   "hooks": {
