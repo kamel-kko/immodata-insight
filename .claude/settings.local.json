@@ -253,7 +253,8 @@
       "Bash(kill -9 33432)",
       "Bash(curl -s http://localhost:8501/health)",
       "Bash(findstr \":8222.*LISTEN\")",
-      "Bash(ps -p 43720 -o comm=)"
+      "Bash(ps -p 43720 -o comm=)",
+      "Bash(curl -s -X POST http://localhost:8223/api/plan-to-dwg/analyze)"
     ]
   },
   "hooks": {
