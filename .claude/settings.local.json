@@ -241,7 +241,19 @@
       "Bash(taskkill //F //PID 37268)",
       "Bash(taskkill //F //PID 18272)",
       "Bash(taskkill //F //PID 13392)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8222/bento)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8222/bento)",
+      "Bash(taskkill /F /PID 43720)",
+      "Bash(findstr \":8501\\\\|:8222\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''run_server.py''\\).read\\(\\)\\); print\\(''Syntaxe OK''\\)\")",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze)",
+      "Bash(tasklist /FI 'PID eq 43720')",
+      "Bash(kill 43720)",
+      "Bash(kill -9 43720)",
+      "Bash(kill -9 33432)",
+      "Bash(curl -s http://localhost:8501/health)",
+      "Bash(findstr \":8222.*LISTEN\")",
+      "Bash(ps -p 43720 -o comm=)"
     ]
   },
   "hooks": {
