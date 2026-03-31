@@ -263,7 +263,11 @@
       "Bash(choco install:*)",
       "Bash(conda install:*)",
       "Bash(python -c \"import fitz; print\\(''PyMuPDF OK:'', fitz.version\\)\")",
-      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@test_plan.png\" -F \"types=plan\")"
+      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@test_plan.png\" -F \"types=plan\")",
+      "Bash(curl -s http://localhost:8222/api/health)",
+      "Bash(find 'P:/CLAUDE CODE/boomerang-v2' -name DOC* -type f)",
+      "Bash(curl -s http://localhost:8222/)",
+      "Bash(curl -s http://localhost:8222/api/plan-to-dwg/analyze -X POST)"
     ]
   },
   "hooks": {
