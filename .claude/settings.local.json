@@ -267,7 +267,11 @@
       "Bash(curl -s http://localhost:8222/api/health)",
       "Bash(find 'P:/CLAUDE CODE/boomerang-v2' -name DOC* -type f)",
       "Bash(curl -s http://localhost:8222/)",
-      "Bash(curl -s http://localhost:8222/api/plan-to-dwg/analyze -X POST)"
+      "Bash(curl -s http://localhost:8222/api/plan-to-dwg/analyze -X POST)",
+      "Bash(taskkill //F //PID 51076)",
+      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@/dev/null;filename=test.txt\")",
+      "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@/dev/null;filename=test.txt\" -w \"\\\\nHTTP_CODE: %{http_code}\\\\n\")",
+      "Bash(curl -v -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@P:/CLAUDE CODE/boomerang-v2/server.log;filename=test.txt\")"
     ]
   },
   "hooks": {
