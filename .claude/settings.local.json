@@ -326,7 +326,9 @@
       "Bash(curl -s -o nul -w \"%{http_code}\" http://localhost:8222/static/bento.html)",
       "Bash(cmd //c \"taskkill /PID 51680 /F /T\")",
       "Bash(ping -n 12 127.0.0.1)",
-      "Bash(cmd //c \"taskkill /PID 10376 /F /T\")"
+      "Bash(cmd //c \"taskkill /PID 10376 /F /T\")",
+      "Bash(ping -n 4 127.0.0.1)",
+      "Bash(cmd //c \"taskkill /PID 44360 /F /T\")"
     ]
   },
   "hooks": {
