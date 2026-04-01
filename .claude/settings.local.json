@@ -334,7 +334,13 @@
       "Bash(PYTHONPATH=src python -c \"from pdf_to_ifc.vectorizer import classify_lines, _compute_stroke_thresholds, _is_dark_color; print\\(''OK''\\)\")",
       "Bash(PYTHONPATH=src python -m pytest tests/ -x -q --timeout=30)",
       "Bash(PYTHONPATH=src python -m pytest tests/ -x -q)",
-      "Bash(PYTHONPATH=src python -m pytest tests/ -x -q --ignore=tests/engine -k \"pdf or dwg or cv or vector\")"
+      "Bash(PYTHONPATH=src python -m pytest tests/ -x -q --ignore=tests/engine -k \"pdf or dwg or cv or vector\")",
+      "Bash(ipconfig)",
+      "Bash(findstr /R \"IPv4\")",
+      "Bash(cmd //c \"taskkill /PID 35008 /F /T\")",
+      "Bash(cmd //c 'netsh advfirewall firewall show rule name=Boomerang API 8222')",
+      "Bash(cmd //c \"netsh advfirewall firewall add rule name=\"\"Boomerang API 8222\"\" dir=in action=allow protocol=TCP localport=8222\")",
+      "Bash(curl -s -o nul -w \"%{http_code}\" http://192.168.1.173:8222/bento)"
     ]
   },
   "hooks": {
