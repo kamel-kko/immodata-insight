@@ -301,7 +301,9 @@
       "Bash(taskkill //F //PID 53832)",
       "Bash(findstr :8222.*LISTENING)",
       "Bash(taskkill //F //PID 49864)",
-      "Bash(python -c \"import sys; lines=sys.stdin.readlines\\(\\); print\\(''''''''.join\\(lines[-40:]\\)\\)\")"
+      "Bash(python -c \"import sys; lines=sys.stdin.readlines\\(\\); print\\(''''''''.join\\(lines[-40:]\\)\\)\")",
+      "Bash(taskkill //F //PID 5216)",
+      "Bash(timeout)"
     ]
   },
   "hooks": {
