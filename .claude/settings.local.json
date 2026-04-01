@@ -298,7 +298,10 @@
       "Bash(curl -s -X POST http://localhost:8222/api/pdf-to-ifc/analyze -F \"files=@C:/Users/H7606/AppData/Local/Temp/test_floor_plan.pdf\" -F \"model=gemini-2.5-flash\" -F \"use_cv=true\" --max-time 120)",
       "Bash(curl -s -X POST http://localhost:8222/api/plan-to-dwg/analyze -F \"files=@C:/Users/H7606/AppData/Local/Temp/test_floor_plan.pdf\" -F \"model=gemini-2.5-flash\" --max-time 120)",
       "Read(//c/Users/H7606/AppData/Local/Temp/**)",
-      "Bash(taskkill //F //PID 53832)"
+      "Bash(taskkill //F //PID 53832)",
+      "Bash(findstr :8222.*LISTENING)",
+      "Bash(taskkill //F //PID 49864)",
+      "Bash(python -c \"import sys; lines=sys.stdin.readlines\\(\\); print\\(''''''''.join\\(lines[-40:]\\)\\)\")"
     ]
   },
   "hooks": {
