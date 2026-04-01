@@ -285,7 +285,12 @@
       "Bash(curl -s -w \"\\\\n%{http_code}\" -X POST \"http://localhost:8222/api/plan-to-dwg/analyze\" -F \"files=@C:\\\\Users\\\\H7606\\\\AppData\\\\Local\\\\Temp\\\\test_plan.pdf\" -F \"model=gemini-2.5-flash\")",
       "Bash(cmd /c \"for /f \"\"tokens=5\"\" %a in \\(''netstat -ano ^| findstr :8222 ^| findstr LISTENING''\\) do taskkill /F /PID %a\")",
       "Bash(taskkill //F //PID 52992)",
-      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\" -X POST \"http://localhost:8222/api/plan-to-dwg/analyze\" -F \"files=@C:\\\\Users\\\\H7606\\\\AppData\\\\Local\\\\Temp\\\\test_plan.pdf\" -F \"model=gemini-2.5-flash\")"
+      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\" -X POST \"http://localhost:8222/api/plan-to-dwg/analyze\" -F \"files=@C:\\\\Users\\\\H7606\\\\AppData\\\\Local\\\\Temp\\\\test_plan.pdf\" -F \"model=gemini-2.5-flash\")",
+      "Bash(taskkill //F //PID 3012)",
+      "Bash(curl -s -w \"%{http_code}\" -o /dev/null http://localhost:8222/bento)",
+      "Bash(findstr \":8222.*LISTENING\")",
+      "Bash(python -c \"import psutil; p = psutil.Process\\(49432\\); print\\(p.name\\(\\), p.cmdline\\(\\)[:5]\\)\")",
+      "Bash(curl -s -D- http://localhost:8222/)"
     ]
   },
   "hooks": {
