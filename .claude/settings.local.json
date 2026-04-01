@@ -330,7 +330,11 @@
       "Bash(ping -n 4 127.0.0.1)",
       "Bash(cmd //c \"taskkill /PID 44360 /F /T\")",
       "Bash(ping -n 15 127.0.0.1)",
-      "Bash(curl -s http://localhost:8501/bento)"
+      "Bash(curl -s http://localhost:8501/bento)",
+      "Bash(PYTHONPATH=src python -c \"from pdf_to_ifc.vectorizer import classify_lines, _compute_stroke_thresholds, _is_dark_color; print\\(''OK''\\)\")",
+      "Bash(PYTHONPATH=src python -m pytest tests/ -x -q --timeout=30)",
+      "Bash(PYTHONPATH=src python -m pytest tests/ -x -q)",
+      "Bash(PYTHONPATH=src python -m pytest tests/ -x -q --ignore=tests/engine -k \"pdf or dwg or cv or vector\")"
     ]
   },
   "hooks": {
