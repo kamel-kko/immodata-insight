@@ -340,7 +340,9 @@
       "Bash(cmd //c \"taskkill /PID 35008 /F /T\")",
       "Bash(cmd //c 'netsh advfirewall firewall show rule name=Boomerang API 8222')",
       "Bash(cmd //c \"netsh advfirewall firewall add rule name=\"\"Boomerang API 8222\"\" dir=in action=allow protocol=TCP localport=8222\")",
-      "Bash(curl -s -o nul -w \"%{http_code}\" http://192.168.1.173:8222/bento)"
+      "Bash(curl -s -o nul -w \"%{http_code}\" http://192.168.1.173:8222/bento)",
+      "Bash(findstr \":8501.*LISTENING\")",
+      "Bash(cmd //c \"taskkill /PID 39464 /F /T\")"
     ]
   },
   "hooks": {
