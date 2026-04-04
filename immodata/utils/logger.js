@@ -61,5 +61,3 @@ if (typeof globalThis.__immodata === 'undefined') {
 }
 globalThis.__immodata.createLogger = createLogger;
 globalThis.__immodata.loggerConfig = { DEV, LEVELS, MIN_LEVEL };
-
-export { createLogger, DEV, LEVELS, MIN_LEVEL };
