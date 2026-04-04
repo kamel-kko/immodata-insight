@@ -1284,6 +1284,20 @@
         popup.classList.remove('visible');
       });
     });
+
+    // Rotation pub QV — toutes les 6s, fondu discret
+    document.querySelectorAll('[data-qv-sponsor]').forEach(wrap => {
+      const items = wrap.querySelectorAll('[data-qvs-idx]');
+      if (items.length < 2) return;
+      let cur = 0;
+      setInterval(() => {
+        items[cur].style.opacity = '0';
+        items[cur].style.position = 'absolute';
+        cur = (cur + 1) % items.length;
+        items[cur].style.opacity = '1';
+        items[cur].style.position = 'relative';
+      }, 6000);
+    });
   </script>
 
 </body>
