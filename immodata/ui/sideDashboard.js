@@ -772,7 +772,7 @@
     const dots = shadow.querySelectorAll('.idi-sponsor-dot');
     if (slides.length > 1) {
       let current = 0;
-      setInterval(() => {
+      sponsorIntervalId = setInterval(() => {
         slides[current].classList.remove('active');
         dots[current].classList.remove('active');
         current = (current + 1) % slides.length;
