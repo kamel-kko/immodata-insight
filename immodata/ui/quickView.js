@@ -394,35 +394,57 @@
   // ============================================================
 
   function init() {
+    log.info('init() appele');
+
     const selector = getCardSelector();
-    if (!selector) return;
+    if (!selector) {
+      log.warn('Aucun selecteur de carte pour ce site (' + window.location.hostname + ')');
+      return;
+    }
+    log.info('Selecteur utilise : ' + selector);
 
     const cards = self.__immodata.currentCards || [];
+    log.info('currentCards disponibles : ' + cards.length);
 
     // Attacher aux cartes deja presentes
     const cardElements = document.querySelectorAll(selector);
+    log.info('Cards DOM trouvees : ' + cardElements.length);
+
     cardElements.forEach((el, i) => {
       const cardData = cards[i] || extractMinimalData(el);
       attachToCard(el, cardData);
     });
+
+    // Si aucune carte trouvee, on essaie les selecteurs un par un pour debug
+    if (cardElements.length === 0) {
+      const host = window.location.hostname;
+      const key = host.includes('seloger') ? 'seloger' : host.includes('leboncoin') ? 'leboncoin' : host.includes('bienici') ? 'bienici' : null;
+      if (key) {
+        CARD_SELECTORS[key].split(', ').forEach(sel => {
+          const found = document.querySelectorAll(sel);
+          log.debug('  selecteur "' + sel + '" → ' + found.length + ' element(s)');
+        });
+      }
+    }
 
     // Observer les nouvelles cartes (scroll infini, SPA)
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
         for (const node of m.addedNodes) {
           if (node.nodeType !== 1) continue;
-          // Verifier si le node lui-meme est une carte
           if (node.matches && node.matches(selector)) {
+            log.debug('MutationObserver : nouvelle carte detectee');
             attachToCard(node, extractMinimalData(node));
           }
-          // Verifier les enfants
           const inner = node.querySelectorAll ? node.querySelectorAll(selector) : [];
+          if (inner.length > 0) log.debug('MutationObserver : ' + inner.length + ' carte(s) ajoutee(s)');
           inner.forEach(el => attachToCard(el, extractMinimalData(el)));
         }
       }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+    log.info('MutationObserver demarre');
   }
 
   /**
