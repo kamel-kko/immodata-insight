@@ -46,6 +46,9 @@
         "modules/scraper/seloger.js",
         "modules/scraper/leboncoin.js",
         "modules/scraper/bienici.js",
+        "modules/calculs/notaire.js",
+        "modules/calculs/negotiation.js",
+        "modules/calculs/coutTotal.js",
         "content_script.js"
       ],
       "run_at": "document_idle"
