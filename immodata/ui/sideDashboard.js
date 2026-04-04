@@ -643,7 +643,7 @@
     document.body.appendChild(host);
 
     // Creer le Shadow DOM
-    const shadow = host.attachShadow({ mode: 'open' });
+    const shadow = host.attachShadow({ mode: 'closed' });
 
     // Charger les CSS via fetch (les fichiers sont dans l'extension)
     const cssFiles = ['ui/design-tokens.css', 'ui/bento-grid.css', 'ui/components.css', 'ui/animations.css'];
