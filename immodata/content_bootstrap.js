@@ -2,7 +2,7 @@
  * ImmoData — Content Script Bootstrap
  *
  * Ce fichier est le PREMIER à se charger dans les content scripts.
- * Il initialise window.__immodata et enregistre les utilitaires
+ * Il initialise self.__immodata et enregistre les utilitaires
  * de base (security + logger) pour que tous les autres scripts IIFE
  * puissent les utiliser.
  *
@@ -17,7 +17,7 @@
   'use strict';
 
   // Initialiser le namespace global
-  window.__immodata = window.__immodata || {};
+  self.__immodata = self.__immodata || {};
 
   // ============================================================
   // LOGGER — Copie légère pour les content scripts
@@ -37,8 +37,8 @@
     };
   }
 
-  window.__immodata.createLogger = createLogger;
-  window.__immodata.loggerConfig = { DEV, LEVELS, MIN_LEVEL };
+  self.__immodata.createLogger = createLogger;
+  self.__immodata.loggerConfig = { DEV, LEVELS, MIN_LEVEL };
 
   // ============================================================
   // SECURITY — Copie légère pour les content scripts
@@ -89,7 +89,7 @@
     return /^\d{5}$/.test(cp.trim());
   }
 
-  window.__immodata.security = {
+  self.__immodata.security = {
     sanitizeText, sanitizeNumber, sanitizeUrl,
     validateLatLon, validatePostalCode,
     URL_ALLOWLIST, FRANCE_BOUNDS
