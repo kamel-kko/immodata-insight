@@ -88,69 +88,77 @@
 </head>
 <body>
 
-  <h1>Page hote (simule SeLoger / LeBonCoin)</h1>
-  <p style="margin-bottom:8px">Survolez une annonce pour voir le <strong>QuickView ImmoData</strong> apparaitre.</p>
+  <!-- COLONNE GAUCHE : page liste -->
+  <div class="host-page">
+    <h1>Page liste (simule SeLoger / LeBonCoin)</h1>
+    <p style="margin-bottom:16px">Survolez une annonce pour voir le <strong>QuickView ImmoData</strong> apparaitre au-dessus.</p>
 
-  <div class="listing-grid">
+    <div class="listing-grid">
 
-    <!-- Annonce 1 -->
-    <div class="listing-card" data-qv="0">
-      <div class="listing-img" style="background:#E8F0FE">🏠</div>
-      <div class="listing-body">
-        <div class="listing-price">342 000 EUR</div>
-        <div class="listing-desc">Appartement 3 pieces - 64 m2</div>
-        <div class="listing-loc">Pau (64000) - Centre-ville</div>
-        <div class="listing-tags">
-          <span class="listing-tag">DPE D</span>
-          <span class="listing-tag">Balcon</span>
-          <span class="listing-tag">Cave</span>
+      <!-- Annonce 1 -->
+      <div class="listing-card" data-qv="0">
+        <div class="qv-popup" id="qv-0"></div>
+        <div class="listing-inner">
+          <div class="listing-img" style="background:#E8F0FE">&#127968;</div>
+          <div class="listing-body">
+            <div class="listing-price">342 000 EUR</div>
+            <div class="listing-desc">Appartement 3 pieces - 64 m2</div>
+            <div class="listing-loc">Pau (64000) - Centre-ville</div>
+            <div class="listing-tags">
+              <span class="listing-tag">DPE D</span>
+              <span class="listing-tag">Balcon</span>
+              <span class="listing-tag">Cave</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Annonce 2 -->
-    <div class="listing-card" data-qv="1">
-      <div class="listing-img" style="background:#FEF3E8">🏡</div>
-      <div class="listing-body">
-        <div class="listing-price">441 000 EUR</div>
-        <div class="listing-desc">Villa 5 pieces - 143 m2</div>
-        <div class="listing-loc">Billere (64140) - Quartier calme</div>
-        <div class="listing-tags">
-          <span class="listing-tag">DPE C</span>
-          <span class="listing-tag">Jardin</span>
-          <span class="listing-tag">Garage</span>
+      <!-- Annonce 2 -->
+      <div class="listing-card" data-qv="1">
+        <div class="qv-popup" id="qv-1"></div>
+        <div class="listing-inner">
+          <div class="listing-img" style="background:#FEF3E8">&#127969;</div>
+          <div class="listing-body">
+            <div class="listing-price">441 000 EUR</div>
+            <div class="listing-desc">Villa 5 pieces - 143 m2</div>
+            <div class="listing-loc">Billere (64140) - Quartier calme</div>
+            <div class="listing-tags">
+              <span class="listing-tag">DPE C</span>
+              <span class="listing-tag">Jardin</span>
+              <span class="listing-tag">Garage</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Annonce 3 -->
-    <div class="listing-card" data-qv="2">
-      <div class="listing-img" style="background:#E8FEF0">🏢</div>
-      <div class="listing-body">
-        <div class="listing-price">189 000 EUR</div>
-        <div class="listing-desc">Studio 1 piece - 28 m2</div>
-        <div class="listing-loc">Pau (64000) - Universite</div>
-        <div class="listing-tags">
-          <span class="listing-tag">DPE E</span>
-          <span class="listing-tag">Meuble</span>
-          <span class="listing-tag">Ideal investissement</span>
+      <!-- Annonce 3 -->
+      <div class="listing-card" data-qv="2">
+        <div class="qv-popup" id="qv-2"></div>
+        <div class="listing-inner">
+          <div class="listing-img" style="background:#E8FEF0">&#127970;</div>
+          <div class="listing-body">
+            <div class="listing-price">189 000 EUR</div>
+            <div class="listing-desc">Studio 1 piece - 28 m2</div>
+            <div class="listing-loc">Pau (64000) - Universite</div>
+            <div class="listing-tags">
+              <span class="listing-tag">DPE E</span>
+              <span class="listing-tag">Meuble</span>
+              <span class="listing-tag">Ideal investissement</span>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
 
+    <h2>Isolation Shadow DOM</h2>
+    <div class="host-box">
+      <p>Si ce texte reste noir sur blanc, l'isolation fonctionne :
+         les styles dark du panneau ne contaminent pas la page.</p>
+    </div>
   </div>
 
-  <h2>Isolation Shadow DOM</h2>
-  <div class="host-box">
-    <p>Si ce texte reste noir sur blanc, l'isolation fonctionne :
-       les styles dark du panneau ne contaminent pas la page.</p>
-  </div>
-
-  <button class="toggle-bg" onclick="document.getElementById('immodata-host').style.display = document.getElementById('immodata-host').style.display === 'none' ? 'block' : 'none'">
-    Afficher / Masquer le panel
-  </button>
-
-  <!-- Le Shadow DOM sera attaché ici -->
+  <!-- COLONNE DROITE : le panel ImmoData (Shadow DOM) -->
   <div id="immodata-host"></div>
 
   <script>
