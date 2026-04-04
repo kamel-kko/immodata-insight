@@ -133,39 +133,27 @@
     const notaireVal = notaire ? fmtEur(notaire.frais_median) : '—';
     const notaireType = notaire ? notaire.type_calcul : '';
 
-    // CTA credit (si prix > 80 000)
-    const showCtaCredit = data.prix && data.prix > 80000;
-    const mensualite = ctp ? fmt(ctp.mensualite_credit) : '—';
-    const ctaCredit = showCtaCredit ? `
-      <div class="cta-credit idi-card-xl">
-        <span class="idi-badge idi-badge-success idi-badge-float idi-badge-enter">Sans engagement</span>
-        <div class="bento-header">
-          <span class="bento-icon" style="color:var(--idi-accent)">${ICONS.credit_card || ''}</span>
-          <span class="bento-label">Votre mensualit\u00e9 estim\u00e9e</span>
-        </div>
-        <div class="cta-credit-value">${mensualite} \u20ac<span style="font-size:16px;font-weight:400;color:var(--idi-text-2)">/mois</span></div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <span class="cta-credit-rate">Taux estim\u00e9 3,4%</span>
-          <span style="color:var(--idi-text-3);font-size:11px;">sur 25 ans</span>
-        </div>
-        <div class="cta-credit-sub">${fmtEur(data.prix)} \u2014 Apport 10% \u2014 Assurance incluse</div>
-        <button class="cta-btn-credit">Simuler gratuitement <span class="arrow">\u2192</span></button>
-      </div>` : '';
+    // CTA dynamiques via le systeme d'affiliation
+    // triggers.js decide quels CTA afficher, ctaRenderer.js genere le HTML
+    let ctaHtml = '';
+    if (self.__immodata.affiliation && self.__immodata.affiliation.ctaRenderer) {
+      ctaHtml = self.__immodata.affiliation.ctaRenderer.renderAllCtas(data);
+    }
 
-    // CTA travaux (si DPE >= D)
-    const showCtaTravaux = dpe && 'DEFG'.includes(dpe);
-    const travauxData = data.travaux;
-    const ctaTravaux = showCtaTravaux ? `
-      <div class="cta-travaux idi-card-m">
-        <span class="idi-badge idi-badge-warn idi-badge-float">DPE ${dpe}</span>
-        <div class="bento-header">
-          <span class="bento-icon" style="color:var(--idi-warn)">${ICONS.tool || ''}</span>
-          <span class="bento-label">MaPrimeR\u00e9nov'</span>
-        </div>
-        <div class="cta-travaux-prime">${travauxData ? fmtEur(travauxData.prime_estimee) : '?'}</div>
-        <div class="cta-travaux-label">d'aides r\u00e9cup\u00e9rables</div>
-        <button class="cta-btn-travaux">${ICONS.tool || ''} Devis gratuits</button>
-      </div>` : '';
+    // Tracker : info "en ligne depuis X jours" et baisses de prix
+    const trackerHtml = data.jours_en_ligne != null && data.jours_en_ligne > 0
+      ? `<div class="bento-card idi-card-m">
+          <div class="bento-header">
+            <span class="bento-icon">${ICONS.bar_chart || ''}</span>
+            <span class="bento-label">Historique annonce</span>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--idi-text-1);">\u23f1 En ligne depuis ${data.jours_en_ligne} jour${data.jours_en_ligne > 1 ? 's' : ''}</div>
+          ${data.nb_baisses_prix > 0
+            ? `<div style="font-size:11px;color:var(--idi-success);margin-top:4px;">\u2193 ${data.nb_baisses_prix} baisse(s) de prix d\u00e9tect\u00e9e(s)${data.delta_premier_prix ? ' (' + fmtEur(data.delta_premier_prix) + ')' : ''}</div>`
+            : `<div style="font-size:11px;color:var(--idi-text-3);margin-top:4px;">Aucune baisse de prix d\u00e9tect\u00e9e</div>`
+          }
+        </div>`
+      : '';
 
     return `
       <div class="idi-grid idi-stagger">
