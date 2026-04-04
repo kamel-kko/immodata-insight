@@ -56,8 +56,7 @@ function createLogger(moduleName) {
   };
 }
 
-if (typeof globalThis.__immodata === 'undefined') {
-  globalThis.__immodata = {};
-}
-globalThis.__immodata.createLogger = createLogger;
-globalThis.__immodata.loggerConfig = { DEV, LEVELS, MIN_LEVEL };
+// Export ES Module pour background.js
+// (Ce fichier n'est PAS chargé dans les content scripts —
+//  le content_bootstrap.js fournit createLogger en IIFE)
+export { createLogger, DEV, LEVELS, MIN_LEVEL };
