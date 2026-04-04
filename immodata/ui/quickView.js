@@ -329,9 +329,9 @@
 
   /** Selecteurs CSS pour les cartes d'annonces par site */
   const CARD_SELECTORS = {
-    seloger: '[data-testid="sl.explore.card-container"], .CardContainer',
-    leboncoin: '[data-test-id="ad"], [data-qa-id="aditem_container"]',
-    bienici: '.searchResults__item, .resultsListContainer__resultItem'
+    seloger: '[data-testid="sl.explore.card-container"], .CardContainer, a[class*="ClassifiedCard"]',
+    leboncoin: '[data-qa-id="aditem_container"], [data-test-id="ad"], a[data-qa-id="aditem_container"], li[data-qa-id="aditem_container"], div[class*="aditem"], article[class*="ad"]',
+    bienici: '.searchResults__item, .resultsListContainer__resultItem, div[class*="ResultItem"]'
   };
 
   function getCardSelector() {
