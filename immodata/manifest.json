@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "ImmoData",
+  "version": "1.0.0",
+  "description": "Enrichissez vos annonces immobilières avec des données Open Data françaises — DVF, risques, quartier, investissement.",
+  "icons": {
+    "16": "ui/icons/icon16.png",
+    "48": "ui/icons/icon48.png",
+    "128": "ui/icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api-adresse.data.gouv.fr/*",
+    "https://api.dvf.gouv.fr/*",
+    "https://www.georisques.gouv.fr/*",
+    "https://data.education.gouv.fr/*",
+    "https://overpass-api.de/*",
+    "https://data.ademe.fr/*",
+    "https://www.data.gouv.fr/*",
+    "https://opendata.reseaux-energies.fr/*",
+    "https://data.culture.gouv.fr/*",
+    "https://api.insee.fr/*",
+    "https://api.openrouteservice.org/*",
+    "https://www.anil.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.seloger.com/*",
+        "https://www.leboncoin.fr/*",
+        "https://www.bienici.com/*"
+      ],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "ui/icons/icon16.png",
+      "48": "ui/icons/icon48.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self'"
+  }
+}
