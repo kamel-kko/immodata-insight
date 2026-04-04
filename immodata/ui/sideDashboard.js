@@ -626,8 +626,11 @@
   // ============================================================
 
   function inject(data) {
+    log.info('inject() appele — prix=' + data.prix + ' surface=' + data.surface + ' ville=' + data.ville);
+
     // Eviter double injection
     if (document.getElementById('immodata-host')) {
+      log.info('Panel deja present — update');
       update(data);
       return;
     }
