@@ -54,6 +54,8 @@
         "modules/calculs/qualiteVie.js",
         "modules/calculs/rentabilite.js",
         "ui/icons/icons.js",
+        "ui/sideDashboard.js",
+        "ui/quickView.js",
         "content_script.js"
       ],
       "run_at": "document_idle"
