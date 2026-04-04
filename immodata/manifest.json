@@ -39,8 +39,7 @@
         "https://www.bienici.com/*"
       ],
       "js": [
-        "utils/security.js",
-        "utils/logger.js",
+        "content_bootstrap.js",
         "modules/scraper/extractors.js",
         "modules/scraper/detector.js",
         "modules/scraper/seloger.js",
