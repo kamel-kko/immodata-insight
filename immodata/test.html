@@ -226,13 +226,10 @@
   gap: var(--idi-gap); grid-column: 1 / -1;
 }
 .idi-panel {
-  position: fixed; right: 0; top: 50%; transform: translateY(-50%);
-  width: var(--idi-width); max-height: 90vh;
+  width: 100%; height: 100%;
   background: var(--idi-bg);
   border-left: 1px solid var(--idi-border);
-  border-radius: var(--idi-radius) 0 0 var(--idi-radius);
   box-shadow: var(--idi-shadow);
-  z-index: var(--idi-z-index);
   overflow: hidden; display: flex; flex-direction: column;
 }
 /* Zone fixe : header + pub + onglets — ne scroll jamais */
