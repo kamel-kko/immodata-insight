@@ -14,7 +14,7 @@ type: project
 | 2 | Service Worker & Communication | Validée | 2026-04-04 |
 | 3 | Moteur de Scraping | Validée | 2026-04-04 |
 | 4 | APIs essentielles (MVP) | Validée | 2026-04-04 |
-| 5 | APIs complémentaires | En cours | — |
+| 5 | APIs complémentaires | Validée | 2026-04-04 |
 | 6 | Design System Bento | — | — |
 | 7 | Interface utilisateur | — | — |
 | 8 | Affiliation & Tracker | — | — |
