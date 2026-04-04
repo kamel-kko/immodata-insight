@@ -1,15 +1,20 @@
 /**
  * ImmoData — Module API DVF (Demandes de Valeurs Foncières)
  *
- * Interroge l'API DVF Etalab pour récupérer les transactions immobilières
- * récentes autour d'un point GPS. Ça permet de comparer le prix d'une annonce
- * avec le prix réel du marché dans le même quartier.
+ * Interroge l'API OpenDataSoft (DVF géolocalisé) pour récupérer les
+ * transactions immobilières récentes autour d'un point GPS.
+ * Ça permet de comparer le prix d'une annonce avec le prix réel
+ * du marché dans le même quartier.
  *
  * Analogie : c'est comme consulter les prix de vente réels chez le notaire
  * pour savoir si un bien est vendu au bon prix par rapport aux voisins.
  *
- * API : https://api.dvf.gouv.fr/api/georecords/
- * Documentation : https://dvf.etalab.gouv.fr/
+ * API : https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/
+ *       buildingref-france-demande-de-valeurs-foncieres-geolocalisee-millesime/records
+ *
+ * L'ancienne API (api.dvf.gouv.fr) est hors-ligne depuis fin 2024.
+ * On utilise maintenant OpenDataSoft qui héberge le même jeu de données
+ * avec ~39 millions de transactions et une recherche géographique native.
  */
 
 import { createLogger } from '../../utils/logger.js';
@@ -42,8 +47,8 @@ function mapTypeBienDvf(typeBien) {
   const mapping = {
     appartement: 'Appartement',
     maison: 'Maison',
-    terrain: 'Terrain',
-    parking: 'Parking',
+    terrain: null,
+    parking: null,
     autre: null
   };
   return mapping[typeBien] || null;
@@ -83,21 +88,41 @@ export async function handleFetchDvf(payload) {
     return cached.data;
   }
 
-  // Construire l'URL DVF
-  // L'API attend : lat, lon, dist (rayon en mètres)
+  // Construire la clause WHERE pour l'API OpenDataSoft
+  // L'API utilise un langage de requête ODSQL
   const config = API_CONFIG.dvf;
-  const url = new URL(config.endpoint);
 
-  // Calculer la date limite (24 mois en arrière)
+  // Date limite : 24 mois en arrière
   const dateLimit = new Date();
   dateLimit.setMonth(dateLimit.getMonth() - config.nb_mois_historique);
   const dateLimitStr = dateLimit.toISOString().split('T')[0];
 
-  url.searchParams.set('lat', lat.toFixed(6));
-  url.searchParams.set('lon', lon.toFixed(6));
-  url.searchParams.set('dist', config.rayon_metres);
+  // Construire les conditions de filtrage
+  // within_distance(geo_point, geom'POINT(lon lat)', distm)
+  const conditions = [
+    `within_distance(geo_point, geom'POINT(${lon.toFixed(6)} ${lat.toFixed(6)})', ${config.rayon_metres}m)`,
+    `nature_mutation='Vente'`,
+    `date_mutation>='${dateLimitStr}'`,
+    `valeur_fonciere>0`
+  ];
+
+  // Filtrer par type de bien si disponible
+  const typeDvf = mapTypeBienDvf(type_bien);
+  if (typeDvf) {
+    conditions.push(`type_local='${typeDvf}'`);
+  }
+
+  const whereClause = conditions.join(' AND ');
+
+  // Construire l'URL complète
+  const url = new URL(config.endpoint);
+  url.searchParams.set('where', whereClause);
+  url.searchParams.set('select', 'valeur_fonciere,surface_reelle_bati,type_local,date_mutation,nombre_pieces_principales');
+  url.searchParams.set('limit', '100');
+  url.searchParams.set('order_by', 'date_mutation DESC');
 
   log.info(`DVF: recherche autour de (${lat.toFixed(4)}, ${lon.toFixed(4)}), rayon ${config.rayon_metres}m`);
+  log.debug('DVF URL:', url.toString());
 
   let response;
   try {
@@ -108,17 +133,18 @@ export async function handleFetchDvf(payload) {
   }
 
   if (!response.ok) {
-    log.warn(`DVF: réponse ${response.status}`);
+    const body = await response.text().catch(() => '');
+    log.warn(`DVF: réponse ${response.status}`, body.slice(0, 200));
     return { success: false, error: 'API_ERROR', message: `DVF a répondu ${response.status}` };
   }
 
   const data = await response.json();
 
-  // L'API retourne un tableau de "records" (transactions)
-  // Chaque record a : date_mutation, nature_mutation, valeur_fonciere,
-  // type_local, surface_reelle_bati, etc.
-  const records = data.records || data.results || data || [];
-  const allTransactions = Array.isArray(records) ? records : [];
+  // L'API OpenDataSoft retourne { total_count, results: [...] }
+  const allTransactions = data.results || [];
+  const totalCount = data.total_count || 0;
+
+  log.info(`DVF: ${totalCount} transactions trouvées (${allTransactions.length} retournées)`);
 
   if (allTransactions.length === 0) {
     log.warn('DVF: aucune transaction trouvée dans le rayon');
@@ -128,60 +154,52 @@ export async function handleFetchDvf(payload) {
       tendance: 'indetermine',
       delta_pct: null,
       date_last_transaction: null,
-      transactions_brutes: 0
+      transactions_brutes: totalCount
     };
     await setCache(cacheKey, emptyResult);
     return emptyResult;
   }
 
-  // Filtrer les transactions pertinentes :
-  // 1. Nature mutation = "Vente"
-  // 2. Type de bien correspondant (si disponible)
-  // 3. Surface dans une fourchette de ±20% par rapport à l'annonce
-  const typeDvf = mapTypeBienDvf(type_bien);
+  // Filtrer par surface (±20% par rapport à l'annonce)
+  // On fait ce filtre côté client car l'API ne permet pas
+  // facilement de filtrer sur une plage de surface
   const surfaceMin = surfaceNum * 0.8;
   const surfaceMax = surfaceNum * 1.2;
 
-  const filtered = allTransactions.filter((tx) => {
-    // Normaliser : l'API peut retourner les données à différents niveaux
-    const t = tx.fields || tx;
-
-    // Vente uniquement
-    const nature = t.nature_mutation || '';
-    if (!nature.toLowerCase().includes('vente')) return false;
-
-    // Filtrer par type de bien si on le connaît
-    if (typeDvf) {
-      const typeLocal = t.type_local || '';
-      if (typeLocal && !typeLocal.includes(typeDvf)) return false;
-    }
-
-    // Filtrer par surface (±20%)
-    const surfaceTx = parseFloat(t.surface_reelle_bati || t.surface || 0);
-    if (surfaceTx > 0 && (surfaceTx < surfaceMin || surfaceTx > surfaceMax)) return false;
-
-    // Filtrer par date (24 derniers mois)
-    const dateMut = t.date_mutation || '';
-    if (dateMut && dateMut < dateLimitStr) return false;
-
-    // Avoir un prix valide
-    const valeur = parseFloat(t.valeur_fonciere || 0);
-    if (valeur <= 0) return false;
-
-    return true;
-  });
-
-  // Calculer les prix au m² de chaque transaction
   const prixM2List = [];
   const dates = [];
 
-  for (const tx of filtered) {
-    const t = tx.fields || tx;
-    const valeur = parseFloat(t.valeur_fonciere);
-    const surfaceTx = parseFloat(t.surface_reelle_bati || t.surface || 0);
-    if (surfaceTx > 0 && valeur > 0) {
+  for (const tx of allTransactions) {
+    const valeur = parseFloat(tx.valeur_fonciere);
+    const surfaceTx = parseFloat(tx.surface_reelle_bati || 0);
+
+    // Garder la transaction si la surface est dans la fourchette
+    // ou si on n'a pas de surface (on prend quand même)
+    if (surfaceTx > 0) {
+      if (surfaceTx < surfaceMin || surfaceTx > surfaceMax) continue;
       prixM2List.push(valeur / surfaceTx);
-      if (t.date_mutation) dates.push(t.date_mutation);
+    } else if (valeur > 0) {
+      // Pas de surface connue — on ne peut pas calculer le prix/m²
+      continue;
+    }
+
+    if (tx.date_mutation) dates.push(tx.date_mutation);
+  }
+
+  // Si le filtre surface a trop réduit les résultats, on relâche
+  // et on prend toutes les transactions avec surface connue
+  if (prixM2List.length < 3) {
+    log.info('DVF: trop peu de transactions dans la fourchette ±20%, on élargit');
+    prixM2List.length = 0;
+    dates.length = 0;
+
+    for (const tx of allTransactions) {
+      const valeur = parseFloat(tx.valeur_fonciere);
+      const surfaceTx = parseFloat(tx.surface_reelle_bati || 0);
+      if (surfaceTx > 0 && valeur > 0) {
+        prixM2List.push(valeur / surfaceTx);
+        if (tx.date_mutation) dates.push(tx.date_mutation);
+      }
     }
   }
 
@@ -197,13 +215,13 @@ export async function handleFetchDvf(payload) {
 
     const ancien = [];
     const recent = [];
-    for (const tx of filtered) {
-      const t = tx.fields || tx;
-      const dateMut = t.date_mutation || '';
-      const valeur = parseFloat(t.valeur_fonciere);
-      const surfaceTx = parseFloat(t.surface_reelle_bati || t.surface || 0);
+
+    for (const tx of allTransactions) {
+      const valeur = parseFloat(tx.valeur_fonciere);
+      const surfaceTx = parseFloat(tx.surface_reelle_bati || 0);
       if (surfaceTx > 0 && valeur > 0) {
         const pm2 = valeur / surfaceTx;
+        const dateMut = tx.date_mutation || '';
         if (dateMut < dateMidStr) ancien.push(pm2);
         else recent.push(pm2);
       }
@@ -233,7 +251,7 @@ export async function handleFetchDvf(payload) {
   const result = {
     mediane_m2: medianeM2,
     nb_transactions: prixM2List.length,
-    transactions_brutes: allTransactions.length,
+    transactions_brutes: totalCount,
     tendance,
     delta_pct: deltaPct,
     date_last_transaction: dateLastTransaction
