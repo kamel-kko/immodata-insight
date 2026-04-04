@@ -840,6 +840,10 @@
   // ============================================================
 
   function destroy() {
+    if (sponsorIntervalId) {
+      clearInterval(sponsorIntervalId);
+      sponsorIntervalId = null;
+    }
     const host = document.getElementById('immodata-host');
     if (host) host.remove();
     self.__immodata.ui._shadow = null;
