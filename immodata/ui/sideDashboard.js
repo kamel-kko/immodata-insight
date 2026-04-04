@@ -664,10 +664,10 @@
   }
 
   function buildPanel(shadow, data) {
-    const adresse = data.adresse_normalisee || data.adresse_brute || 'Adresse inconnue';
+    const adresse = escHtml(data.adresse_normalisee || data.adresse_brute || 'Adresse inconnue');
     const surface = data.surface ? data.surface + 'm\u00b2' : '';
     const pieces = data.nb_pieces ? data.nb_pieces + ' p' : '';
-    const subtitle = [pieces, surface, data.ville || ''].filter(Boolean).join(' \u00b7 ');
+    const subtitle = escHtml([pieces, surface, data.ville || ''].filter(Boolean).join(' \u00b7 '));
 
     const panel = document.createElement('div');
     panel.className = 'idi-panel idi-panel-enter';
