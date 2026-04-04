@@ -44,15 +44,25 @@
     const detail = {};
 
     // --- Facteur 1 : Delta DVF (40 pts max) ---
-    // Si le prix est 20% au-dessus du marché → 40 pts
-    // Si le prix est pile au marché → 0 pts
-    // Si le prix est en dessous → 0 pts (pas de négociation à faire)
+    // Le delta mesure l'ecart entre le prix de l'annonce et la mediane DVF.
+    // delta > 0 : surevalue → forte marge de nego (score eleve)
+    // delta = 0 : pile au marche → petite marge possible
+    // delta < 0 : sous-evalue → tres peu de marge (score faible mais > 0)
+    //
+    // On ne met jamais 0 quand on a des donnees DVF, sinon le score
+    // parait "vide" dans l'UI alors qu'on a bien analyse le bien.
     if (delta_dvf !== null && delta_dvf !== undefined) {
       if (delta_dvf > 0) {
-        // Proportionnel : +20% = 40pts, +10% = 20pts, +5% = 10pts
+        // Surevalue : proportionnel, max 40 pts
+        // +20% = 40pts, +10% = 20pts, +5% = 10pts
         detail.delta_dvf = Math.min(Math.round(delta_dvf * 2), 40);
+      } else if (delta_dvf === 0) {
+        // Pile au marche : un peu de marge existe toujours
+        detail.delta_dvf = 8;
       } else {
-        detail.delta_dvf = 0;
+        // Sous-evalue : marge faible — plus c'est negatif, moins on negocie
+        // -5% → 6pts, -10% → 4pts, -20%+ → 2pts
+        detail.delta_dvf = Math.max(2, Math.round(8 - Math.abs(delta_dvf) * 0.4));
       }
     } else {
       detail.delta_dvf = 0;
