@@ -462,6 +462,76 @@
   animation: none;
   box-shadow: 0 4px 20px rgba(108,99,255,0.4);
 }
+
+/* ================================================================
+   Sponsor Banner — Bande publicitaire rotative
+   ================================================================ */
+.idi-sponsor-wrap {
+  background: var(--idi-surface-2);
+  border-bottom: 1px solid var(--idi-border);
+  overflow: hidden;
+}
+.idi-sponsor-band {
+  height: 44px;
+  position: relative;
+  cursor: pointer;
+}
+.idi-sponsor-slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 var(--idi-padding);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 350ms ease, transform 350ms ease;
+  pointer-events: none;
+}
+.idi-sponsor-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.idi-sponsor-logo {
+  width: 20px; height: 20px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 11px; color: #fff; flex-shrink: 0;
+  font-family: var(--idi-font);
+}
+.idi-sponsor-name {
+  font-family: var(--idi-font); font-size: 12px;
+  font-weight: 700; color: var(--idi-text-1);
+  white-space: nowrap;
+}
+.idi-sponsor-msg {
+  font-family: var(--idi-font); font-size: 11px;
+  color: var(--idi-text-2); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.idi-sponsor-arrow {
+  margin-left: auto; color: var(--idi-text-3);
+  flex-shrink: 0; transition: transform 200ms ease;
+}
+.idi-sponsor-band:hover .idi-sponsor-arrow {
+  transform: translateX(2px); color: var(--idi-text-2);
+}
+.idi-sponsor-band:hover {
+  background: var(--idi-surface-3);
+}
+.idi-sponsor-dots {
+  display: flex; justify-content: center; gap: 4px;
+  padding: 3px 0 1px;
+}
+.idi-sponsor-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--idi-text-3); transition: all 250ms ease;
+}
+.idi-sponsor-dot.active {
+  background: var(--idi-accent); width: 12px; border-radius: 2px;
+}
+.idi-sponsor-mention {
+  font-family: var(--idi-font); font-size: 10px;
+  color: var(--idi-text-3); text-align: center;
+  padding: 2px 0 5px; letter-spacing: 0.02em;
+}
     `;
     shadow.appendChild(style);
 
