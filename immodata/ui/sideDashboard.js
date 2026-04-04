@@ -27,6 +27,9 @@
 
   const ICONS = self.__immodata.icons || {};
 
+  // Référence pour le setInterval sponsor (nettoyé sur destroy)
+  let sponsorIntervalId = null;
+
   // ============================================================
   // HELPERS — Fonctions utilitaires pour construire le HTML
   // ============================================================
