@@ -55,7 +55,7 @@ const API_CONFIG = {
     timeout_ms: 5000
   },
   dvf: {
-    endpoint: 'https://api.dvf.gouv.fr/api/georecords/',
+    endpoint: 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/buildingref-france-demande-de-valeurs-foncieres-geolocalisee-millesime/records',
     ttl_days: 7,
     timeout_ms: 8000,
     rayon_metres: 500,
