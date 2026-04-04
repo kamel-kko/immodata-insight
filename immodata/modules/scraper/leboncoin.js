@@ -156,25 +156,39 @@
     log.info('Extraction cartes liste LeBonCoin');
 
     const cards = [];
+
+    // Strategie 1 : selecteurs classiques data-qa-id
     for (const selector of SEL.card_liste) {
       const elements = document.querySelectorAll(selector);
       if (elements.length > 0) {
+        log.info('Selecteur card OK : "' + selector + '" → ' + elements.length + ' card(s)');
         elements.forEach((el) => {
-          const prixBrut = ext.extractText(SEL.prix, 'prix-card', el);
-          const surfaceBrut = ext.extractText(SEL.surface, 'surface-card', el);
-          const prix = ext.parsePrice(prixBrut);
-          const surface = ext.parseSurface(surfaceBrut);
+          // Essayer les selecteurs specifiques carte d'abord, puis fallback texte
+          const prixBrut = ext.extractText(SEL_CARD.prix, 'prix-card', el);
+          const surfaceBrut = ext.extractText(SEL_CARD.surface, 'surface-card', el);
+          let prix = ext.parsePrice(prixBrut);
+          let surface = ext.parseSurface(surfaceBrut);
+
+          // Fallback regex sur le texte entier de la card
+          if (prix === null) {
+            prix = extractPrixFromText(el.textContent);
+          }
+          if (surface === null) {
+            surface = extractSurfaceFromText(el.textContent);
+          }
 
           if (prix === null && surface === null) return;
 
-          const link = el.querySelector('a[href]');
-          const dpeBrut = ext.extractText(SEL.dpe, 'dpe-card', el);
+          const link = el.tagName === 'A' ? el : el.querySelector('a[href]');
+          const dpeBrut = ext.extractText(SEL_CARD.dpe, 'dpe-card', el);
+          const titreBrut = ext.extractText(SEL_CARD.titre, 'titre-card', el);
 
           cards.push({
             element: el,
             prix,
             surface,
             dpe: ext.parseDpe(dpeBrut),
+            titre: titreBrut,
             url: link ? link.href : null
           });
         });
@@ -182,8 +196,65 @@
       }
     }
 
-    log.info(`${cards.length} carte(s) extraite(s)`);
+    // Strategie 2 : fallback robuste par liens d'annonces
+    // Independant des classes CSS — fonctionne meme si LeBonCoin change son design
+    if (cards.length === 0) {
+      log.info('Selecteurs classiques echoues — fallback par liens annonces');
+      const allLinks = document.querySelectorAll('a[href*="/ad/ventes_immobilieres/"], a[href*="/ad/locations/"], a[href*="/ad/colocations/"]');
+      log.info('Liens annonces trouves : ' + allLinks.length);
+
+      allLinks.forEach((link) => {
+        // Eviter les doublons (meme href)
+        if (cards.some(c => c.url === link.href)) return;
+
+        const text = link.textContent || '';
+        const prix = extractPrixFromText(text);
+        const surface = extractSurfaceFromText(text);
+
+        if (prix === null && surface === null) return;
+
+        // Remonter au parent le plus proche qui ressemble a une card
+        // (le lien lui-meme ou un parent avec du contenu)
+        const cardEl = link.closest('article, li, div[class*="item"], div[class*="card"]') || link;
+
+        cards.push({
+          element: cardEl,
+          prix,
+          surface,
+          dpe: null,
+          titre: null,
+          url: link.href
+        });
+      });
+    }
+
+    log.info(cards.length + ' carte(s) extraite(s)');
     return cards;
+  }
+
+  /**
+   * Extrait un prix depuis le texte brut avec regex.
+   * "299 000 €" → 299000
+   */
+  function extractPrixFromText(text) {
+    if (!text) return null;
+    const match = text.match(/(\d[\d\s.]*)\s*\u20ac/);
+    if (!match) return null;
+    const cleaned = match[1].replace(/[\s.]/g, '');
+    const num = parseInt(cleaned, 10);
+    return (num >= 1000 && num < 100000000) ? num : null;
+  }
+
+  /**
+   * Extrait une surface depuis le texte brut avec regex.
+   * "157m²" → 157, "65 m2" → 65
+   */
+  function extractSurfaceFromText(text) {
+    if (!text) return null;
+    const match = text.match(/(\d[\d,]*)\s*m[²2]/i);
+    if (!match) return null;
+    const num = parseFloat(match[1].replace(',', '.'));
+    return (num > 0 && num < 10000) ? Math.round(num) : null;
   }
 
   self.__immodata.scrapers = self.__immodata.scrapers || {};
