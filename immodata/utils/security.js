@@ -105,22 +105,12 @@ function validatePostalCode(cp) {
   return /^\d{5}$/.test(cp.trim());
 }
 
-// Export pour utilisation en ES Module (background.js)
-// et en IIFE (content_script.js) selon le contexte
+// Enregistrement global pour les content scripts (IIFE)
+// Le background.js importe ce fichier en ES Module et accède aussi via globalThis
 if (typeof globalThis.__immodata === 'undefined') {
   globalThis.__immodata = {};
 }
 globalThis.__immodata.security = {
-  sanitizeText,
-  sanitizeNumber,
-  sanitizeUrl,
-  validateLatLon,
-  validatePostalCode,
-  URL_ALLOWLIST,
-  FRANCE_BOUNDS
-};
-
-export {
   sanitizeText,
   sanitizeNumber,
   sanitizeUrl,
