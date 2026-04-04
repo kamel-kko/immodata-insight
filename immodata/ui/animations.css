@@ -1,0 +1,145 @@
+/**
+ * ImmoData — Animations
+ *
+ * Toutes les animations et transitions du design system :
+ * - Shimmer : effet de chargement "brillant" sur les skeletons
+ * - Slide-in : le panneau latéral glisse depuis la droite
+ * - Fade-in : le QuickView apparaît en douceur
+ * - Pulse : clignotement doux pour attirer l'attention
+ * - Score fill : remplissage progressif des barres de score
+ */
+
+/* ============================================================
+   SHIMMER — Skeleton loader
+   Un effet de "vague lumineuse" qui passe de gauche à droite,
+   comme un reflet sur une surface métallique. Indique que
+   les données sont en train de charger.
+   ============================================================ */
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   SLIDE-IN — Panneau latéral
+   Le dashboard glisse depuis le bord droit de l'écran.
+   Comme un tiroir qui s'ouvre.
+   ============================================================ */
+
+@keyframes idi-slide-in {
+  from {
+    transform: translateY(-50%) translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes idi-slide-out {
+  from {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50%) translateX(100%);
+    opacity: 0;
+  }
+}
+
+.idi-panel-enter {
+  animation: idi-slide-in 280ms ease-out forwards;
+}
+
+.idi-panel-exit {
+  animation: idi-slide-out 200ms ease-in forwards;
+}
+
+/* ============================================================
+   FADE-IN — QuickView (survol liste)
+   Apparition douce, comme un fondu au cinéma.
+   ============================================================ */
+
+@keyframes idi-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes idi-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(4px); }
+}
+
+.idi-quickview-enter {
+  animation: idi-fade-in 150ms ease-out forwards;
+}
+
+.idi-quickview-exit {
+  animation: idi-fade-out 100ms ease-in forwards;
+}
+
+/* ============================================================
+   PULSE — Attirer l'attention
+   Clignotement doux pour signaler un nouveau résultat
+   ou un score important.
+   ============================================================ */
+
+@keyframes idi-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+.idi-pulse {
+  animation: idi-pulse 1.5s ease-in-out 3;
+}
+
+/* ============================================================
+   SCORE FILL — Barres de score
+   Remplissage progressif de gauche à droite.
+   ============================================================ */
+
+@keyframes idi-fill {
+  from { width: 0; }
+}
+
+.idi-score-bar-fill.animate {
+  animation: idi-fill 600ms ease-out forwards;
+}
+
+/* ============================================================
+   SCALE-IN — Apparition des badges
+   Petit effet de zoom à l'apparition.
+   ============================================================ */
+
+@keyframes idi-scale-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.idi-badge-enter {
+  animation: idi-scale-in 200ms ease-out forwards;
+}
+
+/* ============================================================
+   STAGGER — Apparition en cascade des cartes
+   Chaque carte apparaît avec un léger décalage, comme
+   des dominos qui tombent.
+   ============================================================ */
+
+.idi-stagger > * {
+  opacity: 0;
+  animation: idi-fade-in 200ms ease-out forwards;
+}
+
+.idi-stagger > *:nth-child(1)  { animation-delay: 0ms; }
+.idi-stagger > *:nth-child(2)  { animation-delay: 50ms; }
+.idi-stagger > *:nth-child(3)  { animation-delay: 100ms; }
+.idi-stagger > *:nth-child(4)  { animation-delay: 150ms; }
+.idi-stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.idi-stagger > *:nth-child(6)  { animation-delay: 250ms; }
+.idi-stagger > *:nth-child(7)  { animation-delay: 300ms; }
+.idi-stagger > *:nth-child(8)  { animation-delay: 350ms; }
+.idi-stagger > *:nth-child(9)  { animation-delay: 400ms; }
+.idi-stagger > *:nth-child(10) { animation-delay: 450ms; }
