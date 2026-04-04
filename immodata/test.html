@@ -104,10 +104,13 @@
 </head>
 <body>
 
-  <!-- COLONNE GAUCHE : page liste -->
-  <div class="host-page">
-    <h1>Page liste (simule SeLoger / LeBonCoin)</h1>
-    <p style="margin-bottom:16px">Survolez une annonce pour voir le <strong>QuickView ImmoData</strong> apparaitre au-dessus.</p>
+  <!-- ============================================================ -->
+  <!-- SECTION 1 : PAGE LISTE — QuickView uniquement                -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <span class="demo-label demo-label-liste">Section 1</span>
+    <h1>Page Liste (simule SeLoger / LeBonCoin)</h1>
+    <p style="margin-bottom:16px">Survolez une annonce pour voir le <strong>QuickView ImmoData</strong> apparaitre au-dessus. Pas de Side Dashboard ici.</p>
 
     <div class="listing-grid">
 
@@ -166,16 +169,48 @@
       </div>
 
     </div>
-
-    <h2>Isolation Shadow DOM</h2>
-    <div class="host-box">
-      <p>Si ce texte reste noir sur blanc, l'isolation fonctionne :
-         les styles dark du panneau ne contaminent pas la page.</p>
-    </div>
   </div>
 
-  <!-- COLONNE DROITE : le panel ImmoData (Shadow DOM) -->
-  <div id="immodata-host"></div>
+  <!-- ============================================================ -->
+  <!-- SECTION 2 : PAGE ANNONCE — Side Dashboard uniquement         -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <span class="demo-label demo-label-annonce">Section 2</span>
+    <h1>Page Annonce (simule la fiche detail)</h1>
+    <p style="margin-bottom:16px">Le Side Dashboard ImmoData est colle a droite. Le contenu de l'annonce est a gauche.</p>
+
+    <div class="annonce-layout">
+
+      <!-- Contenu de la fausse annonce -->
+      <div class="annonce-content">
+        <div class="host-box">
+          <h2 style="margin-top:0">Appartement 3 pieces - 64 m2</h2>
+          <p style="font-size:24px;font-weight:700;color:#1a56db;margin:8px 0">342 000 EUR</p>
+          <p>Pau (64000) - Centre-ville</p>
+        </div>
+        <div class="host-box">
+          <h3>Description</h3>
+          <p>Bel appartement traversant au 3e etage avec balcon et vue degagee. Proche commerces et transports en commun. Cave et parking en sous-sol. Copropriete bien entretenue de 24 lots. Chauffage collectif gaz.</p>
+        </div>
+        <div class="host-box">
+          <h3>Caracteristiques</h3>
+          <p>3 pieces - 2 chambres - 64 m2 - 3e etage - Ascenseur - Balcon - Cave - Parking</p>
+        </div>
+        <div class="host-box">
+          <h3>Diagnostic energetique</h3>
+          <p>DPE : D (217 kWh/m2/an) — GES : D</p>
+        </div>
+        <div class="host-box">
+          <h3>Isolation Shadow DOM</h3>
+          <p>Si ce texte reste noir sur blanc, l'isolation fonctionne : les styles dark du panneau ne contaminent pas la page.</p>
+        </div>
+      </div>
+
+      <!-- Panel ImmoData (Shadow DOM) -->
+      <div id="immodata-host"></div>
+
+    </div>
+  </div>
 
   <script>
     // On attache un Shadow DOM fermé (comme dans l'extension réelle)
