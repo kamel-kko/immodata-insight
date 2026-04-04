@@ -73,15 +73,25 @@
     ],
     "ville": [
       "[data-qa-id='adview_location_informations']",
-      "[itemprop='addressLocality']"
+      "[itemprop='addressLocality']",
+      "div[data-test-id='ad_location'] span",
+      "span[class*='location']",
+      "div[class*='Location'] span",
+      "a[href*='/recherche/'] span"
     ],
     "cp": [
       "[itemprop='postalCode']",
-      "[data-qa-id='adview_location_informations'] span:last-child"
+      "[data-qa-id='adview_location_informations'] span:last-child",
+      "div[data-test-id='ad_location']",
+      "span[class*='location']",
+      "div[class*='Location']"
     ],
     "adresse": [
       "[itemprop='streetAddress']",
-      "[data-qa-id='adview_location_informations']"
+      "[data-qa-id='adview_location_informations']",
+      "div[data-test-id='ad_location']",
+      "div[class*='Location']",
+      "span[class*='address']"
     ],
     "description": [
       "[data-qa-id='adview_description_container']",
