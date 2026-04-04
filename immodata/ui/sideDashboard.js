@@ -782,6 +782,11 @@
 
     body.innerHTML = content + renderFooter();
     body.scrollTop = 0;
+
+    // Brancher les clics CTA affiliation sur le contenu fraichement rendu
+    if (self.__immodata.affiliation && self.__immodata.affiliation.ctaRenderer) {
+      self.__immodata.affiliation.ctaRenderer.bindCtaClicks(shadow);
+    }
   }
 
   // ============================================================
