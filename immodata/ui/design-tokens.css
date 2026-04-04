@@ -1,0 +1,57 @@
+/**
+ * ImmoData — Design Tokens
+ *
+ * Variables CSS globales du design system Bento dark.
+ * Toutes les couleurs, tailles et polices sont définies ici.
+ * Préfixe --idi- (ImmoData Interface) pour éviter les conflits.
+ *
+ * Ces variables sont déclarées sur :host car elles vivent
+ * à l'intérieur d'un Shadow DOM — elles ne "fuient" jamais
+ * vers la page du site immobilier.
+ */
+
+:host {
+  /* Fond et surfaces — du plus sombre au plus clair */
+  --idi-bg:           #0F0F11;
+  --idi-surface:      #1A1A1F;
+  --idi-surface-2:    #242429;
+  --idi-surface-3:    #2E2E36;
+  --idi-border:       rgba(255,255,255,0.07);
+
+  /* Accents — couleur principale (violet) et secondaire (vert) */
+  --idi-accent:       #6C63FF;
+  --idi-accent-glow:  rgba(108,99,255,0.18);
+  --idi-green:        #00D4AA;
+  --idi-green-glow:   rgba(0,212,170,0.15);
+
+  /* Sémantique — couleurs de statut */
+  --idi-warn:         #F59E0B;
+  --idi-danger:       #EF4444;
+  --idi-success:      #22C55E;
+  --idi-neutral:      #64748B;
+
+  /* Typographie */
+  --idi-text-1:       #F2F2F7;
+  --idi-text-2:       #A0A0B0;
+  --idi-text-3:       #5C5C6E;
+  --idi-font:         'Inter', 'Segoe UI', system-ui, sans-serif;
+  --idi-font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Grille Bento */
+  --idi-gap:          8px;
+  --idi-radius:       12px;
+  --idi-radius-sm:    8px;
+  --idi-padding:      14px;
+  --idi-width:        360px;
+
+  /* Ombres */
+  --idi-shadow:       0 4px 24px rgba(0,0,0,0.4);
+  --idi-shadow-card:  0 2px 8px rgba(0,0,0,0.25);
+
+  /* Transitions */
+  --idi-transition:   150ms ease;
+  --idi-slide-duration: 280ms;
+
+  /* Z-index maximum pour rester au-dessus de tout */
+  --idi-z-index:      2147483647;
+}
