@@ -175,10 +175,10 @@
   }
 
   // Exposer via globalThis
-  if (typeof window.__immodata === 'undefined') {
-    window.__immodata = {};
+  if (typeof self.__immodata === 'undefined') {
+    self.__immodata = {};
   }
-  window.__immodata.calculs = window.__immodata.calculs || {};
-  window.__immodata.calculs.coutTotal = { calculerCoutTotal, calcMensualiteCredit, DPE_KWH };
+  self.__immodata.calculs = self.__immodata.calculs || {};
+  self.__immodata.calculs.coutTotal = { calculerCoutTotal, calcMensualiteCredit, DPE_KWH };
 
 })();
