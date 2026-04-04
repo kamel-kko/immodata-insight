@@ -45,7 +45,7 @@
   // ============================================================
 
   const URL_ALLOWLIST = [
-    'api-adresse.data.gouv.fr', 'api.dvf.gouv.fr', 'www.georisques.gouv.fr',
+    'api-adresse.data.gouv.fr', 'public.opendatasoft.com', 'www.georisques.gouv.fr',
     'data.education.gouv.fr', 'overpass-api.de', 'data.ademe.fr',
     'www.data.gouv.fr', 'opendata.reseaux-energies.fr', 'data.culture.gouv.fr',
     'api.insee.fr', 'api.openrouteservice.org', 'www.anil.org',
