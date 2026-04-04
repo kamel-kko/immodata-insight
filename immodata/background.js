@@ -353,6 +353,31 @@ async function handleOpenAffiliateUrl(payload) {
 }
 
 // ============================================================
+// HANDLERS CALCULS — Exécutés localement (pas d'appel réseau)
+// ============================================================
+
+/**
+ * CALC_NOTAIRE — Calcule les frais de notaire
+ */
+function handleCalcNotaire(payload) {
+  return calculerFraisNotaire(payload);
+}
+
+/**
+ * CALC_NEGOTIATION — Calcule le score de négociation
+ */
+function handleCalcNegociation(payload) {
+  return calculerScoreNegociation(payload);
+}
+
+/**
+ * CALC_COUT_TOTAL — Calcule le Coût Total de Possession
+ */
+function handleCalcCoutTotal(payload) {
+  return calculerCoutTotal(payload);
+}
+
+// ============================================================
 // DISPATCHER — Branchement des handlers sur les actions
 // ============================================================
 // On associe chaque action à sa fonction de traitement.
@@ -361,6 +386,8 @@ async function handleOpenAffiliateUrl(payload) {
 
 const handlers = {
   FETCH_BAN: handleFetchBan,
+  FETCH_DVF: handleFetchDvf,
+  FETCH_GEORISQUES: handleFetchGeorisques,
   GET_CACHE: handleGetCache,
   SET_CACHE: handleSetCache,
   CLEAR_CACHE: handleClearCache,
