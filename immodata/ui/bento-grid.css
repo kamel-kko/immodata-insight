@@ -84,11 +84,19 @@
   overflow: hidden;
 }
 
+/* Zone fixe : header + pub + onglets — ne scroll jamais */
+.idi-panel-fixed {
+  flex-shrink: 0;
+  background: var(--idi-bg);
+  z-index: 1;
+}
+
 /* Zone scrollable du contenu */
 .idi-panel-body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  min-height: 0;
 }
 
 /* Header du panel */
@@ -96,7 +104,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px var(--idi-padding);
+  padding: 10px var(--idi-padding);
   border-bottom: 1px solid var(--idi-border);
   background: var(--idi-surface);
 }
