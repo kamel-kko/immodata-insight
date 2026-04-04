@@ -15,7 +15,7 @@ type: project
 | 3 | Moteur de Scraping | Validée | 2026-04-04 |
 | 4 | APIs essentielles (MVP) | Validée | 2026-04-04 |
 | 5 | APIs complémentaires | Validée | 2026-04-04 |
-| 6 | Design System Bento | — | — |
+| 6 | Design System Bento | Créée | 2026-04-04 |
 | 7 | Interface utilisateur | — | — |
 | 8 | Affiliation & Tracker | — | — |
 | 9 | Popup extension | — | — |
