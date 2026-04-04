@@ -101,13 +101,90 @@
       }
     }
 
-    // Les appels DVF, Géorisques, etc. seront ajoutés aux Étapes 4-5.
+    // Étape 2 : Appels API en parallèle (DVF + Géorisques)
+    // On lance les deux en même temps pour gagner du temps
+    if (data.lat && data.lon) {
+      const [dvfResult, georisquesResult] = await Promise.all([
+        sendToBackground('FETCH_DVF', {
+          lat: data.lat,
+          lon: data.lon,
+          type_bien: data.type_bien,
+          surface: data.surface,
+          prix_annonce: data.prix,
+          code_insee: data.code_insee
+        }),
+        sendToBackground('FETCH_GEORISQUES', {
+          lat: data.lat,
+          lon: data.lon
+        })
+      ]);
+
+      // DVF — prix du marché
+      if (dvfResult.success !== false) {
+        data.dvf = dvfResult;
+        log.info(`DVF: médiane ${dvfResult.mediane_m2}€/m², ${dvfResult.nb_transactions} transactions, delta ${dvfResult.delta_pct}%`);
+      } else {
+        log.warn('DVF échoué :', dvfResult.error);
+        data.dvf = null;
+      }
+
+      // Géorisques — risques naturels et industriels
+      if (georisquesResult.success !== false) {
+        data.georisques = georisquesResult;
+        log.info(`Géorisques: ${georisquesResult.nb_risques} risque(s), ${georisquesResult.nb_icpe} ICPE`);
+      } else {
+        log.warn('Géorisques échoué :', georisquesResult.error);
+        data.georisques = null;
+      }
+    }
+
+    // Étape 3 : Calculs locaux (frais notaire, négociation, CTP)
+    // Ces calculs sont exécutés dans le background mais sans appel réseau
+
+    // Frais de notaire
+    const isNeuf = data.flags_regex && data.flags_regex.neuf_vefa;
+    const notaireResult = await sendToBackground('CALC_NOTAIRE', {
+      prix: data.prix,
+      neuf: isNeuf
+    });
+    if (notaireResult.success !== false) {
+      data.frais_notaire = notaireResult;
+      log.info(`Notaire: ${notaireResult.frais_median}€ (${notaireResult.type_calcul})`);
+    }
+
+    // Score de négociation
+    const negoResult = await sendToBackground('CALC_NEGOTIATION', {
+      delta_dvf: data.dvf ? data.dvf.delta_pct : null,
+      jours_en_ligne: null, // Sera rempli par le tracker (Étape 8)
+      urgence_texte: data.flags_regex ? data.flags_regex.urgent : false,
+      nb_photos: null, // Pas encore extrait
+      dpe: data.dpe
+    });
+    if (negoResult.success !== false) {
+      data.negotiation = negoResult;
+      log.info(`Négociation: score ${negoResult.score}/100 — "${negoResult.label}"`);
+    }
+
+    // Coût Total de Possession
+    const ctpResult = await sendToBackground('CALC_COUT_TOTAL', {
+      prix: data.prix,
+      surface: data.surface,
+      type_bien: data.type_bien,
+      dpe: data.dpe,
+      annee_constr: data.annee_constr,
+      taxe_fonciere: data.flags_regex ? data.flags_regex.taxe_fonciere : null
+    });
+    if (ctpResult.success !== false) {
+      data.cout_total = ctpResult;
+      log.info(`CTP: ${ctpResult.total_mensuel}€/mois (crédit ${ctpResult.mensualite_credit}€)`);
+    }
+
     // L'injection UI sera ajoutée aux Étapes 6-7.
 
-    // Stocker les données scrapées pour usage ultérieur (UI, etc.)
+    // Stocker les données enrichies pour usage ultérieur (UI, etc.)
     globalThis.__immodata.currentData = data;
 
-    log.info('Traitement annonce terminé');
+    log.info('Traitement annonce terminé — toutes les données enrichies');
     return data;
   }
 
