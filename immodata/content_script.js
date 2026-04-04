@@ -405,6 +405,11 @@
   // Écouter les navigations SPA (détectées par detector.js)
   document.addEventListener('immodata:page-changed', () => {
     log.info('Événement page-changed reçu — re-traitement');
+    // Nettoyer l'UI existante avant re-injection
+    if (self.__immodata.ui) {
+      if (self.__immodata.ui.sideDashboard) self.__immodata.ui.sideDashboard.destroy();
+      if (self.__immodata.ui.quickView) self.__immodata.ui.quickView.destroy();
+    }
     // Réinitialiser pour permettre le re-traitement
     lastProcessedUrl = null;
     // Petit délai pour laisser le DOM se stabiliser
