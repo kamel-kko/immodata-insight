@@ -145,8 +145,8 @@
     const qvScore = d.qv_score !== undefined ? d.qv_score : null;
     const riskScore = d.risk_score !== undefined ? d.risk_score : null;
 
-    // Titre
-    const title = d.title || 'Annonce';
+    // Titre (echappe pour eviter XSS)
+    const title = escHtml(d.title) || 'Annonce';
 
     // Jours en ligne
     const jours = d.jours_en_ligne;
