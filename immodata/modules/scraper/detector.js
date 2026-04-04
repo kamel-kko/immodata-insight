@@ -17,7 +17,7 @@
 (function () {
   'use strict';
 
-  const log = window.__immodata.createLogger('DETECTOR');
+  const log = self.__immodata.createLogger('DETECTOR');
 
   // ============================================================
   // DÉTECTION DU SITE
@@ -171,7 +171,7 @@
   }
 
   // Exposer les fonctions via globalThis pour le content script (IIFE)
-  window.__immodata.detector = {
+  self.__immodata.detector = {
     detect,
     detectSite,
     detectPageType,
