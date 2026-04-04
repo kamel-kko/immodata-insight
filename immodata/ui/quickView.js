@@ -488,14 +488,16 @@
     // Masquer aussi quand la card quitte le viewport (scroll)
     // pour eviter un popup orphelin
     let scrollTimeout = null;
-    window.addEventListener('scroll', () => {
+    const scrollHandler = () => {
       if (popup.style.opacity === '1') {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
           positionPopup(popup, card);
         }, 16);
       }
-    }, { passive: true });
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    scrollHandlers.push(scrollHandler);
   }
 
   // ============================================================
