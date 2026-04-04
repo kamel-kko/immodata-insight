@@ -8,9 +8,9 @@
 (function () {
   'use strict';
 
-  const log = window.__immodata.createLogger('SCRAPER:LEBONCOIN');
-  const security = window.__immodata.security;
-  const ext = window.__immodata.extractors;
+  const log = self.__immodata.createLogger('SCRAPER:LEBONCOIN');
+  const security = self.__immodata.security;
+  const ext = self.__immodata.extractors;
 
   const SEL = {
     prix: [
@@ -140,7 +140,7 @@
     return cards;
   }
 
-  window.__immodata.scrapers = window.__immodata.scrapers || {};
-  window.__immodata.scrapers.leboncoin = { extractAnnonceData, extractCardsData };
+  self.__immodata.scrapers = self.__immodata.scrapers || {};
+  self.__immodata.scrapers.leboncoin = { extractAnnonceData, extractCardsData };
 
 })();
