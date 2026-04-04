@@ -21,6 +21,16 @@ import { sanitizeUrl, validateLatLon, validatePostalCode } from './utils/securit
 // --- Imports des modules API (ES Modules) ---
 import { handleFetchDvf } from './modules/api/dvf.js';
 import { handleFetchGeorisques } from './modules/api/georisques.js';
+import { handleFetchEducation } from './modules/api/education.js';
+import { handleFetchOverpass } from './modules/api/overpass.js';
+import { handleFetchAdeme } from './modules/api/ademe.js';
+import { handleFetchLoyers } from './modules/api/loyers.js';
+import { handleFetchRte } from './modules/api/rte.js';
+import { handleFetchBruit } from './modules/api/bruit.js';
+import { handleFetchMerimee } from './modules/api/merimee.js';
+import { handleFetchSirene } from './modules/api/sirene.js';
+import { handleFetchOrs } from './modules/api/ors.js';
+import { handleFetchAnil } from './modules/api/anil.js';
 
 // --- Imports des modules de calcul (IIFE, chargés via globalThis) ---
 // Ces fichiers utilisent self.__immodata, pas d'export ES Module.
