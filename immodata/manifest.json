@@ -38,7 +38,16 @@
         "https://www.leboncoin.fr/*",
         "https://www.bienici.com/*"
       ],
-      "js": ["content_script.js"],
+      "js": [
+        "utils/security.js",
+        "utils/logger.js",
+        "modules/scraper/extractors.js",
+        "modules/scraper/detector.js",
+        "modules/scraper/seloger.js",
+        "modules/scraper/leboncoin.js",
+        "modules/scraper/bienici.js",
+        "content_script.js"
+      ],
       "run_at": "document_idle"
     }
   ],
