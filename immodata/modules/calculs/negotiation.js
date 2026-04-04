@@ -21,10 +21,11 @@
 
   // Messages associés à chaque tranche de score
   const SCORE_LABELS = [
-    { min: 0,  max: 25,  label: 'Prix dans la norme marché',         couleur: 'yellow' },
-    { min: 26, max: 50,  label: 'Légère marge de négociation',       couleur: 'orange' },
-    { min: 51, max: 75,  label: '+8-12% vs marché — négociable',     couleur: 'red' },
-    { min: 76, max: 100, label: 'Surévalué — marge estimée 12-20%',  couleur: 'red-double' }
+    { min: 0,  max: 10,  label: 'Bonne affaire — peu de marge de négo', couleur: 'green' },
+    { min: 11, max: 25,  label: 'Prix dans la norme marché',            couleur: 'yellow' },
+    { min: 26, max: 50,  label: 'Légère marge de négociation',          couleur: 'orange' },
+    { min: 51, max: 75,  label: '+8-12% vs marché — négociable',        couleur: 'red' },
+    { min: 76, max: 100, label: 'Surévalué — marge estimée 12-20%',     couleur: 'red-double' }
   ];
 
   /**
