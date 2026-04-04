@@ -1193,10 +1193,26 @@
     // QuickView — hover sur les listing cards (hors Shadow DOM)
     // ============================================================
     const QV_DATA = [
-      { title: 'Appart. 3p \u00b7 64m\u00b2', dpe: 'D', dpeColor: '#F59E0B', delta: -8, prixM2: '5 344', mediane: '5 812', score: 65, scoreColor: '#6C63FF', jours: 43 },
-      { title: 'Villa 5p \u00b7 143m\u00b2', dpe: 'C', dpeColor: '#22C55E', delta: +3, prixM2: '3 084', mediane: '2 995', score: 42, scoreColor: '#F59E0B', jours: 12 },
-      { title: 'Studio 1p \u00b7 28m\u00b2', dpe: 'E', dpeColor: '#EF4444', delta: -15, prixM2: '6 750', mediane: '7 941', score: 81, scoreColor: '#00D4AA', jours: 67 }
+      { title: 'Appart. 3p \u00b7 64m\u00b2', dpe: 'D', dpeColor: '#F59E0B', delta: -8, prixM2: '5 344', mediane: '5 812',
+        nego: 65, negoColor: '#6C63FF', plusValue: 78, pvColor: '#00D4AA', qualVie: 52, qvColor: '#F59E0B', risques: 23, rColor: '#EF4444', jours: 43 },
+      { title: 'Villa 5p \u00b7 143m\u00b2', dpe: 'C', dpeColor: '#22C55E', delta: +3, prixM2: '3 084', mediane: '2 995',
+        nego: 42, negoColor: '#F59E0B', plusValue: 61, pvColor: '#6C63FF', qualVie: 74, qvColor: '#00D4AA', risques: 35, rColor: '#F59E0B', jours: 12 },
+      { title: 'Studio 1p \u00b7 28m\u00b2', dpe: 'E', dpeColor: '#EF4444', delta: -15, prixM2: '6 750', mediane: '7 941',
+        nego: 81, negoColor: '#00D4AA', plusValue: 44, pvColor: '#F59E0B', qualVie: 38, qvColor: '#EF4444', risques: 62, rColor: '#EF4444', jours: 67 }
     ];
+
+    function renderScoreBar(label, value, color) {
+      return `
+        <div style="min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+            <span style="font-size:9px;font-weight:600;color:#A0A0B0;text-transform:uppercase;letter-spacing:0.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</span>
+            <span style="font-family:monospace;font-size:12px;font-weight:700;color:#F2F2F7;flex-shrink:0;margin-left:4px;">${value}</span>
+          </div>
+          <div style="width:100%;height:5px;background:#2E2E36;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${value}%;background:${color};border-radius:3px;"></div>
+          </div>
+        </div>`;
+    }
 
     function renderQvHtml(d) {
       const sign = d.delta <= 0 ? '' : '+';
@@ -1219,14 +1235,11 @@
               <div style="font-size:10px;color:#5C5C6E;margin-top:2px;text-transform:uppercase;letter-spacing:0.06em">prix/m\u00b2 \u00b7 m\u00e9d. ${d.mediane}</div>
             </div>
           </div>
-          <div style="padding:10px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#1A1A1F;">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">
-              <span style="font-size:10px;font-weight:600;color:#A0A0B0;text-transform:uppercase;letter-spacing:0.08em">N\u00e9gociation</span>
-              <span style="font-family:monospace;font-size:13px;font-weight:700;color:#F2F2F7;">${d.score}/100</span>
-            </div>
-            <div style="width:100%;height:5px;background:#2E2E36;border-radius:3px;overflow:hidden;">
-              <div style="height:100%;width:${d.score}%;background:${d.scoreColor};border-radius:3px;"></div>
-            </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#1A1A1F;">
+            ${renderScoreBar('N\u00e9gociation', d.nego, d.negoColor)}
+            ${renderScoreBar('Plus-value 5a', d.plusValue, d.pvColor)}
+            ${renderScoreBar('Qualit\u00e9 vie', d.qualVie, d.qvColor)}
+            ${renderScoreBar('Risques', d.risques, d.rColor)}
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#0F0F11;">
             <span style="font-size:11px;color:#5C5C6E;">&#9201; En ligne : ${d.jours} jours</span>
