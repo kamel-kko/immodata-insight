@@ -17,7 +17,7 @@ type: project
 | 5 | APIs complémentaires | Validée | 2026-04-04 |
 | 6 | Design System Bento | Validée | 2026-04-04 |
 | 7 | Interface utilisateur | Validée | 2026-04-05 |
-| 8 | Affiliation & Tracker | — | — |
+| 8 | Affiliation & Tracker | Créée | 2026-04-05 |
 | 9 | Popup extension | — | — |
 | 10 | Tests finaux & Optimisation | — | — |
 
