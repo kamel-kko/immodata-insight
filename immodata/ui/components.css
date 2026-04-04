@@ -1,0 +1,337 @@
+/**
+ * ImmoData — Composants UI
+ *
+ * Tous les composants réutilisables du design system :
+ * cards Bento, badges, boutons, onglets, skeleton loaders,
+ * scrollbar custom, tooltips.
+ */
+
+/* ============================================================
+   CARTES BENTO
+   ============================================================ */
+
+.bento-card {
+  background: var(--idi-surface);
+  border: 1px solid var(--idi-border);
+  border-radius: var(--idi-radius);
+  padding: var(--idi-padding);
+  position: relative;
+  transition: background var(--idi-transition);
+}
+
+.bento-card:hover {
+  background: var(--idi-surface-2);
+}
+
+/* Chiffre clé — le gros chiffre principal de chaque carte */
+.bento-value {
+  font-family: var(--idi-font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--idi-text-1);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.bento-value-lg {
+  font-size: 28px;
+}
+
+/* Label — petit texte au-dessus du chiffre */
+.bento-label {
+  font-family: var(--idi-font);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--idi-text-2);
+  margin-bottom: 4px;
+}
+
+/* Icône dans une carte */
+.bento-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--idi-text-2);
+  flex-shrink: 0;
+}
+
+/* Ligne icône + label */
+.bento-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* ============================================================
+   BADGES / PILLS
+   ============================================================ */
+
+.idi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-family: var(--idi-font);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.idi-badge-success {
+  background: rgba(34,197,94,0.15);
+  color: var(--idi-success);
+}
+
+.idi-badge-warn {
+  background: rgba(245,158,11,0.15);
+  color: var(--idi-warn);
+}
+
+.idi-badge-danger {
+  background: rgba(239,68,68,0.15);
+  color: var(--idi-danger);
+}
+
+.idi-badge-neutral {
+  background: rgba(100,116,139,0.15);
+  color: var(--idi-neutral);
+}
+
+.idi-badge-accent {
+  background: var(--idi-accent-glow);
+  color: var(--idi-accent);
+}
+
+/* Badge positionné en haut à droite d'une carte */
+.idi-badge-float {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* ============================================================
+   BOUTONS
+   ============================================================ */
+
+.idi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--idi-radius-sm);
+  font-family: var(--idi-font);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--idi-transition);
+  text-decoration: none;
+}
+
+.idi-btn-primary {
+  background: var(--idi-accent);
+  color: #fff;
+}
+
+.idi-btn-primary:hover {
+  background: #7B73FF;
+  box-shadow: 0 0 16px var(--idi-accent-glow);
+}
+
+.idi-btn-ghost {
+  background: transparent;
+  color: var(--idi-text-2);
+  border: 1px solid var(--idi-border);
+}
+
+.idi-btn-ghost:hover {
+  background: var(--idi-surface-2);
+  color: var(--idi-text-1);
+}
+
+.idi-btn-cta {
+  background: linear-gradient(135deg, var(--idi-accent), #8B5CF6);
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 13px;
+  border-radius: var(--idi-radius);
+}
+
+.idi-btn-cta:hover {
+  box-shadow: 0 0 20px var(--idi-accent-glow);
+  transform: translateY(-1px);
+}
+
+/* Bouton icône seul (fermer, replier...) */
+.idi-btn-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--idi-radius-sm);
+  color: var(--idi-text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--idi-transition);
+}
+
+.idi-btn-icon:hover {
+  background: var(--idi-surface-2);
+  color: var(--idi-text-1);
+}
+
+/* ============================================================
+   ONGLETS
+   ============================================================ */
+
+.idi-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--idi-surface);
+  border-bottom: 1px solid var(--idi-border);
+  overflow-x: auto;
+}
+
+.idi-tab {
+  padding: 8px 12px;
+  font-family: var(--idi-font);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--idi-text-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--idi-radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--idi-transition);
+}
+
+.idi-tab:hover {
+  color: var(--idi-text-2);
+  background: var(--idi-surface-2);
+}
+
+.idi-tab.active {
+  color: var(--idi-accent);
+  background: var(--idi-accent-glow);
+  font-weight: 600;
+}
+
+/* ============================================================
+   SKELETON LOADER
+   ============================================================ */
+
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--idi-surface-2) 25%,
+    var(--idi-surface-3) 50%,
+    var(--idi-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--idi-radius-sm);
+}
+
+.skeleton-value {
+  height: 24px;
+  width: 80px;
+  margin-bottom: 4px;
+}
+
+.skeleton-label {
+  height: 10px;
+  width: 60px;
+}
+
+.skeleton-line {
+  height: 12px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   SCROLLBAR CUSTOM DARK
+   ============================================================ */
+
+.idi-panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.idi-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.idi-panel-body::-webkit-scrollbar-thumb {
+  background: var(--idi-surface-3);
+  border-radius: 3px;
+}
+
+.idi-panel-body::-webkit-scrollbar-thumb:hover {
+  background: var(--idi-neutral);
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+
+.idi-tooltip {
+  position: relative;
+}
+
+.idi-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--idi-surface-3);
+  color: var(--idi-text-1);
+  font-family: var(--idi-font);
+  font-size: 11px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--idi-transition);
+}
+
+.idi-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ============================================================
+   SCORE BAR — Barre de progression colorée
+   ============================================================ */
+
+.idi-score-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--idi-surface-3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.idi-score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 400ms ease-out;
+}
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+
+.idi-divider {
+  height: 1px;
+  background: var(--idi-border);
+  margin: var(--idi-gap) 0;
+  grid-column: 1 / -1;
+}
