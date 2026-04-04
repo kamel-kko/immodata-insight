@@ -16,7 +16,7 @@ type: project
 | 4 | APIs essentielles (MVP) | Validée | 2026-04-04 |
 | 5 | APIs complémentaires | Validée | 2026-04-04 |
 | 6 | Design System Bento | Validée | 2026-04-04 |
-| 7 | Interface utilisateur | — | — |
+| 7 | Interface utilisateur | En cours | 2026-04-05 |
 | 8 | Affiliation & Tracker | — | — |
 | 9 | Popup extension | — | — |
 | 10 | Tests finaux & Optimisation | — | — |
