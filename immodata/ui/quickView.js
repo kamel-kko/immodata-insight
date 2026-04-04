@@ -294,33 +294,68 @@
   // CREATION / POSITIONNEMENT DU POPUP
   // ============================================================
 
+  const QV_HEIGHT_ESTIMATE = 280; // hauteur estimee du popup complet
+
   function createPopup() {
     const popup = document.createElement('div');
     popup.className = 'immodata-qv-popup';
     popup.style.cssText = `
-      position:absolute;
-      bottom:calc(100% + 8px);
-      left:50%;
+      position:fixed;
       width:${QV_WIDTH}px;
       z-index:2147483647;
       opacity:0;
       pointer-events:none;
-      transform:translateX(-50%) translateY(6px);
       transition:opacity 150ms ease, transform 150ms ease;
     `;
+    // On l'ajoute au body (pas dans la card) pour eviter overflow:hidden
+    document.body.appendChild(popup);
     return popup;
   }
 
-  function showPopup(popup) {
+  /**
+   * Positionne le popup intelligemment par rapport a la card :
+   * - Au-dessus si assez de place, sinon en dessous
+   * - Horizontal : centre sur la card, cale dans le viewport
+   */
+  function positionPopup(popup, card) {
+    const rect = card.getBoundingClientRect();
+    const qvH = QV_HEIGHT_ESTIMATE;
+
+    // Vertical : au-dessus par defaut, en dessous si pas assez de place
+    const spaceAbove = rect.top;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    let top;
+    if (spaceAbove >= qvH + 8) {
+      // Au-dessus
+      top = rect.top - qvH - 8;
+    } else if (spaceBelow >= qvH + 8) {
+      // En dessous
+      top = rect.bottom + 8;
+    } else {
+      // Pas assez de place ni au-dessus ni en dessous : coller en haut
+      top = 8;
+    }
+
+    // Horizontal : centre sur la card, cale dans l'ecran
+    let left = rect.left + (rect.width / 2) - (QV_WIDTH / 2);
+    left = Math.min(left, window.innerWidth - QV_WIDTH - 16);
+    left = Math.max(left, 16);
+
+    popup.style.top = Math.round(top) + 'px';
+    popup.style.left = Math.round(left) + 'px';
+  }
+
+  function showPopup(popup, card) {
+    positionPopup(popup, card);
     popup.style.opacity = '1';
     popup.style.pointerEvents = 'auto';
-    popup.style.transform = 'translateX(-50%) translateY(0)';
+    popup.style.transform = 'translateY(0)';
   }
 
   function hidePopup(popup) {
     popup.style.opacity = '0';
     popup.style.pointerEvents = 'none';
-    popup.style.transform = 'translateX(-50%) translateY(6px)';
+    popup.style.transform = 'translateY(6px)';
   }
 
   // ============================================================
