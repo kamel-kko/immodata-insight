@@ -15,7 +15,7 @@
   ],
   "host_permissions": [
     "https://api-adresse.data.gouv.fr/*",
-    "https://api.dvf.gouv.fr/*",
+    "https://public.opendatasoft.com/*",
     "https://www.georisques.gouv.fr/*",
     "https://data.education.gouv.fr/*",
     "https://overpass-api.de/*",
