@@ -440,13 +440,28 @@ const handlers = {
   FETCH_BAN: handleFetchBan,
   FETCH_DVF: handleFetchDvf,
   FETCH_GEORISQUES: handleFetchGeorisques,
+  FETCH_EDUCATION: handleFetchEducation,
+  FETCH_OVERPASS: handleFetchOverpass,
+  FETCH_ADEME: handleFetchAdeme,
+  FETCH_LOYERS: handleFetchLoyers,
+  FETCH_RTE: handleFetchRte,
+  FETCH_BRUIT: handleFetchBruit,
+  FETCH_MERIMEE: handleFetchMerimee,
+  FETCH_SIRENE: handleFetchSirene,
+  FETCH_ORS: handleFetchOrs,
+  FETCH_ANIL: handleFetchAnil,
   GET_CACHE: handleGetCache,
   SET_CACHE: handleSetCache,
   CLEAR_CACHE: handleClearCache,
   OPEN_AFFILIATE_URL: handleOpenAffiliateUrl,
   CALC_NOTAIRE: handleCalcNotaire,
   CALC_NEGOTIATION: handleCalcNegociation,
-  CALC_COUT_TOTAL: handleCalcCoutTotal
+  CALC_COUT_TOTAL: handleCalcCoutTotal,
+  CALC_PLUS_VALUE: handleCalcPlusValue,
+  CALC_LIQUIDITE: handleCalcLiquidite,
+  CALC_TRAVAUX: handleCalcTravaux,
+  CALC_QUALITE_VIE: handleCalcQualiteVie,
+  CALC_RENTABILITE: handleCalcRentabilite
 };
 
 const dispatch = createDispatcher(handlers);
