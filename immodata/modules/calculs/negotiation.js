@@ -115,7 +115,3 @@
   globalThis.__immodata.calculs.negotiation = { calculerScoreNegociation, SCORE_LABELS };
 
 })();
-
-export function calculerScoreNegociation(params) {
-  return globalThis.__immodata.calculs.negotiation.calculerScoreNegociation(params);
-}
