@@ -363,6 +363,11 @@
     // Stocker les cartes pour l'injection QuickView
     self.__immodata.currentCards = cards;
 
+    // Analytics : compter la page liste vue
+    if (self.__immodata.affiliation && self.__immodata.affiliation.analytics) {
+      self.__immodata.affiliation.analytics.trackPageListeVue();
+    }
+
     // Étape 7 : Injection du QuickView (popup hover)
     if (self.__immodata.ui && self.__immodata.ui.quickView) {
       log.info('Initialisation du QuickView sur les cartes liste');
