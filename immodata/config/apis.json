@@ -1,0 +1,78 @@
+{
+  "ban": {
+    "endpoint": "https://api-adresse.data.gouv.fr/search/",
+    "ttl_days": 90,
+    "timeout_ms": 5000
+  },
+  "dvf": {
+    "endpoint": "https://api.dvf.gouv.fr/api/georecords/",
+    "ttl_days": 7,
+    "timeout_ms": 8000,
+    "rayon_metres": 500,
+    "nb_mois_historique": 24
+  },
+  "georisques_erial": {
+    "endpoint": "https://www.georisques.gouv.fr/api/v1/erp",
+    "ttl_days": 30,
+    "timeout_ms": 6000
+  },
+  "georisques_icpe": {
+    "endpoint": "https://www.georisques.gouv.fr/api/v1/installations_classees",
+    "ttl_days": 30,
+    "timeout_ms": 6000
+  },
+  "education_annuaire": {
+    "endpoint": "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records",
+    "ttl_days": 30,
+    "timeout_ms": 6000,
+    "rayon_km": 2
+  },
+  "education_ival": {
+    "endpoint": "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-ival/records",
+    "ttl_days": 30,
+    "timeout_ms": 6000
+  },
+  "overpass": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "ttl_days": 7,
+    "timeout_ms": 10000,
+    "rayon_metres": 1000
+  },
+  "ademe_dpe": {
+    "endpoint": "https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines",
+    "ttl_days": 7,
+    "timeout_ms": 5000
+  },
+  "loyers": {
+    "dataset_url": "https://www.data.gouv.fr/fr/datasets/r/9af8a134-0526-48c2-a9b1-9c659ad5b2ee",
+    "ttl_days": 30,
+    "timeout_ms": 5000
+  },
+  "rte_lignes_ht": {
+    "endpoint": "https://opendata.reseaux-energies.fr/api/explore/v2.1/catalog/datasets/lignes-aeriennes-rte-nv/records",
+    "ttl_days": 90,
+    "timeout_ms": 5000
+  },
+  "merimee": {
+    "endpoint": "https://data.culture.gouv.fr/api/explore/v2.1/catalog/datasets/liste-des-immeubles-proteges-au-titre-des-monuments-historiques/records",
+    "ttl_days": 90,
+    "timeout_ms": 5000
+  },
+  "sirene": {
+    "endpoint": "https://api.insee.fr/entreprises/sirene/siret",
+    "ttl_days": 7,
+    "timeout_ms": 6000
+  },
+  "ors_isochrones": {
+    "endpoint": "https://api.openrouteservice.org/v2/isochrones/driving-car",
+    "ttl_days": 7,
+    "timeout_ms": 8000,
+    "api_key_required": true,
+    "api_key_source": "chrome.storage.local:ors_api_key"
+  },
+  "anil_zonage": {
+    "endpoint": "https://www.anil.org/outils/encadrement-des-loyers/",
+    "ttl_days": 30,
+    "timeout_ms": 5000
+  }
+}
