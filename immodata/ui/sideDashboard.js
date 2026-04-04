@@ -578,22 +578,29 @@
   // ============================================================
 
   function renderSponsorBanner() {
+    // URLs partenaires avec UTM (construites ici, ouvertes via background)
+    var sponsorUrls = {
+      pretto: 'https://www.pretto.fr/simulation/?utm_source=immodata&utm_medium=extension&utm_campaign=banner',
+      habitissimo: 'https://www.habitissimo.fr/devis/?utm_source=immodata&utm_medium=extension&utm_campaign=banner',
+      luko: 'https://www.luko.eu/fr/?utm_source=immodata&utm_medium=extension&utm_campaign=banner'
+    };
+
     return `
       <div class="idi-sponsor-wrap">
         <div class="idi-sponsor-band" id="idi-sponsor-band">
-          <div class="idi-sponsor-slide active" data-url="#">
+          <div class="idi-sponsor-slide active" data-url="${sponsorUrls.pretto}" data-sponsor="pretto">
             <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#6C63FF,#8B5CF6)">P</div>
             <span class="idi-sponsor-name">Pretto</span>
             <span class="idi-sponsor-msg">Taux d\u00e8s 3,2% \u2014 Simulation gratuite</span>
             <span class="idi-sponsor-arrow">\u203a</span>
           </div>
-          <div class="idi-sponsor-slide" data-url="#">
+          <div class="idi-sponsor-slide" data-url="${sponsorUrls.habitissimo}" data-sponsor="habitissimo">
             <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#F59E0B,#F97316)">H</div>
             <span class="idi-sponsor-name">Habitissimo</span>
             <span class="idi-sponsor-msg">3 devis travaux gratuits en 24h</span>
             <span class="idi-sponsor-arrow">\u203a</span>
           </div>
-          <div class="idi-sponsor-slide" data-url="#">
+          <div class="idi-sponsor-slide" data-url="${sponsorUrls.luko}" data-sponsor="luko">
             <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#00D4AA,#059669)">L</div>
             <span class="idi-sponsor-name">Luko</span>
             <span class="idi-sponsor-msg">Assurance d\u00e8s 3,30 \u20ac/mois</span>
