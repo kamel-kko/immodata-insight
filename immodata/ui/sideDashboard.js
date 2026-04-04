@@ -743,6 +743,21 @@
       });
     }
 
+    // Clics sponsors : ouvrir l'URL via background + tracker analytics
+    shadow.querySelectorAll('.idi-sponsor-slide[data-url]').forEach(slide => {
+      slide.style.cursor = 'pointer';
+      slide.addEventListener('click', () => {
+        const url = slide.getAttribute('data-url');
+        const sponsorId = slide.getAttribute('data-sponsor');
+        if (url && url !== '#') {
+          if (self.__immodata.affiliation && self.__immodata.affiliation.analytics) {
+            self.__immodata.affiliation.analytics.trackClick('sponsor_' + sponsorId);
+          }
+          chrome.runtime.sendMessage({ action: 'OPEN_AFFILIATE_URL', payload: { url } });
+        }
+      });
+    });
+
     // Rotation sponsor (8s)
     const slides = shadow.querySelectorAll('.idi-sponsor-slide');
     const dots = shadow.querySelectorAll('.idi-sponsor-dot');
