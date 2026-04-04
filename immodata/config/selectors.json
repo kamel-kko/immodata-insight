@@ -1,0 +1,170 @@
+{
+  "seloger": {
+    "prix": [
+      "[data-testid='price']",
+      ".Price__price",
+      "span[class*='Price']",
+      "meta[property='product:price:amount'][content]"
+    ],
+    "surface": [
+      "[data-testid='surface']",
+      "span[class*='Surface']",
+      "div[class*='surface']"
+    ],
+    "dpe": [
+      "[data-testid='dpe-letter']",
+      "span[class*='Dpe']",
+      ".energy-diagnostic span"
+    ],
+    "ville": [
+      "[data-testid='city']",
+      "span[class*='City']",
+      "meta[property='og:locality']"
+    ],
+    "cp": [
+      "[data-testid='postalcode']",
+      "span[class*='PostalCode']"
+    ],
+    "adresse": [
+      "[data-testid='address']",
+      "span[class*='Address']"
+    ],
+    "description": [
+      "[data-testid='description']",
+      ".Description__content",
+      "div[class*='Description']"
+    ],
+    "type_bien": [
+      "[data-testid='property-type']",
+      "span[class*='PropertyType']"
+    ],
+    "nb_pieces": [
+      "[data-testid='rooms']",
+      "span[class*='Rooms']"
+    ],
+    "annee_construction": [
+      "[data-testid='construction-year']",
+      "span[class*='ConstructionYear']"
+    ],
+    "page_annonce": [
+      "[data-testid='classified-detail']",
+      ".ClassifiedDetail",
+      "div[class*='AdDetail']"
+    ],
+    "card_liste": [
+      "[data-testid='card-list']",
+      ".ListCard",
+      "div[class*='Card']"
+    ]
+  },
+  "leboncoin": {
+    "prix": [
+      "[data-qa-id='adview_price']",
+      "span[class*='price']",
+      "[itemprop='price']"
+    ],
+    "surface": [
+      "[data-qa-id='criteria_item_square']",
+      "div[class*='surface']"
+    ],
+    "dpe": [
+      "[data-qa-id='criteria_item_energy_rate']",
+      "div[class*='energy']"
+    ],
+    "ville": [
+      "[data-qa-id='adview_location_informations']",
+      "[itemprop='addressLocality']"
+    ],
+    "cp": [
+      "[itemprop='postalCode']",
+      "[data-qa-id='adview_location_informations'] span:last-child"
+    ],
+    "adresse": [
+      "[itemprop='streetAddress']",
+      "[data-qa-id='adview_location_informations']"
+    ],
+    "description": [
+      "[data-qa-id='adview_description_container']",
+      "div[class*='description']"
+    ],
+    "type_bien": [
+      "[data-qa-id='criteria_item_real_estate_type']"
+    ],
+    "nb_pieces": [
+      "[data-qa-id='criteria_item_rooms']"
+    ],
+    "annee_construction": [
+      "[data-qa-id='criteria_item_square_land_surface']"
+    ],
+    "page_annonce": [
+      "[data-qa-id='adview_container']",
+      "div[class*='adview']"
+    ],
+    "card_liste": [
+      "[data-qa-id='aditem_container']",
+      "li[class*='aditem']"
+    ]
+  },
+  "bienici": {
+    "prix": [
+      "span[class*='mainPrice']",
+      "p[class*='price']",
+      "[data-testid='price']"
+    ],
+    "surface": [
+      "span[class*='surface']",
+      "[data-testid='surface']"
+    ],
+    "dpe": [
+      "div[class*='dpe']",
+      "[data-testid='dpe']"
+    ],
+    "ville": [
+      "span[class*='city']",
+      "[itemprop='addressLocality']"
+    ],
+    "cp": [
+      "span[class*='postalCode']",
+      "[itemprop='postalCode']"
+    ],
+    "adresse": [
+      "div[class*='address']",
+      "[itemprop='streetAddress']"
+    ],
+    "description": [
+      "div[class*='description']",
+      "[data-testid='description']"
+    ],
+    "type_bien": [
+      "span[class*='propertyType']"
+    ],
+    "nb_pieces": [
+      "span[class*='rooms']"
+    ],
+    "annee_construction": [
+      "span[class*='constructionYear']"
+    ],
+    "page_annonce": [
+      "div[class*='detailPage']",
+      "main[class*='adDetail']"
+    ],
+    "card_liste": [
+      "div[class*='listCard']",
+      "article[class*='propertyCard']"
+    ]
+  },
+  "regex": {
+    "jardin": "(?i)\\b(jardin|terrain\\s+privatif|extérieur\\s+privatif)\\b",
+    "balcon": "(?i)\\b(balcon|terrasse|loggia)\\b",
+    "neuf_vefa": "(?i)\\b(neuf|vefa|programme\\s+neuf|livraison|promoteur|RT2020|RE2020)\\b",
+    "travaux": "(?i)\\b(travaux|à\\s+rénover|à\\s+rafraîchir|rénovation|remise\\s+en\\s+état|gros\\s+travaux)\\b",
+    "taxe_fonciere": "taxe\\s+foncière[^\\d]{0,20}(\\d[\\s\\d]*\\d?)\\s*€?",
+    "cave": "(?i)\\b(cave|cellier|sous-sol\\s+privatif)\\b",
+    "parking": "(?i)\\b(parking|garage|stationnement|box\\s+fermé|place\\s+de\\s+parking)\\b",
+    "ascenseur": "(?i)\\b(ascenseur|élévateur)\\b",
+    "gardien": "(?i)\\b(gardien|concierge|interphone\\s+vidéo)\\b",
+    "piscine": "(?i)\\b(piscine|jacuzzi|spa)\\b",
+    "urgent": "(?i)\\b(urgent|mutation|cause\\s+départ|à\\s+saisir|opportunité)\\b",
+    "copropriete": "(?i)\\b(copropriété|syndic|charges\\s+de\\s+copro)\\b"
+  }
+}
