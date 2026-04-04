@@ -23,7 +23,7 @@ import { handleFetchDvf } from './modules/api/dvf.js';
 import { handleFetchGeorisques } from './modules/api/georisques.js';
 
 // --- Imports des modules de calcul (IIFE, chargés via globalThis) ---
-// Ces fichiers utilisent globalThis.__immodata, pas d'export ES Module.
+// Ces fichiers utilisent self.__immodata, pas d'export ES Module.
 // On les importe ici pour qu'ils s'exécutent et s'enregistrent sur globalThis.
 import './modules/calculs/notaire.js';
 import './modules/calculs/negotiation.js';
@@ -362,21 +362,21 @@ async function handleOpenAffiliateUrl(payload) {
  * CALC_NOTAIRE — Calcule les frais de notaire
  */
 function handleCalcNotaire(payload) {
-  return globalThis.__immodata.calculs.notaire.calculerFraisNotaire(payload);
+  return self.__immodata.calculs.notaire.calculerFraisNotaire(payload);
 }
 
 /**
  * CALC_NEGOTIATION — Calcule le score de négociation
  */
 function handleCalcNegociation(payload) {
-  return globalThis.__immodata.calculs.negotiation.calculerScoreNegociation(payload);
+  return self.__immodata.calculs.negotiation.calculerScoreNegociation(payload);
 }
 
 /**
  * CALC_COUT_TOTAL — Calcule le Coût Total de Possession
  */
 function handleCalcCoutTotal(payload) {
-  return globalThis.__immodata.calculs.coutTotal.calculerCoutTotal(payload);
+  return self.__immodata.calculs.coutTotal.calculerCoutTotal(payload);
 }
 
 // ============================================================
