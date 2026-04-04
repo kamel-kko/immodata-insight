@@ -223,11 +223,11 @@
           <div style="font-size:10px;color:var(--idi-text-3);margin-top:2px;">${dpe && 'FG'.includes(dpe) ? 'Passoire thermique' : dpe && 'DE'.includes(dpe) ? 'Travaux recommand\u00e9s' : dpe ? 'Correct' : 'Non communiqu\u00e9'}</div>
         </div>
 
-        <!-- CTA Credit -->
-        ${ctaCredit}
+        <!-- Tracker historique annonce -->
+        ${trackerHtml}
 
-        <!-- CTA Travaux (si DPE mauvais) -->
-        ${ctaTravaux}
+        <!-- CTA Affiliation dynamiques -->
+        ${ctaHtml}
       </div>`;
   }
 
