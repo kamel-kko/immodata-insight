@@ -362,21 +362,21 @@ async function handleOpenAffiliateUrl(payload) {
  * CALC_NOTAIRE — Calcule les frais de notaire
  */
 function handleCalcNotaire(payload) {
-  return calculerFraisNotaire(payload);
+  return globalThis.__immodata.calculs.notaire.calculerFraisNotaire(payload);
 }
 
 /**
  * CALC_NEGOTIATION — Calcule le score de négociation
  */
 function handleCalcNegociation(payload) {
-  return calculerScoreNegociation(payload);
+  return globalThis.__immodata.calculs.negotiation.calculerScoreNegociation(payload);
 }
 
 /**
  * CALC_COUT_TOTAL — Calcule le Coût Total de Possession
  */
 function handleCalcCoutTotal(payload) {
-  return calculerCoutTotal(payload);
+  return globalThis.__immodata.calculs.coutTotal.calculerCoutTotal(payload);
 }
 
 // ============================================================
