@@ -67,6 +67,12 @@
     return 'Critique';
   }
 
+  /** Echappe les caracteres HTML dangereux (anti-XSS) */
+  function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   /** Couleur DPE standard */
   function dpeColor(dpe) {
     const colors = { A: '#22C55E', B: '#84CC16', C: '#EAB308', D: '#F59E0B', E: '#F97316', F: '#EF4444', G: '#DC2626' };
