@@ -20,8 +20,8 @@ export async function handleFetchOrs(payload) {
   }
 
   // Récupérer la clé API depuis chrome.storage
-  const storage = await chrome.storage.local.get('ors_api_key');
-  const apiKey = storage.ors_api_key;
+  const storage = await chrome.storage.local.get('immodata_ors_key');
+  const apiKey = storage.immodata_ors_key;
 
   if (!apiKey) {
     log.warn('ORS : pas de clé API configurée');
