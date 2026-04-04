@@ -383,13 +383,8 @@
     card.setAttribute('data-immodata-qv', 'true');
     log.debug('attachToCard : prix=' + cardData.prix + ' surface=' + cardData.surface + ' url=' + (cardData.url || '').slice(0, 60));
 
-    // La card doit etre en position relative pour le popup absolu
-    const pos = getComputedStyle(card).position;
-    if (pos === 'static') card.style.position = 'relative';
-
-    // Creer le popup
+    // Creer le popup (sur le body, pas dans la card)
     const popup = createPopup();
-    card.appendChild(popup);
 
     let hoverTimeout = null;
     let loaded = false;
@@ -403,13 +398,13 @@
             <div style="background:${COLORS.bg};border:1px solid ${COLORS.border};border-radius:12px;padding:20px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);font-family:'Inter','Segoe UI',system-ui,sans-serif;">
               <div style="font-size:12px;color:${COLORS.text2};">Chargement...</div>
             </div>`;
-          showPopup(popup);
+          showPopup(popup, card);
 
           const qvData = await fetchQvData(cardData);
           popup.innerHTML = buildPopupHtml(qvData);
           loaded = true;
         }
-        showPopup(popup);
+        showPopup(popup, card);
 
         // Garbage collect : garder max N popups
         activePopups.push(popup);
@@ -424,6 +419,18 @@
       clearTimeout(hoverTimeout);
       hidePopup(popup);
     });
+
+    // Masquer aussi quand la card quitte le viewport (scroll)
+    // pour eviter un popup orphelin
+    let scrollTimeout = null;
+    window.addEventListener('scroll', () => {
+      if (popup.style.opacity === '1') {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          positionPopup(popup, card);
+        }, 16);
+      }
+    }, { passive: true });
   }
 
   // ============================================================
