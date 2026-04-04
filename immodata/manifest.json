@@ -24,8 +24,7 @@
     "https://opendata.reseaux-energies.fr/*",
     "https://data.culture.gouv.fr/*",
     "https://api.insee.fr/*",
-    "https://api.openrouteservice.org/*",
-    "https://www.anil.org/*"
+    "https://api.openrouteservice.org/*"
   ],
   "background": {
     "service_worker": "background.js",
