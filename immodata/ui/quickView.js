@@ -559,19 +559,28 @@
     const surfMatch = text.match(/([\d,]+)\s*m[²2]/);
     const surface = surfMatch ? parseFloat(surfMatch[1].replace(',', '.')) : null;
     // URL
-    const link = el.querySelector('a[href]');
+    const link = el.tagName === 'A' ? el : el.querySelector('a[href]');
     const url = link ? link.href : '#';
+    // Titre
+    const titleEl = el.querySelector('p[class*="title"], span[class*="title"], h2, h3');
+    const titre = titleEl ? titleEl.textContent.trim() : null;
+    // DPE
+    const dpeMatch = text.match(/DPE\s*:?\s*([A-G])/i) || text.match(/\bclasse\s+[eé]nergie\s*:?\s*([A-G])/i);
+    const dpe = dpeMatch ? dpeMatch[1].toUpperCase() : null;
+    // Location (ville + CP)
+    const loc = extractLocationFromText(text);
 
     return {
+      element: el,
       prix: prix,
       surface: surface,
       url: url,
-      titre: null,
-      dpe: null,
+      titre: titre,
+      dpe: dpe,
       type_bien: null,
       adresse_brute: null,
-      cp: null,
-      ville: null
+      cp: loc.cp,
+      ville: loc.ville
     };
   }
 
