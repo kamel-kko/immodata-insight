@@ -616,6 +616,10 @@
   // ============================================================
 
   function destroy() {
+    // Retirer les scroll listeners pour eviter les fuites memoire
+    scrollHandlers.forEach(h => window.removeEventListener('scroll', h));
+    scrollHandlers.length = 0;
+
     document.querySelectorAll('.immodata-qv-popup').forEach(p => p.remove());
     document.querySelectorAll('[data-immodata-qv]').forEach(el => {
       el.removeAttribute('data-immodata-qv');
