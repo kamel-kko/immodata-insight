@@ -6,7 +6,7 @@
 // Liste blanche des domaines autorisés pour les URLs
 const URL_ALLOWLIST = [
   'api-adresse.data.gouv.fr',
-  'api.dvf.gouv.fr',
+  'public.opendatasoft.com',
   'www.georisques.gouv.fr',
   'data.education.gouv.fr',
   'overpass-api.de',
