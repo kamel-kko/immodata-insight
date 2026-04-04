@@ -105,12 +105,10 @@ function validatePostalCode(cp) {
   return /^\d{5}$/.test(cp.trim());
 }
 
-// Enregistrement global pour les content scripts (IIFE)
-// Le background.js importe ce fichier en ES Module et accède aussi via globalThis
-if (typeof globalThis.__immodata === 'undefined') {
-  globalThis.__immodata = {};
-}
-globalThis.__immodata.security = {
+// Export ES Module pour background.js
+// (Ce fichier n'est PAS chargé dans les content scripts —
+//  le content_bootstrap.js fournit les mêmes fonctions en IIFE)
+export {
   sanitizeText,
   sanitizeNumber,
   sanitizeUrl,
