@@ -73,10 +73,10 @@
 
     const data = scraper.extractAnnonceData();
 
-    // Ne rien envoyer si on n'a ni prix ni surface
+    // Si on n'a ni prix ni surface, on continue quand même
+    // pour afficher le dashboard en mode dégradé
     if (data.prix === null && data.surface === null) {
-      log.warn('Données insuffisantes (prix et surface null) — abandon');
-      return;
+      log.warn('Données insuffisantes (prix et surface null) — mode dégradé');
     }
 
     log.info('Annonce scrapée, envoi au background pour enrichissement');
