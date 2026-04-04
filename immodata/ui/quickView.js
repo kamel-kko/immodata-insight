@@ -346,6 +346,7 @@
     // Eviter double attachement
     if (card.hasAttribute('data-immodata-qv')) return;
     card.setAttribute('data-immodata-qv', 'true');
+    log.debug('attachToCard : prix=' + cardData.prix + ' surface=' + cardData.surface + ' url=' + (cardData.url || '').slice(0, 60));
 
     // La card doit etre en position relative pour le popup absolu
     const pos = getComputedStyle(card).position;
