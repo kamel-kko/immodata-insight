@@ -391,7 +391,10 @@ const handlers = {
   GET_CACHE: handleGetCache,
   SET_CACHE: handleSetCache,
   CLEAR_CACHE: handleClearCache,
-  OPEN_AFFILIATE_URL: handleOpenAffiliateUrl
+  OPEN_AFFILIATE_URL: handleOpenAffiliateUrl,
+  CALC_NOTAIRE: handleCalcNotaire,
+  CALC_NEGOTIATION: handleCalcNegociation,
+  CALC_COUT_TOTAL: handleCalcCoutTotal
 };
 
 const dispatch = createDispatcher(handlers);
