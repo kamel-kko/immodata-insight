@@ -1,0 +1,155 @@
+/**
+ * ImmoData — Grille Bento
+ *
+ * La grille Bento, c'est comme un bento japonais : une boîte
+ * divisée en compartiments de tailles différentes.
+ *
+ * On a 4 tailles de cartes :
+ * - XL : prend toute la largeur (2 colonnes)
+ * - L  : prend environ 2/3 de la largeur
+ * - M  : prend 1/2 (1 colonne)
+ * - S  : petit carré compact (1 colonne, hauteur fixe)
+ *
+ * La grille fait 360px de large avec 2 colonnes et un gap de 8px.
+ */
+
+/* Conteneur de la grille */
+.idi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--idi-gap);
+  width: 100%;
+  padding: var(--idi-gap);
+}
+
+/* Carte XL — pleine largeur */
+.idi-card-xl {
+  grid-column: 1 / -1;
+}
+
+/* Carte L — 2/3 de largeur (prend les 2 colonnes mais avec un voisin M possible) */
+.idi-card-l {
+  grid-column: 1 / -1;
+}
+
+/* Carte M — 1 colonne */
+.idi-card-m {
+  grid-column: span 1;
+}
+
+/* Carte S — 1 colonne, hauteur compacte */
+.idi-card-s {
+  grid-column: span 1;
+  min-height: 72px;
+  max-height: 88px;
+}
+
+/* Row helper pour mettre L + M côte à côte */
+.idi-row-split {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: var(--idi-gap);
+  grid-column: 1 / -1;
+}
+
+/* Row helper pour 3 cartes S côte à côte */
+.idi-row-triple {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--idi-gap);
+  grid-column: 1 / -1;
+}
+
+/* Conteneur principal du Side Dashboard */
+.idi-panel {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--idi-width);
+  max-height: 90vh;
+  background: var(--idi-bg);
+  border-left: 1px solid var(--idi-border);
+  border-radius: var(--idi-radius) 0 0 var(--idi-radius);
+  box-shadow: var(--idi-shadow);
+  z-index: var(--idi-z-index);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel replié (juste le bouton tab visible) */
+.idi-panel.collapsed {
+  width: 40px;
+  overflow: hidden;
+}
+
+/* Zone scrollable du contenu */
+.idi-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Header du panel */
+.idi-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px var(--idi-padding);
+  border-bottom: 1px solid var(--idi-border);
+  background: var(--idi-surface);
+}
+
+.idi-panel-title {
+  font-family: var(--idi-font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--idi-text-1);
+}
+
+.idi-panel-subtitle {
+  font-size: 11px;
+  color: var(--idi-text-2);
+  margin-top: 2px;
+}
+
+/* Bouton toggle (visible quand replié) */
+.idi-toggle-btn {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 64px;
+  background: var(--idi-surface);
+  border: 1px solid var(--idi-border);
+  border-right: none;
+  border-radius: var(--idi-radius-sm) 0 0 var(--idi-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--idi-accent);
+  box-shadow: var(--idi-shadow-card);
+}
+
+.idi-toggle-btn:hover {
+  background: var(--idi-surface-2);
+}
+
+/* QuickView — petit panneau au survol des listes */
+.idi-quickview {
+  position: absolute;
+  width: 340px;
+  max-height: 100px;
+  background: var(--idi-bg);
+  border: 1px solid var(--idi-border);
+  border-radius: var(--idi-radius);
+  box-shadow: var(--idi-shadow);
+  padding: var(--idi-gap);
+  z-index: var(--idi-z-index);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--idi-gap);
+}
