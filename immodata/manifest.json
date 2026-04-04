@@ -68,6 +68,21 @@
       "48": "ui/icons/icon48.png"
     }
   },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "ui/design-tokens.css",
+        "ui/bento-grid.css",
+        "ui/components.css",
+        "ui/animations.css"
+      ],
+      "matches": [
+        "https://www.seloger.com/*",
+        "https://www.leboncoin.fr/*",
+        "https://www.bienici.com/*"
+      ]
+    }
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self'"
   }
