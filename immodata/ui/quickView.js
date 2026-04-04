@@ -36,6 +36,9 @@
   const MAX_POPUPS = 3;          // max popups en memoire
   const QV_WIDTH = 360;          // largeur du popup en px
 
+  // Références pour nettoyage des listeners scroll
+  const scrollHandlers = [];
+
   // Cache des donnees QV deja recuperees
   const qvCache = new Map();
 
