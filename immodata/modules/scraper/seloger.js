@@ -8,9 +8,9 @@
 (function () {
   'use strict';
 
-  const log = globalThis.__immodata.createLogger('SCRAPER:SELOGER');
-  const security = globalThis.__immodata.security;
-  const ext = globalThis.__immodata.extractors;
+  const log = window.__immodata.createLogger('SCRAPER:SELOGER');
+  const security = window.__immodata.security;
+  const ext = window.__immodata.extractors;
 
   // Sélecteurs multi-fallback pour SeLoger
   // Si le site change son HTML, on peut mettre à jour ces listes
@@ -163,7 +163,7 @@
     return cards;
   }
 
-  globalThis.__immodata.scrapers = globalThis.__immodata.scrapers || {};
-  globalThis.__immodata.scrapers.seloger = { extractAnnonceData, extractCardsData };
+  window.__immodata.scrapers = window.__immodata.scrapers || {};
+  window.__immodata.scrapers.seloger = { extractAnnonceData, extractCardsData };
 
 })();
