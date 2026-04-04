@@ -1,0 +1,83 @@
+{
+  "credit": [
+    {
+      "name": "Pretto",
+      "logo": "pretto",
+      "url_base": "https://www.pretto.fr/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=credit",
+      "label": "Simuler mon taux",
+      "sublabel": "Sans engagement · 2 min",
+      "cpl_estimate": 45,
+      "min_price": 80000
+    },
+    {
+      "name": "Meilleurtaux",
+      "logo": "meilleurtaux",
+      "url_base": "https://www.meilleurtaux.com/credit-immobilier/simulation-de-pret/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=credit",
+      "label": "Comparer les taux",
+      "sublabel": "100% gratuit",
+      "cpl_estimate": 38,
+      "min_price": 80000
+    }
+  ],
+  "demenagement": [
+    {
+      "name": "Moveezy",
+      "logo": "moveezy",
+      "url_base": "https://www.moveezy.fr/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=demenagement",
+      "label": "Devis déménagement",
+      "sublabel": "Gratuit · 3 devis",
+      "cpa_estimate": 18
+    }
+  ],
+  "travaux": [
+    {
+      "name": "Habitissimo",
+      "logo": "habitissimo",
+      "url_base": "https://www.habitissimo.fr/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=travaux",
+      "label": "Devis artisans locaux",
+      "sublabel": "Gratuit · Sans engagement",
+      "cpl_estimate": 25,
+      "trigger_dpe": ["E", "F", "G"],
+      "trigger_age_before": 1975
+    }
+  ],
+  "assurance": [
+    {
+      "name": "Luko",
+      "logo": "luko",
+      "url_base": "https://www.luko.eu/fr/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=assurance",
+      "label": "Assurance dès 5€/mois",
+      "sublabel": "Résiliation gratuite",
+      "cpa_estimate": 22
+    }
+  ],
+  "diagnostics": [
+    {
+      "name": "Diagamter",
+      "logo": "diagamter",
+      "url_base": "https://www.diagamter.com/",
+      "utm": "?utm_source=immodata&utm_medium=extension&utm_campaign=diagnostics",
+      "label": "Pack diagnostics",
+      "sublabel": "DPE · Amiante · Électricité",
+      "cpl_estimate": 20,
+      "trigger_age_before": 1997
+    }
+  ],
+  "rapport_pdf": {
+    "enabled": true,
+    "price": 4.90,
+    "label": "Rapport d'analyse complet",
+    "items": [
+      "Historique DVF 5 ans détaillé",
+      "Score de négociation argumenté",
+      "Stratégie locative optimale",
+      "Analyse copropriété",
+      "Projection valeur 2030"
+    ]
+  }
+}
