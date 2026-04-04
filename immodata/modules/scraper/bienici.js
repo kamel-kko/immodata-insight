@@ -8,9 +8,9 @@
 (function () {
   'use strict';
 
-  const log = globalThis.__immodata.createLogger('SCRAPER:BIENICI');
-  const security = globalThis.__immodata.security;
-  const ext = globalThis.__immodata.extractors;
+  const log = window.__immodata.createLogger('SCRAPER:BIENICI');
+  const security = window.__immodata.security;
+  const ext = window.__immodata.extractors;
 
   const SEL = {
     prix: [
@@ -140,7 +140,7 @@
     return cards;
   }
 
-  globalThis.__immodata.scrapers = globalThis.__immodata.scrapers || {};
-  globalThis.__immodata.scrapers.bienici = { extractAnnonceData, extractCardsData };
+  window.__immodata.scrapers = window.__immodata.scrapers || {};
+  window.__immodata.scrapers.bienici = { extractAnnonceData, extractCardsData };
 
 })();
