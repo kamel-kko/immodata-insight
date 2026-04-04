@@ -53,6 +53,7 @@
         "modules/calculs/travaux.js",
         "modules/calculs/qualiteVie.js",
         "modules/calculs/rentabilite.js",
+        "ui/icons/icons.js",
         "content_script.js"
       ],
       "run_at": "document_idle"
