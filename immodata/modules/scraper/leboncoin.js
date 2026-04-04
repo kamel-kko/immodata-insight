@@ -12,19 +12,24 @@
   const security = self.__immodata.security;
   const ext = self.__immodata.extractors;
 
+  // Selecteurs pour la PAGE ANNONCE (fiche detail)
   const SEL = {
     prix: [
       "[data-qa-id='adview_price']",
-      "span[class*='price']",
-      "[itemprop='price']"
+      "span[class*='rice']",
+      "[itemprop='price']",
+      "p[class*='rice']",
+      "div[class*='rice'] span"
     ],
     surface: [
       "[data-qa-id='criteria_item_square']",
-      "div[class*='surface']"
+      "div[class*='surface']",
+      "span[class*='surface']"
     ],
     dpe: [
       "[data-qa-id='criteria_item_energy_rate']",
-      "div[class*='energy']"
+      "div[class*='energy']",
+      "span[class*='energy']"
     ],
     ville: [
       "[data-qa-id='adview_location_informations']",
@@ -67,7 +72,38 @@
     ],
     card_liste: [
       "[data-qa-id='aditem_container']",
-      "li[class*='aditem']"
+      "a[data-qa-id='aditem_container']",
+      "li[data-qa-id='aditem_container']",
+      "div[class*='aditem']",
+      "article[class*='ad']"
+    ]
+  };
+
+  // Selecteurs specifiques aux CARDS LISTE (plus souples)
+  const SEL_CARD = {
+    prix: [
+      "[data-qa-id='price']",
+      "span[class*='rice']",
+      "p[class*='rice']",
+      "[class*='Price']",
+      "span[aria-label*='rix']"
+    ],
+    surface: [
+      "span[class*='surface']",
+      "[class*='Surface']",
+      "span[class*='square']"
+    ],
+    dpe: [
+      "span[class*='energy']",
+      "[class*='Energy']",
+      "[class*='dpe']"
+    ],
+    titre: [
+      "[data-qa-id='title']",
+      "p[class*='title']",
+      "span[class*='title']",
+      "h2",
+      "h3"
     ]
   };
 
