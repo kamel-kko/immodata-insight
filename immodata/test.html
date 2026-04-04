@@ -611,6 +611,113 @@
   color: var(--idi-text-3); text-align: center;
   padding: 2px 0 5px; letter-spacing: 0.02em;
 }
+
+/* ================================================================
+   QuickView — Mini-popup hover sur page liste
+   ================================================================ */
+.idi-qv {
+  position: fixed;
+  width: 340px;
+  background: var(--idi-bg);
+  border: 1px solid var(--idi-border);
+  border-radius: var(--idi-radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: var(--idi-z-index);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 150ms ease, transform 150ms ease;
+  font-family: var(--idi-font);
+}
+.idi-qv.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Header QuickView */
+.idi-qv-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--idi-border);
+  background: var(--idi-surface);
+}
+.idi-qv-title {
+  font-size: 13px; font-weight: 600; color: var(--idi-text-1);
+  display: flex; align-items: center; gap: 6px;
+}
+.idi-qv-dpe {
+  font-family: var(--idi-font-mono); font-size: 12px; font-weight: 700;
+  padding: 1px 7px; border-radius: 4px;
+}
+
+/* Grille 2 colonnes dans le QV */
+.idi-qv-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--idi-border);
+}
+.idi-qv-cell {
+  background: var(--idi-surface);
+  padding: 10px 14px;
+}
+.idi-qv-cell-value {
+  font-family: var(--idi-font-mono); font-size: 18px;
+  font-weight: 700; color: var(--idi-text-1);
+  line-height: 1.1;
+}
+.idi-qv-cell-label {
+  font-size: 10px; color: var(--idi-text-3);
+  margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+/* Score bar dans QV */
+.idi-qv-score {
+  padding: 10px 14px;
+  border-top: 1px solid var(--idi-border);
+  background: var(--idi-surface);
+}
+.idi-qv-score-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 5px;
+}
+.idi-qv-score-label {
+  font-size: 10px; font-weight: 600; color: var(--idi-text-2);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.idi-qv-score-value {
+  font-family: var(--idi-font-mono); font-size: 13px;
+  font-weight: 700; color: var(--idi-text-1);
+}
+.idi-qv-bar {
+  width: 100%; height: 5px; background: var(--idi-surface-3);
+  border-radius: 3px; overflow: hidden;
+}
+.idi-qv-bar-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 400ms ease-out;
+}
+
+/* Footer QV */
+.idi-qv-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  border-top: 1px solid var(--idi-border);
+  background: var(--idi-bg);
+}
+.idi-qv-meta {
+  font-size: 11px; color: var(--idi-text-3);
+  display: flex; align-items: center; gap: 5px;
+}
+.idi-qv-cta {
+  font-family: var(--idi-font); font-size: 11px; font-weight: 700;
+  color: var(--idi-accent); background: none; border: none;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  padding: 4px 0; transition: all 150ms ease;
+}
+.idi-qv-cta:hover { color: #7B73FF; }
+.idi-qv-cta .arrow { transition: transform 150ms ease; }
+.idi-qv-cta:hover .arrow { transform: translateX(3px); }
     `;
     shadow.appendChild(style);
 
