@@ -182,7 +182,3 @@
   globalThis.__immodata.calculs.coutTotal = { calculerCoutTotal, calcMensualiteCredit, DPE_KWH };
 
 })();
-
-export function calculerCoutTotal(params) {
-  return globalThis.__immodata.calculs.coutTotal.calculerCoutTotal(params);
-}
