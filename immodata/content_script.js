@@ -179,6 +179,137 @@
       log.info(`CTP: ${ctpResult.total_mensuel}€/mois (crédit ${ctpResult.mensualite_credit}€)`);
     }
 
+    // Étape 4 : APIs complémentaires en parallèle
+    // On lance toutes les APIs qui dépendent des coordonnées GPS et/ou du code INSEE
+    if (data.lat && data.lon) {
+      const apiPromises = [
+        sendToBackground('FETCH_EDUCATION', { lat: data.lat, lon: data.lon }),
+        sendToBackground('FETCH_OVERPASS', { lat: data.lat, lon: data.lon }),
+        sendToBackground('FETCH_RTE', { lat: data.lat, lon: data.lon }),
+        sendToBackground('FETCH_BRUIT', { lat: data.lat, lon: data.lon }),
+        sendToBackground('FETCH_MERIMEE', { lat: data.lat, lon: data.lon })
+      ];
+
+      // APIs qui utilisent le code INSEE
+      if (data.code_insee) {
+        apiPromises.push(
+          sendToBackground('FETCH_SIRENE', { code_insee: data.code_insee }),
+          sendToBackground('FETCH_ANIL', { code_insee: data.code_insee }),
+          sendToBackground('FETCH_LOYERS', { code_insee: data.code_insee, type_bien: data.type_bien, surface: data.surface })
+        );
+      }
+
+      // ADEME (DPE officiel)
+      if (data.adresse_normalisee) {
+        apiPromises.push(
+          sendToBackground('FETCH_ADEME', { adresse: data.adresse_normalisee, code_insee: data.code_insee })
+        );
+      }
+
+      // ORS (isochrones — optionnel, nécessite clé API)
+      apiPromises.push(
+        sendToBackground('FETCH_ORS', { lat: data.lat, lon: data.lon })
+      );
+
+      const [
+        educationResult, overpassResult, rteResult, bruitResult, merimeeResult,
+        ...extraResults
+      ] = await Promise.all(apiPromises);
+
+      // Stocker les résultats
+      if (educationResult.success !== false) { data.education = educationResult; log.info(`Éducation: ${educationResult.nb_etablissements || 0} établissement(s)`); }
+      if (overpassResult.success !== false) { data.overpass = overpassResult; log.info(`Overpass: ${overpassResult.nb_commerces || 0} commerces, ${overpassResult.nb_transports || 0} transports`); }
+      if (rteResult.success !== false) { data.rte = rteResult; log.info(`RTE: ligne HT ${rteResult.ligne_proche ? 'oui' : 'non'}`); }
+      if (bruitResult.success !== false) { data.bruit = bruitResult; log.info(`Bruit: zone PEB ${bruitResult.zone_peb ? 'oui' : 'non'}`); }
+      if (merimeeResult.success !== false) { data.merimee = merimeeResult; log.info(`Mérimée: ${merimeeResult.nb_monuments || 0} monument(s)`); }
+
+      // Résultats conditionnels (SIRENE, ANIL, Loyers, ADEME, ORS)
+      let idx = 0;
+      if (data.code_insee) {
+        if (extraResults[idx] && extraResults[idx].success !== false) { data.sirene = extraResults[idx]; log.info(`SIRENE: ${extraResults[idx].nb_etablissements || 0} entreprises`); }
+        idx++;
+        if (extraResults[idx] && extraResults[idx].success !== false) { data.anil = extraResults[idx]; log.info(`ANIL: zone ${extraResults[idx].zone}`); }
+        idx++;
+        if (extraResults[idx] && extraResults[idx].success !== false) { data.loyers = extraResults[idx]; log.info(`Loyers: médiane ${extraResults[idx].loyer_median || '?'}€/m²`); }
+        idx++;
+      }
+      if (data.adresse_normalisee) {
+        if (extraResults[idx] && extraResults[idx].success !== false) { data.ademe = extraResults[idx]; log.info(`ADEME: DPE ${extraResults[idx].dpe || '?'}`); }
+        idx++;
+      }
+      // ORS est toujours le dernier
+      if (extraResults[idx] && extraResults[idx].success !== false) { data.ors = extraResults[idx]; log.info(`ORS: ${extraResults[idx].nb_zones || 0} isochrone(s)`); }
+    }
+
+    // Étape 5 : Calculs avancés (plus-value, liquidité, travaux, qualité de vie, rentabilité)
+
+    // Estimation travaux
+    const travauxResult = await sendToBackground('CALC_TRAVAUX', {
+      dpe: data.dpe,
+      surface: data.surface,
+      annee_construction: data.annee_constr,
+      type_bien: data.type_bien
+    });
+    if (travauxResult.success !== false) {
+      data.travaux = travauxResult;
+      log.info(`Travaux: ${travauxResult.niveau} — ${travauxResult.cout_estime}€`);
+    }
+
+    // Score plus-value
+    const pvResult = await sendToBackground('CALC_PLUS_VALUE', {
+      tendance_dvf: data.dvf ? data.dvf.tendance : null,
+      nb_transactions: data.dvf ? data.dvf.nb_transactions : 0,
+      nb_etablissements: data.sirene ? data.sirene.nb_etablissements : 0,
+      score_qualite_vie: null, // sera recalculé après
+      projets_urbains: false   // pas de source de données pour l'instant
+    });
+    if (pvResult.success !== false) {
+      data.plus_value = pvResult;
+      log.info(`Plus-value: score ${pvResult.score}/100 — "${pvResult.label}"`);
+    }
+
+    // Liquidité
+    const liqResult = await sendToBackground('CALC_LIQUIDITE', {
+      nb_transactions: data.dvf ? data.dvf.nb_transactions : 0,
+      type_bien: data.type_bien,
+      surface: data.surface,
+      tendance_dvf: data.dvf ? data.dvf.tendance : null
+    });
+    if (liqResult.success !== false) {
+      data.liquidite = liqResult;
+      log.info(`Liquidité: ${liqResult.profil} — délai ${liqResult.delai_vente_median}j`);
+    }
+
+    // Qualité de vie (utilise les résultats des APIs complémentaires)
+    const qvResult = await sendToBackground('CALC_QUALITE_VIE', {
+      nb_commerces: data.overpass ? data.overpass.nb_commerces : 0,
+      nb_transports: data.overpass ? data.overpass.nb_transports : 0,
+      nb_ecoles: data.education ? data.education.nb_etablissements : 0,
+      risques_niveau: data.georisques ? data.georisques.classification : 'FAIBLE',
+      zone_bruit: data.bruit ? data.bruit.zone_peb : false,
+      nb_monuments: data.merimee ? data.merimee.nb_monuments : 0,
+      ligne_haute_tension: data.rte ? data.rte.ligne_proche : false
+    });
+    if (qvResult.success !== false) {
+      data.qualite_vie = qvResult;
+      log.info(`Qualité de vie: score ${qvResult.score}/100 — "${qvResult.label}"`);
+    }
+
+    // Rentabilité locative
+    const rentaResult = await sendToBackground('CALC_RENTABILITE', {
+      prix_achat: data.prix,
+      loyer_median: data.loyers ? data.loyers.loyer_median : null,
+      surface: data.surface,
+      frais_notaire: data.frais_notaire ? data.frais_notaire.frais_median : null,
+      cout_travaux: data.travaux ? data.travaux.cout_estime : 0,
+      taxe_fonciere: null,
+      charges_copro: null
+    });
+    if (rentaResult.success !== false) {
+      data.rentabilite = rentaResult;
+      log.info(`Rentabilité: meilleure stratégie "${rentaResult.meilleure}"`);
+    }
+
     // L'injection UI sera ajoutée aux Étapes 6-7.
 
     // Stocker les données enrichies pour usage ultérieur (UI, etc.)
