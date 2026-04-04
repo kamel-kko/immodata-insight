@@ -6,8 +6,89 @@
   <title>ImmoData</title>
 </head>
 <body>
-  <h1>ImmoData</h1>
-  <p>Extension en cours de développement.</p>
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="popup-logo">
+      <span class="popup-logo-icon">&#x1F3E0;</span>
+      <span class="popup-logo-text">ImmoData</span>
+    </div>
+    <div class="popup-toggle-wrap">
+      <label class="toggle" for="toggle-enabled">
+        <input type="checkbox" id="toggle-enabled" checked>
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label" id="toggle-label">Actif</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="popup-section">
+    <div class="section-title">Statistiques</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-annonces">0</div>
+        <div class="stat-label">Annonces analys&#233;es</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-listes">0</div>
+        <div class="stat-label">Pages liste</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-cache-keys">0</div>
+        <div class="stat-label">Cl&#233;s en cache</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-cache-size">0 KB</div>
+        <div class="stat-label">Taille cache</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parametres credit -->
+  <div class="popup-section">
+    <div class="section-title">Param&#232;tres cr&#233;dit</div>
+    <div class="param-row">
+      <label class="param-label" for="param-apport">Apport (%)</label>
+      <input type="number" id="param-apport" class="param-input" min="0" max="100" value="10">
+    </div>
+    <div class="param-row">
+      <label class="param-label" for="param-duree">Dur&#233;e (ans)</label>
+      <select id="param-duree" class="param-input param-select">
+        <option value="15">15 ans</option>
+        <option value="20">20 ans</option>
+        <option value="25" selected>25 ans</option>
+        <option value="30">30 ans</option>
+      </select>
+    </div>
+    <div class="param-saved" id="param-saved">&#10003; Sauvegard&#233;</div>
+  </div>
+
+  <!-- Cle API ORS -->
+  <div class="popup-section">
+    <div class="section-title">Cl&#233; API OpenRouteService</div>
+    <div class="param-row">
+      <input type="password" id="param-ors-key" class="param-input param-full" placeholder="Coller votre cl&#233; ORS ici">
+      <button class="btn-small" id="btn-show-ors" title="Afficher/masquer">&#x1F441;</button>
+    </div>
+    <div class="param-hint">Gratuit sur <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a> &#8212; active les isochrones</div>
+    <div class="param-saved" id="ors-saved">&#10003; Sauvegard&#233;</div>
+  </div>
+
+  <!-- Actions -->
+  <div class="popup-section">
+    <div class="section-title">Maintenance</div>
+    <div class="actions-row">
+      <button class="btn-action" id="btn-clear-cache">&#x1F5D1; Vider le cache</button>
+      <button class="btn-action btn-action-warn" id="btn-clear-stats">&#x1F4CA; Effacer stats</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="popup-footer">
+    <div class="footer-rgpd">&#x1F512; Aucune donn&#233;e ne quitte votre navigateur</div>
+    <div class="footer-version">ImmoData v<span id="popup-version">1.0.0</span> &#8212; Donn&#233;es Open Data</div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
