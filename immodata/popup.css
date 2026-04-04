@@ -1,8 +1,304 @@
-/* ImmoData — Popup styles placeholder — sera complété à l'Étape 9 */
+/**
+ * ImmoData -- Popup Styles
+ * Design dark coherent avec le design system Bento.
+ * Les variables sont en dur (pas de Shadow DOM ici, c'est une page extension).
+ */
+
+/* Reset + base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  width: 300px;
-  padding: 16px;
+  width: 340px;
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
   background: #0F0F11;
   color: #F2F2F7;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+a { color: #6C63FF; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: #1A1A1F;
+}
+
+.popup-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popup-logo-icon {
+  font-size: 18px;
+}
+
+.popup-logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Toggle switch */
+.popup-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #2E2E36;
+  border-radius: 11px;
+  transition: background 150ms ease;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  background: #F2F2F7;
+  border-radius: 50%;
+  transition: transform 150ms ease;
+}
+
+.toggle input:checked + .toggle-slider {
+  background: #6C63FF;
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #A0A0B0;
+  min-width: 40px;
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+
+.popup-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5C5C6E;
+  margin-bottom: 10px;
+}
+
+/* ============================================================
+   STATS GRID
+   ============================================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-card {
+  background: #1A1A1F;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #F2F2F7;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #5C5C6E;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   PARAMS
+   ============================================================ */
+
+.param-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.param-label {
+  font-size: 12px;
+  color: #A0A0B0;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.param-input {
+  flex: 1;
+  background: #1A1A1F;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #F2F2F7;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.param-input:focus {
+  border-color: #6C63FF;
+}
+
+.param-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235C5C6E'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+  cursor: pointer;
+}
+
+.param-select option {
+  background: #1A1A1F;
+  color: #F2F2F7;
+}
+
+.param-full {
+  flex: 1;
+}
+
+.param-hint {
+  font-size: 10px;
+  color: #5C5C6E;
+  margin-top: 2px;
+}
+
+.param-saved {
+  font-size: 11px;
+  color: #22C55E;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.param-saved.visible {
+  opacity: 1;
+}
+
+/* Bouton petit (oeil ORS) */
+.btn-small {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: #A0A0B0;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+
+.btn-small:hover {
+  background: #242429;
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action {
+  flex: 1;
+  background: #1A1A1F;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px 0;
+  color: #A0A0B0;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.btn-action:hover {
+  background: #242429;
+  color: #F2F2F7;
+}
+
+.btn-action-warn:hover {
+  background: rgba(239,68,68,0.1);
+  color: #EF4444;
+  border-color: rgba(239,68,68,0.2);
+}
+
+.btn-action.done {
+  color: #22C55E;
+  border-color: rgba(34,197,94,0.2);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.popup-footer {
+  padding: 10px 16px 14px;
+  text-align: center;
+}
+
+.footer-rgpd {
+  font-size: 10px;
+  color: #A0A0B0;
+  margin-bottom: 4px;
+}
+
+.footer-version {
+  font-size: 10px;
+  color: #5C5C6E;
 }
