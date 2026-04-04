@@ -310,10 +310,14 @@
       log.info(`Rentabilité: meilleure stratégie "${rentaResult.meilleure}"`);
     }
 
-    // L'injection UI sera ajoutée aux Étapes 6-7.
-
-    // Stocker les données enrichies pour usage ultérieur (UI, etc.)
+    // Stocker les données enrichies pour usage ultérieur
     self.__immodata.currentData = data;
+
+    // Étape 7 : Injection de l'interface utilisateur (Side Dashboard)
+    if (self.__immodata.ui && self.__immodata.ui.sideDashboard) {
+      log.info('Injection du Side Dashboard');
+      self.__immodata.ui.sideDashboard.inject(data);
+    }
 
     log.info('Traitement annonce terminé — toutes les données enrichies');
     return data;
