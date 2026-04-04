@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ImmoData - Politique de confidentialite</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0F0F11;
+      color: #E0E0E0;
+      line-height: 1.7;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 28px;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+    h2 {
+      font-size: 18px;
+      color: #FFFFFF;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2A2A2F;
+    }
+    p, li {
+      font-size: 15px;
+      color: #C0C0C0;
+      margin-bottom: 12px;
+    }
+    ul {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+    li { margin-bottom: 6px; }
+    .highlight {
+      background: #1A1A1F;
+      border: 1px solid #2A2A2F;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+    .highlight p { margin-bottom: 0; }
+    .badge {
+      display: inline-block;
+      background: #6C63FF22;
+      color: #6C63FF;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    a { color: #6C63FF; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #2A2A2F;
+      font-size: 13px;
+      color: #666;
+    }
+    code {
+      background: #1A1A1F;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #6C63FF;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #2A2A2F;
+      font-size: 14px;
+    }
+    th {
+      color: #888;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td { color: #C0C0C0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">Extension Chrome</span>
+    <h1>ImmoData - Politique de confidentialite</h1>
+    <p class="subtitle">Derniere mise a jour : 5 avril 2026</p>
+
+    <div class="highlight">
+      <p><strong>En resume :</strong> ImmoData ne collecte aucune donnee personnelle.
+      Toutes les informations restent dans votre navigateur. Rien n'est envoye
+      a des serveurs tiers.</p>
+    </div>
+
+    <h2>1. Donnees collectees</h2>
+    <p>ImmoData ne collecte <strong>aucune donnee personnelle</strong>. L'extension :</p>
+    <ul>
+      <li>Ne cree pas de compte utilisateur</li>
+      <li>Ne demande pas d'adresse email</li>
+      <li>Ne suit pas votre navigation</li>
+      <li>Ne place pas de cookies</li>
+      <li>N'utilise pas de service d'analytics externe (Google Analytics, Mixpanel, etc.)</li>
+    </ul>
+
+    <h2>2. Stockage local</h2>
+    <p>ImmoData utilise le stockage local de Chrome (<code>chrome.storage.local</code>)
+    pour enregistrer :</p>
+    <ul>
+      <li><strong>Cache API</strong> : les reponses des APIs Open Data sont mises en cache
+      localement pour eviter les requetes repetees et accelerer l'affichage.
+      Chaque entree a une duree de vie limitee (1 a 30 jours selon l'API).</li>
+      <li><strong>Parametres</strong> : vos preferences (apport, duree de credit,
+      cle API OpenRouteService si configuree).</li>
+      <li><strong>Statistiques d'utilisation</strong> : compteurs locaux (nombre d'annonces
+      analysees, de pages vues). Ces statistiques ne quittent jamais votre navigateur.</li>
+      <li><strong>Suivi des annonces</strong> : historique de prix des annonces visitees
+      pour detecter les baisses de prix.</li>
+    </ul>
+    <p>Toutes ces donnees sont <strong>effacables a tout moment</strong> depuis
+    la popup de l'extension (boutons "Vider le cache" et "Reinitialiser les stats").</p>
+
+    <h2>3. APIs interrogees</h2>
+    <p>Pour enrichir les annonces, ImmoData interroge exclusivement des
+    <strong>APIs Open Data publiques francaises</strong>. Voici la liste complete :</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>API</th>
+          <th>Donnees</th>
+          <th>Operateur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Base Adresse Nationale</td>
+          <td>Geocodage (adresse vers GPS)</td>
+          <td>data.gouv.fr</td>
+        </tr>
+        <tr>
+          <td>DVF (OpenDataSoft)</td>
+          <td>Transactions immobilieres</td>
+          <td>public.opendatasoft.com</td>
+        </tr>
+        <tr>
+          <td>Georisques</td>
+          <td>Risques naturels et industriels</td>
+          <td>georisques.gouv.fr</td>
+        </tr>
+        <tr>
+          <td>Annuaire Education</td>
+          <td>Ecoles et etablissements</td>
+          <td>data.education.gouv.fr</td>
+        </tr>
+        <tr>
+          <td>Overpass (OpenStreetMap)</td>
+          <td>Commerces et transports</td>
+          <td>overpass-api.de</td>
+        </tr>
+        <tr>
+          <td>ADEME</td>
+          <td>Diagnostics energetiques (DPE)</td>
+          <td>data.ademe.fr</td>
+        </tr>
+        <tr>
+          <td>INSEE</td>
+          <td>Donnees demographiques</td>
+          <td>api.insee.fr</td>
+        </tr>
+        <tr>
+          <td>Merimee</td>
+          <td>Monuments historiques</td>
+          <td>data.culture.gouv.fr</td>
+        </tr>
+        <tr>
+          <td>RTE</td>
+          <td>Lignes haute tension</td>
+          <td>opendata.reseaux-energies.fr</td>
+        </tr>
+        <tr>
+          <td>OpenRouteService</td>
+          <td>Isochrones (optionnel)</td>
+          <td>openrouteservice.org</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Les seules informations transmises a ces APIs sont les <strong>coordonnees GPS</strong>
+    et le <strong>code INSEE</strong> derives de l'adresse du bien consulte.
+    Aucune information personnelle n'est envoyee.</p>
+
+    <h2>4. Liens d'affiliation</h2>
+    <p>ImmoData peut afficher des suggestions de services partenaires (courtiers,
+    diagnostiqueurs, assurances) sous forme de boutons dans le dashboard.
+    Ces liens contiennent des parametres UTM pour identifier la source.</p>
+    <ul>
+      <li>Les liens s'ouvrent dans un nouvel onglet uniquement si vous cliquez dessus</li>
+      <li>Aucun tracking entre les sites n'est effectue par ImmoData</li>
+      <li>Les impressions et clics sont comptes localement pour les statistiques internes</li>
+    </ul>
+
+    <h2>5. Permissions Chrome</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>storage</code></td>
+          <td>Sauvegarder le cache, les parametres et les statistiques locales</td>
+        </tr>
+        <tr>
+          <td><code>alarms</code></td>
+          <td>Programmer le nettoyage automatique du cache expire</td>
+        </tr>
+        <tr>
+          <td><code>activeTab</code></td>
+          <td>Lire le contenu de l'onglet actif pour extraire les donnees de l'annonce</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Vos droits</h2>
+    <p>Puisqu'aucune donnee personnelle n'est collectee ni transmise, il n'y a
+    rien a supprimer cote serveur. Vous pouvez a tout moment :</p>
+    <ul>
+      <li><strong>Desactiver</strong> l'extension via le toggle dans la popup</li>
+      <li><strong>Vider le cache</strong> et les statistiques depuis la popup</li>
+      <li><strong>Desinstaller</strong> l'extension, ce qui supprime toutes les donnees locales</li>
+    </ul>
+
+    <h2>7. Contact</h2>
+    <p>Pour toute question concernant cette politique de confidentialite,
+    vous pouvez ouvrir une issue sur le
+    <a href="https://github.com/immodata/immodata-extension" target="_blank" rel="noopener">depot GitHub du projet</a>.</p>
+
+    <div class="footer">
+      <p>ImmoData v1.0.0 --- Extension Chrome open source.</p>
+      <p>Cette politique de confidentialite est conforme au RGPD (Reglement General
+      sur la Protection des Donnees) et a la directive ePrivacy.</p>
+    </div>
+  </div>
+</body>
+</html>
