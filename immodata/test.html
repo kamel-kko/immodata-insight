@@ -1107,59 +1107,6 @@
 
     shadow.appendChild(panel);
 
-    // QuickView element (vit aussi dans le Shadow DOM)
-    const qv = document.createElement('div');
-    qv.className = 'idi-qv';
-    qv.id = 'immodata-qv';
-    shadow.appendChild(qv);
-
-    // Donnees fictives pour les 3 annonces
-    const QV_DATA = [
-      { title: 'Appart. 3p · 64m2', dpe: 'D', dpeColor: '#F59E0B', delta: -8, prixM2: '5 344', mediane: '5 812', score: 65, scoreColor: 'var(--idi-accent)', jours: 43 },
-      { title: 'Villa 5p · 143m2', dpe: 'C', dpeColor: '#22C55E', delta: +3, prixM2: '3 084', mediane: '2 995', score: 42, scoreColor: 'var(--idi-warn)', jours: 12 },
-      { title: 'Studio 1p · 28m2', dpe: 'E', dpeColor: '#EF4444', delta: -15, prixM2: '6 750', mediane: '7 941', score: 81, scoreColor: 'var(--idi-green)', jours: 67 }
-    ];
-
-    function renderQV(data) {
-      const deltaSign = data.delta <= 0 ? '' : '+';
-      const deltaClass = data.delta <= 0 ? 'idi-badge-success' : 'idi-badge-danger';
-      const deltaLabel = data.delta <= 0 ? 'sous le marche' : 'au-dessus marche';
-      qv.innerHTML = \`
-        <div class="idi-qv-header">
-          <div class="idi-qv-title">
-            <span style="font-size:14px">&#127968;</span>
-            \${data.title}
-          </div>
-          <span class="idi-qv-dpe" style="background:\${data.dpeColor}20;color:\${data.dpeColor}">DPE \${data.dpe}</span>
-        </div>
-        <div class="idi-qv-grid">
-          <div class="idi-qv-cell">
-            <div class="idi-qv-cell-value">
-              <span class="idi-badge \${deltaClass}" style="font-size:15px;padding:2px 10px;font-weight:700">\${deltaSign}\${data.delta}%</span>
-            </div>
-            <div class="idi-qv-cell-label">\${deltaLabel}</div>
-          </div>
-          <div class="idi-qv-cell">
-            <div class="idi-qv-cell-value">\${data.prixM2} EUR</div>
-            <div class="idi-qv-cell-label">prix/m2 · med. \${data.mediane}</div>
-          </div>
-        </div>
-        <div class="idi-qv-score">
-          <div class="idi-qv-score-header">
-            <span class="idi-qv-score-label">Negociation</span>
-            <span class="idi-qv-score-value">\${data.score}/100</span>
-          </div>
-          <div class="idi-qv-bar">
-            <div class="idi-qv-bar-fill" style="width:\${data.score}%;background:\${data.scoreColor}"></div>
-          </div>
-        </div>
-        <div class="idi-qv-footer">
-          <span class="idi-qv-meta">&#9201; En ligne : \${data.jours} jours</span>
-          <button class="idi-qv-cta">Analyse complete <span class="arrow">&#8594;</span></button>
-        </div>
-      \`;
-    }
-
     // Interactivite des onglets
     shadow.querySelectorAll('.idi-tab').forEach(tab => {
       tab.addEventListener('click', () => {
