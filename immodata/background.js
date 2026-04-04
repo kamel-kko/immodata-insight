@@ -394,6 +394,41 @@ function handleCalcCoutTotal(payload) {
   return self.__immodata.calculs.coutTotal.calculerCoutTotal(payload);
 }
 
+/**
+ * CALC_PLUS_VALUE — Score Potentiel de Plus-Value (0-100)
+ */
+function handleCalcPlusValue(payload) {
+  return self.__immodata.calculs.plusValue.calculerScorePlusValue(payload);
+}
+
+/**
+ * CALC_LIQUIDITE — Profil de liquidité et délai de vente
+ */
+function handleCalcLiquidite(payload) {
+  return self.__immodata.calculs.liquidite.calculerLiquidite(payload);
+}
+
+/**
+ * CALC_TRAVAUX — Estimation travaux + MaPrimeRénov'
+ */
+function handleCalcTravaux(payload) {
+  return self.__immodata.calculs.travaux.estimerTravaux(payload);
+}
+
+/**
+ * CALC_QUALITE_VIE — Score composite qualité de vie (0-100)
+ */
+function handleCalcQualiteVie(payload) {
+  return self.__immodata.calculs.qualiteVie.calculerQualiteVie(payload);
+}
+
+/**
+ * CALC_RENTABILITE — 4 stratégies locatives
+ */
+function handleCalcRentabilite(payload) {
+  return self.__immodata.calculs.rentabilite.calculerRentabilite(payload);
+}
+
 // ============================================================
 // DISPATCHER — Branchement des handlers sur les actions
 // ============================================================
