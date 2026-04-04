@@ -122,8 +122,3 @@
   globalThis.__immodata.calculs.notaire = { calculerFraisNotaire };
 
 })();
-
-// Export ES Module pour usage dans background.js
-export function calculerFraisNotaire(params) {
-  return globalThis.__immodata.calculs.notaire.calculerFraisNotaire(params);
-}
