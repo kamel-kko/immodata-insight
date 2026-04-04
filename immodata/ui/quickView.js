@@ -361,6 +361,7 @@
 
     card.addEventListener('mouseenter', () => {
       hoverTimeout = setTimeout(async () => {
+        log.info('Survol card — popup affiche (prix=' + cardData.prix + ')');
         // Charger les donnees si pas encore fait
         if (!loaded) {
           popup.innerHTML = `
