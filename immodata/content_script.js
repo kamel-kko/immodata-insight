@@ -340,8 +340,14 @@
       return;
     }
 
-    // Stocker les cartes pour l'injection QuickView (Étape 7)
+    // Stocker les cartes pour l'injection QuickView
     self.__immodata.currentCards = cards;
+
+    // Étape 7 : Injection du QuickView (popup hover)
+    if (self.__immodata.ui && self.__immodata.ui.quickView) {
+      log.info('Initialisation du QuickView sur les cartes liste');
+      self.__immodata.ui.quickView.init();
+    }
 
     log.info(`${cards.length} carte(s) détectée(s) sur la page liste`);
     return cards;
