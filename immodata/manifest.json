@@ -48,6 +48,11 @@
         "modules/calculs/notaire.js",
         "modules/calculs/negotiation.js",
         "modules/calculs/coutTotal.js",
+        "modules/calculs/plusValue.js",
+        "modules/calculs/liquidite.js",
+        "modules/calculs/travaux.js",
+        "modules/calculs/qualiteVie.js",
+        "modules/calculs/rentabilite.js",
         "content_script.js"
       ],
       "run_at": "document_idle"
