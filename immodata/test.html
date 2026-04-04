@@ -1160,6 +1160,50 @@
       dot.style.cursor = 'pointer';
       dot.addEventListener('click', () => showSlide(i));
     });
+
+    // QuickView hover sur les listing cards (vivent hors du Shadow DOM)
+    let qvTimeout = null;
+    const listingCards = document.querySelectorAll('.listing-card[data-qv]');
+
+    listingCards.forEach(card => {
+      card.addEventListener('mouseenter', (e) => {
+        const idx = parseInt(card.getAttribute('data-qv'));
+        const data = QV_DATA[idx];
+        if (!data) return;
+
+        // Delai 300ms avant affichage (evite les survols accidentels)
+        qvTimeout = setTimeout(() => {
+          renderQV(data);
+
+          // Positionner le QV a droite de la card
+          const rect = card.getBoundingClientRect();
+          const qvWidth = 340;
+          let left = rect.right + 12;
+          let top = rect.top + (rect.height / 2);
+
+          // Si pas assez de place a droite (panel ImmoData), mettre a gauche
+          if (left + qvWidth > window.innerWidth - 400) {
+            left = rect.left - qvWidth - 12;
+          }
+          // Eviter de depasser en haut/bas
+          top = Math.max(20, Math.min(top, window.innerHeight - 220));
+
+          qv.style.left = left + 'px';
+          qv.style.top = top + 'px';
+          qv.classList.add('visible');
+        }, 300);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        clearTimeout(qvTimeout);
+        qv.classList.remove('visible');
+      });
+    });
+
+    // Fermer le QV si la souris entre dedans puis en sort
+    qv.addEventListener('mouseleave', () => {
+      qv.classList.remove('visible');
+    });
   </script>
 
 </body>
