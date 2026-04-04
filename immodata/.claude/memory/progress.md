@@ -18,7 +18,7 @@ type: project
 | 6 | Design System Bento | Validée | 2026-04-04 |
 | 7 | Interface utilisateur | Validée | 2026-04-05 |
 | 8 | Affiliation & Tracker | Créée | 2026-04-05 |
-| 9 | Popup extension | Créée | 2026-04-05 |
+| 9 | Popup extension | Validée | 2026-04-05 |
 | 10 | Tests finaux & Optimisation | — | — |
 
 ## Décisions prises
