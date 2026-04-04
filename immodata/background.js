@@ -38,6 +38,11 @@ import { handleFetchAnil } from './modules/api/anil.js';
 import './modules/calculs/notaire.js';
 import './modules/calculs/negotiation.js';
 import './modules/calculs/coutTotal.js';
+import './modules/calculs/plusValue.js';
+import './modules/calculs/liquidite.js';
+import './modules/calculs/travaux.js';
+import './modules/calculs/qualiteVie.js';
+import './modules/calculs/rentabilite.js';
 
 // --- Import de la config API ---
 // On ne peut pas importer du JSON directement en ES Module dans un SW Chrome,
