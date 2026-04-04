@@ -9,7 +9,7 @@
  *
  * Il est chargé en dernier dans la liste des content scripts du manifest,
  * après security.js, logger.js, extractors.js, detector.js et les scrapers.
- * Tous ces modules s'enregistrent sur window.__immodata.
+ * Tous ces modules s'enregistrent sur self.__immodata.
  *
  * IMPORTANT : ce fichier ne fait JAMAIS de fetch() directement.
  * Toute communication réseau passe par le background via chrome.runtime.sendMessage.
@@ -19,13 +19,13 @@
   'use strict';
 
   // Initialiser le namespace si ce n'est pas déjà fait
-  if (typeof window.__immodata === 'undefined') {
-    window.__immodata = {};
+  if (typeof self.__immodata === 'undefined') {
+    self.__immodata = {};
   }
 
-  const log = window.__immodata.createLogger('CONTENT');
-  const detector = window.__immodata.detector;
-  const scrapers = window.__immodata.scrapers;
+  const log = self.__immodata.createLogger('CONTENT');
+  const detector = self.__immodata.detector;
+  const scrapers = self.__immodata.scrapers;
 
   // Flag pour éviter de traiter la même page deux fois d'affilée
   let lastProcessedUrl = null;
@@ -182,7 +182,7 @@
     // L'injection UI sera ajoutée aux Étapes 6-7.
 
     // Stocker les données enrichies pour usage ultérieur (UI, etc.)
-    window.__immodata.currentData = data;
+    self.__immodata.currentData = data;
 
     log.info('Traitement annonce terminé — toutes les données enrichies');
     return data;
@@ -206,7 +206,7 @@
     }
 
     // Stocker les cartes pour l'injection QuickView (Étape 7)
-    window.__immodata.currentCards = cards;
+    self.__immodata.currentCards = cards;
 
     log.info(`${cards.length} carte(s) détectée(s) sur la page liste`);
     return cards;
