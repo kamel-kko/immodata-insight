@@ -214,12 +214,33 @@
     });
   }
 
+  /**
+   * Extraire ville et CP depuis le texte d'une card.
+   * LeBonCoin affiche souvent "Pau (64000)" ou "64000 Pau"
+   */
+  function extractLocationFromText(text) {
+    if (!text) return { ville: null, cp: null };
+    // Format "Ville (XXXXX)" ou "Ville XXXXX"
+    const m1 = text.match(/([A-Za-zÀ-ÿ\s-]+)\s*\(?(\d{5})\)?/);
+    if (m1) return { ville: m1[1].trim(), cp: m1[2] };
+    // Format "XXXXX Ville"
+    const m2 = text.match(/(\d{5})\s+([A-Za-zÀ-ÿ\s-]+)/);
+    if (m2) return { ville: m2[2].trim(), cp: m2[1] };
+    // Juste un CP
+    const m3 = text.match(/\b(\d{5})\b/);
+    if (m3) return { ville: null, cp: m3[1] };
+    return { ville: null, cp: null };
+  }
+
   async function fetchQvData(cardData) {
     // Verifier le cache
-    const cacheKey = cardData.url || cardData.adresse_brute || JSON.stringify(cardData);
+    const cacheKey = cardData.url || JSON.stringify({ p: cardData.prix, s: cardData.surface });
     if (qvCache.has(cacheKey)) {
+      log.debug('Cache hit pour ' + cacheKey.slice(0, 60));
       return qvCache.get(cacheKey);
     }
+
+    log.info('fetchQvData — prix=' + cardData.prix + ' surface=' + cardData.surface);
 
     const result = {
       title: cardData.titre || cardData.type_bien || 'Annonce',
@@ -238,18 +259,39 @@
     // Calculer prix au m2 si possible
     if (cardData.prix && cardData.surface) {
       result.prix_m2 = Math.round(cardData.prix / cardData.surface);
+      log.debug('Prix/m2 calcule : ' + result.prix_m2);
     }
 
-    // Geocoder via BAN
-    if (cardData.adresse_brute || cardData.cp || cardData.ville) {
+    // Enrichir les donnees de localisation si manquantes
+    // Extraire depuis le texte de l'element DOM si on l'a
+    let adresse = cardData.adresse_brute || null;
+    let cp = cardData.cp || null;
+    let ville = cardData.ville || null;
+
+    if (!adresse && !cp && !ville && cardData.element) {
+      const loc = extractLocationFromText(cardData.element.textContent);
+      cp = loc.cp;
+      ville = loc.ville;
+      log.debug('Location extraite du DOM : ville=' + ville + ' cp=' + cp);
+    }
+
+    // Construire une adresse a geocoder
+    const adresseGeo = adresse || [ville, cp].filter(Boolean).join(' ');
+
+    // Etape 1 : Geocoder via BAN
+    if (adresseGeo) {
+      log.info('BAN appele pour : ' + adresseGeo);
       const ban = await sendToBackground('FETCH_BAN', {
-        adresse: cardData.adresse_brute,
-        cp: cardData.cp,
-        ville: cardData.ville
+        adresse: adresse,
+        cp: cp,
+        ville: ville
       });
 
       if (ban.success !== false && ban.lat && ban.lon) {
-        // Appeler DVF
+        log.info('BAN reponse : lat=' + ban.lat + ' lon=' + ban.lon + ' insee=' + ban.code_insee);
+
+        // Etape 2 : DVF
+        log.info('DVF appele');
         const dvf = await sendToBackground('FETCH_DVF', {
           lat: ban.lat,
           lon: ban.lon,
@@ -262,9 +304,13 @@
         if (dvf.success !== false) {
           result.mediane_m2 = dvf.mediane_m2;
           result.delta_pct = dvf.delta_pct;
+          log.info('DVF reponse : mediane=' + dvf.mediane_m2 + ' delta=' + dvf.delta_pct + '%');
+        } else {
+          log.warn('DVF echoue : ' + (dvf.error || 'inconnu'));
         }
 
-        // Score negociation rapide
+        // Etape 3 : Score negociation
+        log.info('CALC_NEGOTIATION appele');
         const nego = await sendToBackground('CALC_NEGOTIATION', {
           delta_dvf: dvf.success !== false ? dvf.delta_pct : null,
           jours_en_ligne: null,
@@ -274,9 +320,18 @@
         });
         if (nego.success !== false) {
           result.nego_score = nego.score;
+          log.info('Negociation : score=' + nego.score);
+        } else {
+          log.warn('CALC_NEGOTIATION echoue : ' + (nego.error || 'inconnu'));
         }
+      } else {
+        log.warn('BAN echoue : ' + (ban.error || 'pas de coordonnees'));
       }
+    } else {
+      log.warn('Pas d\'adresse disponible — BAN non appele');
     }
+
+    log.info('Donnees injectees dans popup — delta=' + result.delta_pct + ' nego=' + result.nego_score);
 
     // Stocker en cache
     qvCache.set(cacheKey, result);
