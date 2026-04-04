@@ -5,42 +5,51 @@
   <title>ImmoData — Test Design System Bento</title>
   <style>
     /* Style de la page hôte (simule un site immobilier) */
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       color: #333;
-      padding: 40px;
+      display: flex;
+      min-height: 100vh;
     }
-    h1 { font-size: 20px; color: #666; }
+    /* Colonne gauche : page liste */
+    .host-page {
+      flex: 1;
+      padding: 24px 32px;
+      min-width: 0;
+    }
+    /* Colonne droite : le panel ImmoData */
+    #immodata-host {
+      width: 380px;
+      min-width: 380px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    h1 { font-size: 20px; color: #666; margin-top: 0; }
     h2 { font-size: 16px; color: #888; margin-top: 40px; }
-    p { color: #888; max-width: 600px; line-height: 1.6; }
+    p { color: #888; line-height: 1.6; }
     .host-box {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      max-width: 600px;
+      background: #fff; border: 1px solid #ddd;
+      padding: 16px; border-radius: 8px; margin-bottom: 20px;
     }
-    .toggle-bg {
-      position: fixed; top: 12px; right: 12px;
-      padding: 8px 16px; background: #6C63FF; color: #fff;
-      border: none; border-radius: 8px; cursor: pointer; font-size: 13px; z-index: 999;
-    }
-    .toggle-bg:hover { background: #7B73FF; }
 
-    /* Fausses cards d'annonces (simule page liste) */
-    .listing-grid { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+    /* Fausses cards d'annonces */
+    .listing-grid { display: flex; flex-direction: column; gap: 16px; }
     .listing-card {
       background: #fff; border: 1px solid #ddd; border-radius: 10px;
-      padding: 0; overflow: hidden; cursor: pointer;
-      transition: box-shadow 200ms ease, transform 200ms ease;
+      padding: 0; overflow: visible; cursor: pointer;
+      transition: box-shadow 200ms ease;
       position: relative;
     }
     .listing-card:hover {
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      transform: translateY(-2px);
+    }
+    .listing-inner {
+      border-radius: 10px; overflow: hidden;
     }
     .listing-img {
       height: 140px; width: 100%;
@@ -55,6 +64,25 @@
     .listing-tag {
       font-size: 11px; padding: 2px 8px; border-radius: 12px;
       background: #f0f0f0; color: #666;
+    }
+
+    /* QuickView (vit hors Shadow DOM, au-dessus de la card) */
+    .qv-popup {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 340px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease, transform 150ms ease;
+      transform: translateX(-50%) translateY(6px);
+    }
+    .qv-popup.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
