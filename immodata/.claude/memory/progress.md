@@ -13,8 +13,8 @@ type: project
 | 1 | Fondations & Sécurité | Validée | 2026-04-04 |
 | 2 | Service Worker & Communication | Validée | 2026-04-04 |
 | 3 | Moteur de Scraping | Validée | 2026-04-04 |
-| 4 | APIs essentielles (MVP) | En cours | — |
-| 5 | APIs complémentaires | — | — |
+| 4 | APIs essentielles (MVP) | Validée | 2026-04-04 |
+| 5 | APIs complémentaires | En cours | — |
 | 6 | Design System Bento | — | — |
 | 7 | Interface utilisateur | — | — |
 | 8 | Affiliation & Tracker | — | — |
