@@ -26,3 +26,5 @@ type: project
 - **Q1** : Code à la racine de `P:/CLAUDE CODE/immodata/`, pas de sous-dossier.
 - **Q2** : ES Modules pour background.js, IIFE pour content script. Pas de bundler.
 - **Q3** : Pas de clé ORS pour l'instant, fonctionnalité reportée.
+- **Q4** : API DVF migrée de `api.dvf.gouv.fr` (hors-ligne) vers OpenDataSoft (2026-04-05).
+- **Q5** : Score négo : jamais 0 quand DVF disponible. Delta négatif → score faible (2-6), pas zéro.
