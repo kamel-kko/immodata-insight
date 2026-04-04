@@ -115,10 +115,10 @@
   }
 
   // Exposer via globalThis (IIFE) et export (ES Module)
-  if (typeof globalThis.__immodata === 'undefined') {
-    globalThis.__immodata = {};
+  if (typeof window.__immodata === 'undefined') {
+    window.__immodata = {};
   }
-  globalThis.__immodata.calculs = globalThis.__immodata.calculs || {};
-  globalThis.__immodata.calculs.notaire = { calculerFraisNotaire };
+  window.__immodata.calculs = window.__immodata.calculs || {};
+  window.__immodata.calculs.notaire = { calculerFraisNotaire };
 
 })();
