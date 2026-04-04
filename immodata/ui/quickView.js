@@ -89,6 +89,13 @@
     return Math.round(n).toLocaleString('fr-FR');
   }
 
+  // Echappe les caracteres HTML dangereux pour eviter les injections XSS
+  // quand on insere du texte utilisateur dans un innerHTML
+  function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function scoreColor(score) {
     if (score >= 70) return COLORS.green;
     if (score >= 40) return COLORS.accent;
