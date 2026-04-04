@@ -95,4 +95,76 @@
     URL_ALLOWLIST, FRANCE_BOUNDS
   };
 
+  // ============================================================
+  // TRACKER D'ANNONCE — Historique de prix (chrome.storage.local)
+  // ============================================================
+  // Copie legere du tracker de cache.js pour les content scripts.
+  // chrome.storage.local est accessible depuis les content scripts.
+
+  const trackerLog = createLogger('TRACKER');
+
+  function hashUrl(url) {
+    let hash = 0;
+    for (let i = 0; i < url.length; i++) {
+      const ch = url.charCodeAt(i);
+      hash = ((hash << 5) - hash) + ch;
+      hash |= 0;
+    }
+    return 'tracker_' + Math.abs(hash).toString(36);
+  }
+
+  async function trackAnnonceVisit(url, prix, surface) {
+    if (!url) return null;
+    const key = hashUrl(url);
+    try {
+      const result = await chrome.storage.local.get(key);
+      const now = Date.now();
+
+      if (!result[key]) {
+        const entry = {
+          url: url.slice(0, 200),
+          premiere_visite: now,
+          derniere_visite: now,
+          surface: surface,
+          historique_prix: prix ? [{ prix, timestamp: now }] : []
+        };
+        await chrome.storage.local.set({ [key]: entry });
+        trackerLog.debug('Premiere visite pour ' + url.slice(0, 60));
+        return { jours_en_ligne: 0, nb_baisses_prix: 0, delta_premier_prix: null, historique: entry.historique_prix };
+      }
+
+      const entry = result[key];
+      entry.derniere_visite = now;
+      const lastPrix = entry.historique_prix.length > 0
+        ? entry.historique_prix[entry.historique_prix.length - 1].prix : null;
+      if (prix && prix !== lastPrix) {
+        entry.historique_prix.push({ prix, timestamp: now });
+        trackerLog.info('Changement de prix : ' + lastPrix + ' -> ' + prix);
+      }
+      if (entry.historique_prix.length > 20) {
+        entry.historique_prix = entry.historique_prix.slice(-20);
+      }
+      await chrome.storage.local.set({ [key]: entry });
+
+      const joursEnLigne = Math.floor((now - entry.premiere_visite) / (1000 * 60 * 60 * 24));
+      const premierPrix = entry.historique_prix.length > 0 ? entry.historique_prix[0].prix : null;
+      let nbBaisses = 0;
+      for (let i = 1; i < entry.historique_prix.length; i++) {
+        if (entry.historique_prix[i].prix < entry.historique_prix[i - 1].prix) nbBaisses++;
+      }
+      let deltaPremierPrix = null;
+      if (premierPrix && prix && premierPrix !== prix) deltaPremierPrix = prix - premierPrix;
+
+      return { jours_en_ligne: joursEnLigne, nb_baisses_prix: nbBaisses, delta_premier_prix: deltaPremierPrix, historique: entry.historique_prix };
+    } catch (err) {
+      trackerLog.error('Erreur tracker :', err);
+      return null;
+    }
+  }
+
+  self.__immodata.cache = {
+    trackAnnonceVisit,
+    hashUrl
+  };
+
 })();
