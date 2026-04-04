@@ -6,6 +6,14 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8501", "--directory", "P:\\CLAUDE CODE\\boomerang-v2"],
       "port": 8501
+    },
+    {
+      "name": "immodata",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true,
+      "cwd": "P:/CLAUDE CODE/immodata-insight-app"
     }
   ]
 }
