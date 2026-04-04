@@ -1138,48 +1138,68 @@
       dot.addEventListener('click', () => showSlide(i));
     });
 
-    // QuickView hover sur les listing cards (vivent hors du Shadow DOM)
+    // ============================================================
+    // QuickView — hover sur les listing cards (hors Shadow DOM)
+    // ============================================================
+    const QV_DATA = [
+      { title: 'Appart. 3p \u00b7 64m\u00b2', dpe: 'D', dpeColor: '#F59E0B', delta: -8, prixM2: '5 344', mediane: '5 812', score: 65, scoreColor: '#6C63FF', jours: 43 },
+      { title: 'Villa 5p \u00b7 143m\u00b2', dpe: 'C', dpeColor: '#22C55E', delta: +3, prixM2: '3 084', mediane: '2 995', score: 42, scoreColor: '#F59E0B', jours: 12 },
+      { title: 'Studio 1p \u00b7 28m\u00b2', dpe: 'E', dpeColor: '#EF4444', delta: -15, prixM2: '6 750', mediane: '7 941', score: 81, scoreColor: '#00D4AA', jours: 67 }
+    ];
+
+    function renderQvHtml(d) {
+      const sign = d.delta <= 0 ? '' : '+';
+      const badgeBg = d.delta <= 0 ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
+      const badgeColor = d.delta <= 0 ? '#22C55E' : '#EF4444';
+      const label = d.delta <= 0 ? 'sous le march\u00e9' : 'au-dessus march\u00e9';
+      return `
+        <div style="background:#0F0F11;border:1px solid rgba(255,255,255,0.07);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;font-family:'Inter','Segoe UI',system-ui,sans-serif;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);background:#1A1A1F;">
+            <span style="font-size:13px;font-weight:600;color:#F2F2F7;">&#127968; ${d.title}</span>
+            <span style="font-family:monospace;font-size:12px;font-weight:700;padding:1px 7px;border-radius:4px;background:${d.dpeColor}20;color:${d.dpeColor}">DPE ${d.dpe}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.07);">
+            <div style="background:#1A1A1F;padding:10px 14px;">
+              <div><span style="font-size:15px;font-weight:700;padding:2px 10px;border-radius:20px;background:${badgeBg};color:${badgeColor}">${sign}${d.delta}%</span></div>
+              <div style="font-size:10px;color:#5C5C6E;margin-top:4px;text-transform:uppercase;letter-spacing:0.06em">${label}</div>
+            </div>
+            <div style="background:#1A1A1F;padding:10px 14px;">
+              <div style="font-family:monospace;font-size:18px;font-weight:700;color:#F2F2F7;">${d.prixM2} \u20ac</div>
+              <div style="font-size:10px;color:#5C5C6E;margin-top:2px;text-transform:uppercase;letter-spacing:0.06em">prix/m\u00b2 \u00b7 m\u00e9d. ${d.mediane}</div>
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#1A1A1F;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">
+              <span style="font-size:10px;font-weight:600;color:#A0A0B0;text-transform:uppercase;letter-spacing:0.08em">N\u00e9gociation</span>
+              <span style="font-family:monospace;font-size:13px;font-weight:700;color:#F2F2F7;">${d.score}/100</span>
+            </div>
+            <div style="width:100%;height:5px;background:#2E2E36;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:${d.score}%;background:${d.scoreColor};border-radius:3px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#0F0F11;">
+            <span style="font-size:11px;color:#5C5C6E;">&#9201; En ligne : ${d.jours} jours</span>
+            <span style="font-size:11px;font-weight:700;color:#6C63FF;cursor:pointer;">Analyse compl\u00e8te \u2192</span>
+          </div>
+        </div>`;
+    }
+
     let qvTimeout = null;
-    const listingCards = document.querySelectorAll('.listing-card[data-qv]');
+    document.querySelectorAll('.listing-card[data-qv]').forEach(card => {
+      const idx = parseInt(card.getAttribute('data-qv'));
+      const popup = document.getElementById('qv-' + idx);
+      if (!popup || !QV_DATA[idx]) return;
 
-    listingCards.forEach(card => {
-      card.addEventListener('mouseenter', (e) => {
-        const idx = parseInt(card.getAttribute('data-qv'));
-        const data = QV_DATA[idx];
-        if (!data) return;
+      // Pre-render le contenu
+      popup.innerHTML = renderQvHtml(QV_DATA[idx]);
 
-        // Delai 300ms avant affichage (evite les survols accidentels)
-        qvTimeout = setTimeout(() => {
-          renderQV(data);
-
-          // Positionner le QV a droite de la card
-          const rect = card.getBoundingClientRect();
-          const qvWidth = 340;
-          let left = rect.right + 12;
-          let top = rect.top + (rect.height / 2);
-
-          // Si pas assez de place a droite (panel ImmoData), mettre a gauche
-          if (left + qvWidth > window.innerWidth - 400) {
-            left = rect.left - qvWidth - 12;
-          }
-          // Eviter de depasser en haut/bas
-          top = Math.max(20, Math.min(top, window.innerHeight - 220));
-
-          qv.style.left = left + 'px';
-          qv.style.top = top + 'px';
-          qv.classList.add('visible');
-        }, 300);
+      card.addEventListener('mouseenter', () => {
+        qvTimeout = setTimeout(() => { popup.classList.add('visible'); }, 300);
       });
-
       card.addEventListener('mouseleave', () => {
         clearTimeout(qvTimeout);
-        qv.classList.remove('visible');
+        popup.classList.remove('visible');
       });
-    });
-
-    // Fermer le QV si la souris entre dedans puis en sort
-    qv.addEventListener('mouseleave', () => {
-      qv.classList.remove('visible');
     });
   </script>
 
