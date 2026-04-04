@@ -108,10 +108,10 @@
   }
 
   // Exposer via globalThis
-  if (typeof window.__immodata === 'undefined') {
-    window.__immodata = {};
+  if (typeof self.__immodata === 'undefined') {
+    self.__immodata = {};
   }
-  window.__immodata.calculs = window.__immodata.calculs || {};
-  window.__immodata.calculs.negotiation = { calculerScoreNegociation, SCORE_LABELS };
+  self.__immodata.calculs = self.__immodata.calculs || {};
+  self.__immodata.calculs.negotiation = { calculerScoreNegociation, SCORE_LABELS };
 
 })();
