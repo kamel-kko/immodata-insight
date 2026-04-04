@@ -570,61 +570,63 @@
       <!-- Toggle tab -->
       <div class="idi-toggle-btn">${ICO.chevron_left}</div>
 
-      <!-- Header -->
-      <div class="idi-panel-header">
-        <div>
-          <div class="idi-panel-title">${ICO.home} ImmoData</div>
-          <div class="idi-panel-subtitle">3 pcs 64m² — Pau (64000)</div>
-        </div>
-        <div style="display:flex;gap:4px;">
-          <button class="idi-btn-icon" data-tooltip="Minimiser">${ICO.chevron_left}</button>
-          <button class="idi-btn-icon" data-tooltip="Fermer">${ICO.x}</button>
-        </div>
-      </div>
+      <!-- ZONE FIXE : header + pub + onglets (ne scroll jamais) -->
+      <div class="idi-panel-fixed">
 
-      <!-- Bande sponsor rotative -->
-      <div class="idi-sponsor-wrap">
-        <div class="idi-sponsor-band" id="sponsor-band">
-          <!-- Slide 1 : Pretto -->
-          <div class="idi-sponsor-slide active" data-url="#">
-            <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#6C63FF,#8B5CF6)">P</div>
-            <span class="idi-sponsor-name">Pretto</span>
-            <span class="idi-sponsor-msg">Taux des 3,2% — Simulation gratuite</span>
-            <span class="idi-sponsor-arrow">&#8250;</span>
+        <!-- Header compact -->
+        <div class="idi-panel-header">
+          <div>
+            <div class="idi-panel-title">${ICO.home} ImmoData</div>
+            <div class="idi-panel-subtitle">3 pcs 64m2 — Pau (64000)</div>
           </div>
-          <!-- Slide 2 : Habitissimo -->
-          <div class="idi-sponsor-slide" data-url="#">
-            <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#F59E0B,#F97316)">H</div>
-            <span class="idi-sponsor-name">Habitissimo</span>
-            <span class="idi-sponsor-msg">3 devis travaux gratuits en 24h</span>
-            <span class="idi-sponsor-arrow">&#8250;</span>
-          </div>
-          <!-- Slide 3 : Luko -->
-          <div class="idi-sponsor-slide" data-url="#">
-            <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#00D4AA,#059669)">L</div>
-            <span class="idi-sponsor-name">Luko</span>
-            <span class="idi-sponsor-msg">Assurance habitation des 3,30 EUR/mois</span>
-            <span class="idi-sponsor-arrow">&#8250;</span>
+          <div style="display:flex;gap:4px;">
+            <button class="idi-btn-icon">${ICO.chevron_left}</button>
+            <button class="idi-btn-icon">${ICO.x}</button>
           </div>
         </div>
-        <div class="idi-sponsor-dots" id="sponsor-dots">
-          <div class="idi-sponsor-dot active"></div>
-          <div class="idi-sponsor-dot"></div>
-          <div class="idi-sponsor-dot"></div>
+
+        <!-- Bande sponsor rotative -->
+        <div class="idi-sponsor-wrap">
+          <div class="idi-sponsor-band" id="sponsor-band">
+            <div class="idi-sponsor-slide active" data-url="#">
+              <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#6C63FF,#8B5CF6)">P</div>
+              <span class="idi-sponsor-name">Pretto</span>
+              <span class="idi-sponsor-msg">Taux des 3,2% — Simulation gratuite</span>
+              <span class="idi-sponsor-arrow">&#8250;</span>
+            </div>
+            <div class="idi-sponsor-slide" data-url="#">
+              <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#F59E0B,#F97316)">H</div>
+              <span class="idi-sponsor-name">Habitissimo</span>
+              <span class="idi-sponsor-msg">3 devis travaux gratuits en 24h</span>
+              <span class="idi-sponsor-arrow">&#8250;</span>
+            </div>
+            <div class="idi-sponsor-slide" data-url="#">
+              <div class="idi-sponsor-logo" style="background:linear-gradient(135deg,#00D4AA,#059669)">L</div>
+              <span class="idi-sponsor-name">Luko</span>
+              <span class="idi-sponsor-msg">Assurance habitation des 3,30 EUR/mois</span>
+              <span class="idi-sponsor-arrow">&#8250;</span>
+            </div>
+          </div>
+          <div class="idi-sponsor-dots" id="sponsor-dots">
+            <div class="idi-sponsor-dot active"></div>
+            <div class="idi-sponsor-dot"></div>
+            <div class="idi-sponsor-dot"></div>
+          </div>
+          <div class="idi-sponsor-mention">&#10022; Publicite — permet de garder ImmoData gratuit</div>
         </div>
-        <div class="idi-sponsor-mention">&#10022; Publicite — permet de garder ImmoData gratuit</div>
-      </div>
 
-      <!-- Onglets -->
-      <div class="idi-tabs">
-        <button class="idi-tab active">Finance</button>
-        <button class="idi-tab">Quartier</button>
-        <button class="idi-tab">Risques</button>
-        <button class="idi-tab">Investir</button>
-        <button class="idi-tab">Avenir</button>
-      </div>
+        <!-- Onglets -->
+        <div class="idi-tabs">
+          <button class="idi-tab active">Finance</button>
+          <button class="idi-tab">Quartier</button>
+          <button class="idi-tab">Risques</button>
+          <button class="idi-tab">Investir</button>
+          <button class="idi-tab">Avenir</button>
+        </div>
 
-      <!-- Contenu scrollable -->
+      </div><!-- fin zone fixe -->
+
+      <!-- ZONE SCROLLABLE : contenu des cartes -->
       <div class="idi-panel-body">
 
         <!-- ================================ -->
