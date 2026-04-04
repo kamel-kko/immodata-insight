@@ -166,6 +166,148 @@ async function purgeExpiredEntries(maxTtlDays) {
   }
 }
 
+// ============================================================
+// TRACKER D'ANNONCE — Historique de prix
+// ============================================================
+// A chaque visite d'une annonce, on enregistre le prix.
+// Si le prix change entre deux visites, on detecte une baisse
+// et on calcule combien de jours l'annonce est en ligne.
+//
+// Analogie : c'est comme un carnet ou tu notes le prix
+// d'un article a chaque fois que tu passes devant la vitrine.
+// Si le prix baisse, tu le vois tout de suite.
+
+/**
+ * Genere un hash simple d'une URL pour creer une cle de stockage courte.
+ * On ne stocke pas l'URL complete (trop long pour chrome.storage).
+ */
+function hashUrl(url) {
+  let hash = 0;
+  for (let i = 0; i < url.length; i++) {
+    const ch = url.charCodeAt(i);
+    hash = ((hash << 5) - hash) + ch;
+    hash |= 0;
+  }
+  return 'tracker_' + Math.abs(hash).toString(36);
+}
+
+/**
+ * Enregistre une visite sur une annonce.
+ * Si c'est la premiere visite, on cree l'entree.
+ * Si le prix a change, on ajoute une entree dans l'historique.
+ *
+ * @param {string} url - URL de l'annonce
+ * @param {number|null} prix - Prix actuel
+ * @param {number|null} surface - Surface en m2
+ * @returns {{ jours_en_ligne, nb_baisses_prix, delta_premier_prix, historique }}
+ */
+async function trackAnnonceVisit(url, prix, surface) {
+  if (!url) return null;
+  const key = hashUrl(url);
+
+  try {
+    const result = await chrome.storage.local.get(key);
+    const now = Date.now();
+
+    if (!result[key]) {
+      // Premiere visite : creer l'entree
+      const entry = {
+        url: url.slice(0, 200),
+        premiere_visite: now,
+        derniere_visite: now,
+        surface: surface,
+        historique_prix: prix ? [{ prix, timestamp: now }] : []
+      };
+      await chrome.storage.local.set({ [key]: entry });
+      log.debug('Tracker: premiere visite pour ' + url.slice(0, 60));
+      return {
+        jours_en_ligne: 0,
+        nb_baisses_prix: 0,
+        delta_premier_prix: null,
+        historique: entry.historique_prix
+      };
+    }
+
+    // Visite suivante : mettre a jour
+    const entry = result[key];
+    entry.derniere_visite = now;
+
+    // Ajouter au historique si le prix a change
+    const lastPrix = entry.historique_prix.length > 0
+      ? entry.historique_prix[entry.historique_prix.length - 1].prix
+      : null;
+
+    if (prix && prix !== lastPrix) {
+      entry.historique_prix.push({ prix, timestamp: now });
+      log.info('Tracker: changement de prix detecte — ' + lastPrix + ' -> ' + prix);
+    }
+
+    // Limiter l'historique a 20 entrees max
+    if (entry.historique_prix.length > 20) {
+      entry.historique_prix = entry.historique_prix.slice(-20);
+    }
+
+    await chrome.storage.local.set({ [key]: entry });
+
+    // Calculer les metriques
+    const joursEnLigne = Math.floor((now - entry.premiere_visite) / (1000 * 60 * 60 * 24));
+    const premierPrix = entry.historique_prix.length > 0 ? entry.historique_prix[0].prix : null;
+
+    // Compter les baisses de prix
+    let nbBaisses = 0;
+    for (let i = 1; i < entry.historique_prix.length; i++) {
+      if (entry.historique_prix[i].prix < entry.historique_prix[i - 1].prix) {
+        nbBaisses++;
+      }
+    }
+
+    // Delta par rapport au premier prix observe
+    let deltaPremierPrix = null;
+    if (premierPrix && prix && premierPrix !== prix) {
+      deltaPremierPrix = prix - premierPrix;
+    }
+
+    return {
+      jours_en_ligne: joursEnLigne,
+      nb_baisses_prix: nbBaisses,
+      delta_premier_prix: deltaPremierPrix,
+      historique: entry.historique_prix
+    };
+  } catch (err) {
+    log.error('Erreur tracker annonce :', err);
+    return null;
+  }
+}
+
+/**
+ * Recupere les donnees du tracker pour une annonce (sans enregistrer de visite).
+ * Utile pour afficher les infos sans re-tracker.
+ */
+async function getTrackerData(url) {
+  if (!url) return null;
+  const key = hashUrl(url);
+  try {
+    const result = await chrome.storage.local.get(key);
+    if (!result[key]) return null;
+    const entry = result[key];
+    const now = Date.now();
+    const joursEnLigne = Math.floor((now - entry.premiere_visite) / (1000 * 60 * 60 * 24));
+    let nbBaisses = 0;
+    for (let i = 1; i < entry.historique_prix.length; i++) {
+      if (entry.historique_prix[i].prix < entry.historique_prix[i - 1].prix) {
+        nbBaisses++;
+      }
+    }
+    return {
+      jours_en_ligne: joursEnLigne,
+      nb_baisses_prix: nbBaisses,
+      historique: entry.historique_prix
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
 if (typeof globalThis.__immodata === 'undefined') {
   globalThis.__immodata = {};
 }
@@ -175,7 +317,10 @@ globalThis.__immodata.cache = {
   clearCacheByPattern,
   getCacheStats,
   clearAllCache,
-  purgeExpiredEntries
+  purgeExpiredEntries,
+  trackAnnonceVisit,
+  getTrackerData,
+  hashUrl
 };
 
 export {
@@ -185,5 +330,8 @@ export {
   getCacheStats,
   clearAllCache,
   purgeExpiredEntries,
+  trackAnnonceVisit,
+  getTrackerData,
+  hashUrl,
   MAX_STORAGE_BYTES
 };
