@@ -19,7 +19,7 @@ type: project
 | 7 | Interface utilisateur | Validée | 2026-04-05 |
 | 8 | Affiliation & Tracker | Créée | 2026-04-05 |
 | 9 | Popup extension | Validée | 2026-04-05 |
-| 10 | Tests finaux & Optimisation | En cours | 2026-04-05 |
+| 10 | Tests finaux & Optimisation | Validee | 2026-04-05 |
 
 ## Décisions prises
 
