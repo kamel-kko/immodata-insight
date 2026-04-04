@@ -18,6 +18,15 @@ import { checkCache, setCache, purgeExpiredEntries } from './utils/cache.js';
 import { createDispatcher } from './utils/messageRouter.js';
 import { sanitizeUrl, validateLatLon, validatePostalCode } from './utils/security.js';
 
+// --- Imports des modules API ---
+import { handleFetchDvf } from './modules/api/dvf.js';
+import { handleFetchGeorisques } from './modules/api/georisques.js';
+
+// --- Imports des modules de calcul ---
+import { calculerFraisNotaire } from './modules/calculs/notaire.js';
+import { calculerScoreNegociation } from './modules/calculs/negotiation.js';
+import { calculerCoutTotal } from './modules/calculs/coutTotal.js';
+
 // --- Import de la config API ---
 // On ne peut pas importer du JSON directement en ES Module dans un SW Chrome,
 // donc on déclare la config en dur ici, identique à apis.json.
