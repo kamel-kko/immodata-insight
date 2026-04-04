@@ -175,9 +175,9 @@
     // Score de négociation
     const negoResult = await sendToBackground('CALC_NEGOTIATION', {
       delta_dvf: data.dvf ? data.dvf.delta_pct : null,
-      jours_en_ligne: null, // Sera rempli par le tracker (Étape 8)
+      jours_en_ligne: data.jours_en_ligne || null,
       urgence_texte: data.flags_regex ? data.flags_regex.urgent : false,
-      nb_photos: null, // Pas encore extrait
+      nb_photos: null,
       dpe: data.dpe
     });
     if (negoResult.success !== false) {
