@@ -14,8 +14,8 @@
 (function () {
   'use strict';
 
-  const log = window.__immodata.createLogger('EXTRACTOR');
-  const security = window.__immodata.security;
+  const log = self.__immodata.createLogger('EXTRACTOR');
+  const security = self.__immodata.security;
 
   // ============================================================
   // EXTRACTION PAR SÉLECTEURS MULTI-FALLBACK
@@ -205,7 +205,7 @@
   }
 
   // Exposer via globalThis
-  window.__immodata.extractors = {
+  self.__immodata.extractors = {
     extractText,
     parsePrice,
     parseSurface,
