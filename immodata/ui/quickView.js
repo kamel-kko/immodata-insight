@@ -24,6 +24,10 @@
   if (!self.__immodata) self.__immodata = {};
   if (!self.__immodata.ui) self.__immodata.ui = {};
 
+  const log = self.__immodata.createLogger
+    ? self.__immodata.createLogger('QUICKVIEW')
+    : { info: console.log, warn: console.warn, error: console.error, debug: console.debug };
+
   // ============================================================
   // CONFIG
   // ============================================================
