@@ -81,6 +81,26 @@
 
     log.info('Annonce scrapée, envoi au background pour enrichissement');
 
+    // Tracker d'annonce : enregistrer la visite et detecter les changements de prix
+    let trackerInfo = null;
+    if (self.__immodata.cache && self.__immodata.cache.trackAnnonceVisit) {
+      trackerInfo = await self.__immodata.cache.trackAnnonceVisit(
+        data.url_annonce, data.prix, data.surface
+      );
+      if (trackerInfo) {
+        data.jours_en_ligne = trackerInfo.jours_en_ligne;
+        data.nb_baisses_prix = trackerInfo.nb_baisses_prix;
+        data.delta_premier_prix = trackerInfo.delta_premier_prix;
+        data.historique_prix = trackerInfo.historique;
+        log.info(`Tracker: en ligne ${trackerInfo.jours_en_ligne}j, ${trackerInfo.nb_baisses_prix} baisse(s)`);
+      }
+    }
+
+    // Analytics : compter l'annonce analysee
+    if (self.__immodata.affiliation && self.__immodata.affiliation.analytics) {
+      self.__immodata.affiliation.analytics.trackAnnonceAnalysee();
+    }
+
     // Étape 1 : Géocodage BAN (nécessaire pour toutes les APIs suivantes)
     if (data.adresse_brute || data.cp || data.ville) {
       const banResult = await sendToBackground('FETCH_BAN', {
