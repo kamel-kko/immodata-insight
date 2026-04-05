@@ -110,6 +110,20 @@
     // Borner entre 0 et 100
     score = Math.max(0, Math.min(score, 100));
 
+    // Detecter si on n'a eu aucune donnee exploitable
+    // (tous les facteurs a 0 = rien a analyser, pas "bonne affaire")
+    const hasData = detail.delta_dvf > 0 || detail.duree_ligne > 0
+      || detail.urgence_texte > 0 || detail.nb_photos > 0 || detail.dpe_mauvais > 0;
+
+    if (!hasData) {
+      return {
+        score: null,
+        label: NO_DATA_LABEL,
+        couleur: 'grey',
+        detail
+      };
+    }
+
     // Trouver le label et la couleur
     const tranche = SCORE_LABELS.find(t => score >= t.min && score <= t.max) || SCORE_LABELS[0];
 
