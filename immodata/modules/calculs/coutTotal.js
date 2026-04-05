@@ -95,13 +95,15 @@
     const mensualiteCredit = Math.round(calcMensualiteCredit(capitalEmprunte, taux_credit, duree_credit));
 
     // 2. Taxe foncière mensuelle
-    // Si connue (extraite de l'annonce), on l'utilise
-    // Sinon, estimation à 1,2% de la valeur du bien par an
+    // Priorité 1 : valeur scrapée depuis l'annonce (montant annuel / 12)
+    // Priorité 2 : estimation à 0,55% du prix par an (taux moyen France maison)
+    // L'ancien taux de 1,2% était trop élevé — le taux réel moyen
+    // en France est entre 0,5% et 0,8% selon la commune.
     let taxeFonciereMensuelle;
     if (taxe_fonciere && taxe_fonciere > 0) {
       taxeFonciereMensuelle = Math.round(taxe_fonciere / 12);
     } else {
-      taxeFonciereMensuelle = Math.round((prix * 0.012) / 12);
+      taxeFonciereMensuelle = Math.round((prix * 0.0055) / 12);
     }
 
     // 3. Charges de copropriété (uniquement pour les appartements)
