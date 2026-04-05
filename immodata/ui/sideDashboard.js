@@ -175,7 +175,7 @@
             <span class="bento-label">Score de n\u00e9gociation</span>
           </div>
           <div class="bento-value bento-value-lg">${negoScore !== null ? negoScore : '—'}<span style="font-size:16px;color:var(--idi-text-2)">/100</span></div>
-          <div style="font-size:11px;color:var(--idi-text-2);margin-top:4px;">${negoLabel}</div>
+          <div style="font-size:11px;color:var(--idi-text-${negoScore !== null ? '2' : '3'});margin-top:4px;">${negoLabel}</div>
           ${negoScore !== null ? `<div class="idi-score-bar"><div class="idi-score-bar-fill animate" style="width:${negoScore}%;background:${scoreBarColor(negoScore)}"></div></div>` : ''}
         </div>
 
