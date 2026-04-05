@@ -358,7 +358,7 @@
       ? geo.risques.slice(0, 5).map(r =>
           `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
             <span style="color:var(--idi-danger);font-size:14px;flex-shrink:0;">\u26a0</span>
-            <span style="font-size:12px;color:var(--idi-text-1)">${r.libelle || r.type || r}</span>
+            <span style="font-size:12px;color:var(--idi-text-1)">${escHtml(r.libelle || r.type || r)}</span>
           </div>`
         ).join('')
       : '';
