@@ -28,6 +28,9 @@
     { min: 76, max: 100, label: 'Surévalué — marge estimée 12-20%',     couleur: 'red-double' }
   ];
 
+  // Label special quand on n'a aucune donnee pour calculer
+  const NO_DATA_LABEL = 'Données insuffisantes pour évaluer';
+
   /**
    * Calcule le score de négociation.
    *
