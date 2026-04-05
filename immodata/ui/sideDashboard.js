@@ -464,7 +464,7 @@
             <span class="bento-icon">${ICONS.clock || ''}</span>
             <span class="bento-label">D\u00e9lai vente m\u00e9dian</span>
           </div>
-          <div class="bento-value" style="font-size:18px;">${delaiVente} j</div>
+          <div class="bento-value" style="font-size:18px;">${liq ? delaiVente + ' j' : '—'}</div>
         </div>
 
         <!-- Zones -->
