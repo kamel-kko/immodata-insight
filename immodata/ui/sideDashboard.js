@@ -254,7 +254,7 @@
     const transports = ov && ov.transports
       ? ov.transports.slice(0, 5).map(t =>
           `<div style="display:flex;justify-content:space-between;padding:3px 0;">
-            <span style="font-size:12px;color:var(--idi-text-1)">${t.name || t.type}</span>
+            <span style="font-size:12px;color:var(--idi-text-1)">${escHtml(t.name || t.type)}</span>
             <span style="font-size:11px;color:var(--idi-text-3)">${t.distance ? t.distance + 'm' : ''}</span>
           </div>`
         ).join('')
@@ -268,7 +268,7 @@
     const ecoles = edu && edu.etablissements
       ? edu.etablissements.slice(0, 4).map(e =>
           `<div style="display:flex;justify-content:space-between;padding:3px 0;">
-            <span style="font-size:12px;color:var(--idi-text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${e.nom || e.type}</span>
+            <span style="font-size:12px;color:var(--idi-text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${escHtml(e.nom || e.type)}</span>
             <span style="font-size:11px;color:var(--idi-text-3)">${e.distance ? e.distance + 'm' : ''}</span>
           </div>`
         ).join('')
