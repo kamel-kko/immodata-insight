@@ -132,11 +132,12 @@
         })()
       : '';
 
-    // CTP details
+    // CTP details — les postes sont dans detail_postes (pas au premier niveau)
+    const postes = ctp ? ctp.detail_postes : null;
     const credit = ctp ? fmtEur(ctp.mensualite_credit) : '—';
-    const taxeF = ctp ? fmtEur(Math.round(ctp.taxe_fonciere / 12)) : '—';
-    const copro = ctp ? fmtEur(ctp.charges_copro) : '—';
-    const energie = ctp ? fmtEur(ctp.cout_energie) : '—';
+    const taxeF = postes ? fmtEur(postes.taxe_fonciere) : '—';
+    const copro = postes ? fmtEur(postes.charges_copro) : '—';
+    const energie = postes ? fmtEur(postes.energie) : '—';
 
     // Frais notaire
     const notaireVal = notaire ? fmtEur(notaire.frais_median) : '—';
