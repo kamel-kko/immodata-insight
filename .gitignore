@@ -1,0 +1,15 @@
+# Binaires
+*.exe
+
+# Node modules (gstack skills)
+.claude/skills/gstack/node_modules/
+.claude/skills/gstack/browse/dist/
+
+# Fichiers temporaires
+test.html
+start-preview.sh
+*.zip
+
+# OS
+Thumbs.db
+.DS_Store
