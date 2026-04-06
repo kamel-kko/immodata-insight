@@ -13,3 +13,4 @@ start-preview.sh
 # OS
 Thumbs.db
 .DS_Store
+.claude/worktrees/
